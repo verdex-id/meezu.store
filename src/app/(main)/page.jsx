@@ -6,7 +6,7 @@ export default function Home() {
     <>
       <div className="w-full max-w-screen-xl mx-auto px-8 text-white space-y-64 pb-96">
         <div id="hero" className="text-center mt-16 space-y-8">
-          <h1 className="font-bold text-[128px] leading-none">
+          <h1 className="font-bold text-4xl md:text-[128px] leading-none">
             Consistency is A Key
           </h1>
           <h2>
@@ -28,7 +28,7 @@ export default function Home() {
           </div>
         </div>
         <div id="about">
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
               primaryBg={"bg-pink-400"}
               secondaryBg={"bg-pink-300"}
@@ -42,8 +42,8 @@ export default function Home() {
                 hendrerit netus eu.
               </p>
             </Card>
-            <div>
-              <h1 className="font-bold text-[125px] leading-none">
+            <div className="mt-16 md:mt-0">
+              <h1 className="font-bold text-4xl md:text-[125px] leading-none">
                 LOGO AKUDAV
               </h1>
               <h2>
