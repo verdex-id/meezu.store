@@ -1,23 +1,59 @@
-import Link from "next/link";
+import Button from "@/components/button";
+import Card from "@/components/card";
 
 export default function Home() {
   return (
     <>
-      <div className="w-full max-w-screen-xl mx-auto">
-        <div className="flex items-center justify-center w-full text-center">
-          <div className="mt-[200px]">
-            <h1 className="font-black text-6xl">MEEZUSTORE</h1>
-            <h2 className="font-medium text-xl">Under Development</h2>
-            <p>
-              this project is maintained by{" "}
-              <Link
-                href={"https://verdex.id"}
-                target="_blank"
-                className="px-3 bg-blue-950 text-white font-bold"
-              >
-                verdex.id
-              </Link>
-            </p>
+      <div className="w-full max-w-screen-xl mx-auto px-8 text-white space-y-64 pb-96">
+        <div id="hero" className="text-center mt-16 space-y-8">
+          <h1 className="font-bold text-[128px] leading-none">
+            Consistency is A Key
+          </h1>
+          <h2>
+            Lorem ipsum dolor sit amet consectetur. Tincidunt quam risus neque
+            quam laoreet. Ac quis neque ut cras velit. Porta et malesuada neque
+            rhoncus porttitor. Sapien dictum vitae lectus diam eget.
+          </h2>
+          <div className="flex items-center gap-4 justify-center">
+            <Button
+              type={2}
+              href={"https://youtube.com/akudav"}
+              target={"_blank"}
+            >
+              YouTube
+            </Button>
+            <Button type={2} href={"/merch"}>
+              Merchandise
+            </Button>
+          </div>
+        </div>
+        <div id="about">
+          <div className="grid grid-cols-2">
+            <Card
+              primaryBg={"bg-pink-400"}
+              secondaryBg={"bg-pink-300"}
+              className={"max-w-md mx-auto text-xl"}
+            >
+              <p>
+                Lorem ipsum dolor sit amet consectetur. Sit convallis aliquet
+                adipiscing accumsan cras amet integer ut porttitor. Nulla
+                consequat ut egestas nulla iaculis urna a quis. Mauris vel
+                habitant varius consequat ipsum aliquam. Quis dui egestas
+                hendrerit netus eu.
+              </p>
+            </Card>
+            <div>
+              <h1 className="font-bold text-[125px] leading-none">
+                LOGO AKUDAV
+              </h1>
+              <h2>
+                Lorem ipsum dolor sit amet consectetur. Sit convallis aliquet
+                adipiscing accumsan cras amet integer ut porttitor. Nulla
+                consequat ut egestas nulla iaculis urna a quis. Mauris vel
+                habitant varius consequat ipsum aliquam. Quis dui egestas
+                hendrerit netus eu.
+              </h2>
+            </div>
           </div>
         </div>
       </div>
