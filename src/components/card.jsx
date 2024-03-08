@@ -1,18 +1,47 @@
-export default function Card({ primaryBg, secondaryBg, children, className }) {
+import Image from "next/image";
+
+export default function Card({
+  children,
+  image,
+  title,
+  price,
+  discountPrice,
+  sold,
+  product,
+  ...props
+}) {
   return (
     <>
-      <div
-        className={`relative p-16 flex items-center justify-center ${className}`}
-      >
-        <div className="z-10">{children}</div>
-        <div className="absolute top-0 left-0 w-full h-full -z-10">
-          <div className={`${primaryBg} w-full h-full`}></div>
-        </div>
-        <div className="absolute top-0 left-0 w-full h-full px-4 -z-20">
-          <div className={`${secondaryBg} w-full h-full -translate-y-4`}></div>
-        </div>
-        <div className="absolute bottom-0 left-0 w-full h-full px-4 -z-20">
-          <div className={`${secondaryBg} w-full h-full translate-y-4`}></div>
+      <div className="bg-white p-5 max-w-sm mx-auto" {...props}>
+        <div className="flex flex-col justify-between h-full">
+          <div>
+            <div>
+              <Image
+                src={image}
+                width={1080}
+                height={1080}
+                className="h-[400px]"
+              />
+            </div>
+            <div className="space-y-1">
+              <h1 className="font-bold">{title}</h1>
+              <p
+                className={`${
+                  discountPrice != undefined &&
+                  "line-through text-sm text-pink-600/80"
+                } text-xl`}
+              >
+                Rp{price}
+              </p>
+              {discountPrice && <p className="text-xl">Rp{discountPrice}</p>}
+              <div>{children}</div>
+              <p className="text-pink-600/70">Terjual {sold} kali</p>
+            </div>
+          </div>
+          <div className="space-y-4 mt-5">
+            <button className="p-3 w-full bg-pink-300">ADD TO CART</button>
+            <button className="p-3 w-full bg-cyan-300">CHECKOUT</button>
+          </div>
         </div>
       </div>
     </>
