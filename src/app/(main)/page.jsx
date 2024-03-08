@@ -1,5 +1,5 @@
 import Button from "@/components/button";
-import Card from "@/components/card";
+import Box from "@/components/box";
 
 export default function Home() {
   return (
@@ -29,7 +29,7 @@ export default function Home() {
         </div>
         <div id="about">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card
+            <Box
               primaryBg={"bg-pink-400"}
               secondaryBg={"bg-pink-300"}
               className={"max-w-md mx-auto text-xl"}
@@ -41,7 +41,7 @@ export default function Home() {
                 habitant varius consequat ipsum aliquam. Quis dui egestas
                 hendrerit netus eu.
               </p>
-            </Card>
+            </Box>
             <div className="mt-16 md:mt-0">
               <h1 className="font-bold text-4xl md:text-[125px] leading-none">
                 LOGO AKUDAV
