@@ -2,6 +2,7 @@ import Button from "@/components/button";
 import Card from "@/components/card";
 import Input from "@/components/input";
 import Select from "@/components/select";
+import CartIcon from "@/icons/cart";
 
 export default function Test() {
   return (
