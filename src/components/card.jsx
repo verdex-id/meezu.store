@@ -20,7 +20,7 @@ export default function Card({
                 src={image}
                 width={1080}
                 height={1080}
-                className="h-[400px]"
+                className="h-[400px] object-contain"
               />
             </div>
             <div className="space-y-1">
