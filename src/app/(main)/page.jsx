@@ -57,12 +57,8 @@ export default function Home() {
           </div>
         </div>
         <div id="add_merch">
-          <h1 className="text-center font-bold text-6xl p-2">Dapatkan Merchandise</h1>
-          <h1 className="text-center font-bold text-6xl p-2">Dari Lorem Ipsum Der Silit</h1>
-          <h1 className="text-center font-bold text-6xl p-2">Ast Lorem Ipsum</h1>
-
-          <p className="text-center p-8 text-lg">Lorem ipsum dolor sit amet consectetur. Tincidunt quam risus neque quam laoreet. Ac quis neque ut cras velit. Porta et malesuada neque rhoncus porttitor. Sapien dictum vitae lectus diam eget.</p>
-
+          <h1 className="text-center font-bold text-3xl sm:text-4xl lg:text-6xl p-2">Dapatkan Merchandise Dari Lorem Ipsum Der Silit Ast Lorem Ipsum</h1>
+          <p className="text-center p-6 text-lg">Lorem ipsum dolor sit amet consectetur. Tincidunt quam risus neque quam laoreet. Ac quis neque ut cras velit. Porta et malesuada neque rhoncus porttitor. Sapien dictum vitae lectus diam eget.</p>
           <div className="flex flex-row justify-center">
             <Button type={2}>Merchandise</Button>
           </div>
