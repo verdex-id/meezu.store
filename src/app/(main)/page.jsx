@@ -4,7 +4,7 @@ import Box from "@/components/box";
 export default function Home() {
   return (
     <>
-      <div className="w-full max-w-screen-xl mx-auto px-8 text-white space-y-64 pb-96">
+      <div className="w-full max-w-screen-xl mx-auto px-8 text-cyan-900 space-y-64 pb-96">
         <div id="hero" className="text-center mt-16 space-y-8">
           <h1 className="font-bold text-4xl md:text-[128px] leading-none">
             Consistency is A Key
@@ -32,7 +32,7 @@ export default function Home() {
             <Box
               primaryBg={"bg-pink-400"}
               secondaryBg={"bg-pink-300"}
-              className={"max-w-md mx-auto text-xl"}
+              className={"max-w-md mx-auto text-xl text-white"}
             >
               <p>
                 Lorem ipsum dolor sit amet consectetur. Sit convallis aliquet
