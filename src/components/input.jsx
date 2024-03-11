@@ -13,7 +13,7 @@ export default function Input({
       <div className={`group relative ${wrapperClassName}`}>
         <label
           htmlFor={id}
-          className="font-bold text-2xl text-white group-focus-within:text-yellow-200"
+          className="font-bold text-2xl text-cyan-900 group-focus-within:text-yellow-200"
         >
           {title}
         </label>

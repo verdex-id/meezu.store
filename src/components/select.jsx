@@ -6,7 +6,7 @@ export default function Select({ id, name, title, type, children, ...props }) {
       <div className="group" {...props}>
         <label
           htmlFor={id}
-          className="font-bold text-2xl text-white group-focus-within:text-yellow-200"
+          className="font-bold text-2xl text-cyan-900 group-focus-within:text-yellow-200"
         >
           {title}
         </label>

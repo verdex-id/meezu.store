@@ -55,8 +55,8 @@ export default function CheckoutPage(){
                         </div>
                        
                     </div>
-                    <div className="mt-8 border-y-4">
-                        <div className=" mt-8">
+                    <div className="mt-8 ">
+                             <div className=" mt-8">
                                 {/* input Nama */}
                                 <Input
                                 type={"text"}
@@ -82,7 +82,7 @@ export default function CheckoutPage(){
                    
                 </div>
                
-                <div className="mt-8 border-y-4">
+                <div className="mt-8 border-y-4 border-cyan-900">
                     {/* select Provinsi */}
                     <div className="w-full mt-8  ">
                         <Select title={"Provinsi"}>
@@ -133,21 +133,18 @@ export default function CheckoutPage(){
                 </div>
                 {/* Opsi Pembayaran */}
                 <div className="mt-8 mb-8 ">
-                    <h1 className="font-bold text-3xl text-white mt-8">Metode Pembayaran</h1>
+                    <h1 className="font-bold text-3xl text- mt-8 text-cyan-900">Metode Pembayaran</h1>
                     <div className="flex flex-wrap justify-start gap-6 mt-4  ">
                         {paymentOptions.map((payment) => (
                         <button
                             key={payment.id}
-                            className={`p-8 bg-pink-300 ${
-                            selectedPayment === payment.id ? 'bg-pink-500' : ''
-                            }`}
-                            onClick={() => handleClick(payment.id)}
+                            className={`p-8 bg-cyan-50 `}
                         >
                             {payment.label}
                         </button>
                         ))}
                     </div>
-                    <div className="flex justify-end border-y-4 mt-8 p-8">
+                    <div className="flex justify-end border-y-4 border-cyan-900 mt-8 p-8">
                         <div className="">
                             <Button type={2}>CHECKOUT !</Button>
 
