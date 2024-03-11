@@ -2,14 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Delete Select Icon */
 select {
-  /* for Firefox */
   -moz-appearance: none;
-  /* for Chrome */
   -webkit-appearance: none;
 }
-
-/* For IE10 */
 select::-ms-expand {
   display: none;
+}
+
+/* Delete Scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

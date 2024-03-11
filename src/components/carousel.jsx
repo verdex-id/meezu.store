@@ -4,7 +4,7 @@ export default function Carousel({ data, ...props }) {
   return (
     <>
       <div
-        className="flex gap-2 md:gap-4 lg:gap-8 overflow-x-scroll"
+        className="flex gap-2 md:gap-4 lg:gap-8 overflow-x-scroll hide-scrollbar"
         {...props}
       >
         {data.map((d, i) => (

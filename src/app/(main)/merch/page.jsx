@@ -43,6 +43,14 @@ export default function MerchPage() {
       image: "https://pbs.twimg.com/media/Fzrhw0baQAATx_a.jpg:large",
     },
   ]);
+  const [filteredProducts, setFilteredProducts] = useState(products);
+
+  function handleSearch(event) {
+    const filter = products.filter((p) =>
+      p.title.toLowerCase().includes(event.target.value.toLowerCase())
+    );
+    setFilteredProducts(filter);
+  }
 
   return (
     <>
@@ -57,11 +65,12 @@ export default function MerchPage() {
               type={"text"}
               placeholder="Search..."
               icon={<SearchIcon className="w-6 text-black" />}
+              onChange={handleSearch}
             />
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-          {products.map((product, i) => (
+          {filteredProducts.map((product, i) => (
             <>
               <Card
                 image={product.image}
