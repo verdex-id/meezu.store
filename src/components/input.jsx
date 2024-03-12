@@ -11,10 +11,7 @@ export default function Input({
   return (
     <>
       <div className={`group relative ${wrapperClassName}`}>
-        <label
-          htmlFor={id}
-          className="font-bold text-2xl text-white group-focus-within:text-yellow-200"
-        >
+        <label htmlFor={id} className="font-bold text-2xl">
           {title}
         </label>
         {type == "textarea" ? (
@@ -24,7 +21,7 @@ export default function Input({
               id={id}
               name={name}
               rows={5}
-              className={`p-5 mt-1 outline-none bg-white w-full text-black/70 ${className}`}
+              className={`p-5 mt-1 outline-none bg-white w-full text-black/70 border-l-4 border-white focus:border-cyan-900 ${className}`}
               {...props}
             />
           </>
@@ -34,7 +31,7 @@ export default function Input({
               type={type}
               id={id}
               name={name}
-              className={`p-5 mt-1 outline-none bg-white w-full text-black/70 ${className}`}
+              className={`p-5 mt-1 outline-none bg-white w-full text-black/70 border-l-4 border-white focus:border-cyan-900 ${className}`}
               {...props}
             />
           </>
