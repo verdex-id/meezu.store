@@ -16,21 +16,21 @@ datasource db {
 
 model ProductCategory {
   id               Int              @id @default(autoincrement())
-  product_category_slug String @db.VarChar(50)
-  product_category_name String @db.VarChar(50)
+  product_category_slug String @db.VarChar(50) @unique
+  product_category_name String @db.VarChar(50) @unique
 
   products Product[]
 }
 
 model Product {
   id               Int              @id @default(autoincrement())
-  product_slug             String @db.VarChar(70)
-  product_name             String @db.VarChar(70)
+  product_slug             String @db.VarChar(70) @unique
+  product_name             String @db.VarChar(70) @unique
   product_description      String @db.VarChar(2000) 
   product_category ProductCategory @relation(fields: [product_category_id], references: [id])
   product_category_id      Int
-  product_discount ProductDiscount[] @relation(name: "ProductToProductDiscount")
-  product_iteration  ProductIteration[] @relation(name: "ProductToProductIteration")
+  product_discounts ProductDiscount[] @relation(name: "ProductToProductDiscount")
+  product_iterations  ProductIteration[] @relation(name: "ProductToProductIteration")
 }
 
 model ProductIteration {
@@ -57,13 +57,13 @@ model ProductVariantMapping {
 model VariantType {
   id             Int            @id @default(autoincrement())
   variant_type_name String @db.VarChar(30)
-  variant Variant[]
+  variants Variant[]
 }
 
 model Variant {
   id             Int            @id @default(autoincrement())
-  variant_slug String @db.VarChar(15)
-  variant_name String @db.VarChar(15)
+  variant_slug String @db.VarChar(15) @unique
+  variant_name String @db.VarChar(15) @unique
   varian_type VariantType @relation(fields: [varian_type_id], references: [id])
   varian_type_id Int
   product_variant_mapping ProductVariantMapping[]
@@ -124,7 +124,7 @@ model Order {
   order_status String @db.VarChar(50)
   discount_amount Int      @db.UnsignedMediumInt
 
-  order_item  OrderItem[] @relation(name: "OrderToOrderItem")
+  order_items  OrderItem[] @relation(name: "OrderToOrderItem")
   guest_order GuestOrder? @relation(name: "GuestOrderToOrder")
   invoice     Invoice?    @relation(name: "InvoiceToOrder")
   shipment Shipment?
@@ -155,7 +155,7 @@ model Shipment {
 
 model CourierCompany {
   id        Int       @id @default(autoincrement())
-  courier_company_name String
+  courier_company_name String @unique
 
 
   courier_services CourierService[]
@@ -169,7 +169,7 @@ model CourierService {
   courier_company CourierCompany @relation(fields: [courier_company_id], references: [id])
   courier_company_id Int
 
-  shipment Shipment[]
+  shipments Shipment[]
 }
 
 
@@ -247,4 +247,5 @@ model Session {
   admin        Admin?   @relation(fields: [admin_id], references: [id])
   admin_id      String?
 }
+
 
