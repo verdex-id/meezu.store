@@ -1,9 +1,11 @@
+import Review from "@/components/review";
+
 export default function MerchDetail() {
   return (
     <>
       <div className="w-full max-w-screen-xl mx-auto px-8 mt-5 pb-96">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="grid grid-cols-2 gap-2 max-w-sm">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-2 max-w-lg">
             <div className="w-full col-span-2 aspect-video bg-pink-300"></div>
             <div className="w-full aspect-square bg-pink-300"></div>
             <div className="w-full aspect-square bg-pink-300"></div>
@@ -31,10 +33,21 @@ export default function MerchDetail() {
             </div>
           </div>
         </div>
-        <div className="mt-5">
-          <h1 className="font-baloo font-bold">Ulasan</h1>
+        <div className="mt-16">
+          <h1 className="font-baloo font-semibold text-3xl">Ulasan</h1>
           <p>Total 5 ulasan</p>
-          <hr className="border-2 border-cyan-900 my-5" />
+          <hr className="border-2 border-cyan-900 my-3" />
+          <div>
+            <Review
+              date={"14 Maret 2024"}
+              nama={"Agil Ghani Istikmal"}
+              rating={5}
+              ulasan={"Mantap bosque"}
+              profilePicture={
+                "https://upload.wikimedia.org/wikipedia/commons/c/c4/Mark_Zuckerberg_F8_2018_Keynote_%28cropped%29.jpg"
+              }
+            />
+          </div>
         </div>
       </div>
     </>

@@ -10,7 +10,7 @@ export default function Navbar() {
   const pathname = usePathname();
   return (
     <>
-      <div className="flex justify-between items-center w-full max-w-screen-xl p-5 mx-auto border-b-4 border-white">
+      <div className="flex justify-between items-center w-full max-w-screen-xl p-5 mx-auto border-b-4 border-white font-baloo">
         <div>
           <Link href={"/"}>
             <Image src={"/logo/akudav.png"} width={100} height={100} />
