@@ -38,6 +38,10 @@ module.exports = {
           900: "#592132"
         }
       },
+      fontFamily: {
+        fredoka: "var(--font-fredoka)",
+        baloo: "var(--font-baloo)"
+      }
     },
   },
   plugins: [],
