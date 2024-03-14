@@ -1,3 +1,5 @@
+import Review from "@/components/review";
+
 export default function MerchDetail() {
   return (
     <>
@@ -35,6 +37,14 @@ export default function MerchDetail() {
           <h1 className="font-baloo font-bold">Ulasan</h1>
           <p>Total 5 ulasan</p>
           <hr className="border-2 border-cyan-900 my-5" />
+          <div>
+            <Review
+              date={"14 Maret 2024"}
+              nama={"Agil Ghani Istikmal"}
+              rating={5}
+              ulasan={"Mantap bosque"}
+            />
+          </div>
         </div>
       </div>
     </>
