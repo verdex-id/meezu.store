@@ -18,8 +18,10 @@ export default function Review({ profilePicture, nama, rating, ulasan, date }) {
           <div className="flex-grow ">
             <h1 className="font-bold text-3xl text-cyan-900">{nama}</h1>
             <div className=" mx-auto mt-4 inline-flex gap-4">
-              {[...Array(rating)].map(() => (
-                <StarIcon />
+              {[...Array(rating)].map((_, i) => (
+                <div key={i}>
+                  <StarIcon />
+                </div>
               ))}
             </div>
             <p className="mt-4">{ulasan}</p>
