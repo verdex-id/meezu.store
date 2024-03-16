@@ -51,7 +51,7 @@ model ProductVariantMapping {
   product_iteration_id Int
   variant Variant @relation(fields: [variant_id], references: [id])
   variant_id Int
-
+  @@unique([product_iteration_id, variant_id])
 }
 
 model VariantType {
@@ -247,5 +247,6 @@ model Session {
   admin        Admin?   @relation(fields: [admin_id], references: [id])
   admin_id      String?
 }
+
 
 
