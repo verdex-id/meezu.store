@@ -56,7 +56,7 @@ model ProductVariantMapping {
 
 model VariantType {
   id             Int  @unique          @id @default(autoincrement())
-  variant_type_name String @db.VarChar(30)
+  variant_type_name String @db.VarChar(30) @unique
   variants Variant[]
 }
 
