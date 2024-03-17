@@ -192,6 +192,7 @@ model Discount {
   maximum_discount_amount      Int                    @db.UnsignedMediumInt
   is_limited                   Boolean
   usage_limits                 Int                    @db.UnsignedSmallInt
+  number_of_uses               Int                    @db.UnsignedSmallInt
   product_discount             ProductDiscount        @relation(name: "DiscountToProductDiscount", fields: [product_discount_id], references: [product_discount_id])
   product_discount_id          Int                    @unique
   threshold_discount           ThresholdDiscount      @relation(name: "DiscountToThresholdDiscount", fields: [threshold_discount_id], references: [threshold_discount_id])
@@ -247,3 +248,7 @@ model Session {
   admin        Admin?   @relation(fields: [admin_id], references: [admin_id])
   admin_id      String?
 }
+
+
+
+
