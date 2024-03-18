@@ -4,7 +4,7 @@ import Card from "@/components/card";
 import Carousel from "@/components/carousel";
 import Input from "@/components/input";
 import SearchIcon from "@/icons/search";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MerchPage() {
   const [carousel, setCarousel] = useState([
