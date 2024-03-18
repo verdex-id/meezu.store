@@ -20,7 +20,7 @@ export default function Card({
                 src={image}
                 width={1080}
                 height={1080}
-                className="h-[400px]"
+                className="h-[400px] object-contain"
               />
             </div>
             <div className="space-y-1">
@@ -31,16 +31,24 @@ export default function Card({
                   "line-through text-sm text-pink-600/80"
                 } text-xl`}
               >
-                Rp{price}
+                Rp{Intl.NumberFormat("id-ID").format(price)}
               </p>
-              {discountPrice && <p className="text-xl">Rp{discountPrice}</p>}
+              {discountPrice && (
+                <p className="text-xl">
+                  Rp{Intl.NumberFormat("id-ID").format(discountPrice)}
+                </p>
+              )}
               <div>{children}</div>
               <p className="text-pink-600/70">Terjual {sold} kali</p>
             </div>
           </div>
           <div className="space-y-4 mt-5">
-            <button className="p-3 w-full bg-pink-300">ADD TO CART</button>
-            <button className="p-3 w-full bg-cyan-300">CHECKOUT</button>
+            <button className="p-3 w-full bg-pink-300 text-white">
+              ADD TO CART
+            </button>
+            <button className="p-3 w-full bg-cyan-400 text-white">
+              CHECKOUT
+            </button>
           </div>
         </div>
       </div>

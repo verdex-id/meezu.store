@@ -2,14 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-select {
-  /* for Firefox */
-  -moz-appearance: none;
-  /* for Chrome */
-  -webkit-appearance: none;
+@font-face {
+  font-family: "Custom-1";
+  src: url("/public/fonts/Fredoka-Regular.ttf");
 }
 
-/* For IE10 */
+/* Delete Select Icon */
+select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+}
 select::-ms-expand {
   display: none;
+}
+
+/* Delete Scrollbar */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
