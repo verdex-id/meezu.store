@@ -10,10 +10,10 @@ export default function Home() {
             Consistency is A Key
           </h1>
           <h2>
-            Lorem ipsum dolor sit amet consectetur. Tincidunt quam risus neque
-            quam laoreet. Ac quis neque ut cras velit. Porta et malesuada neque
-            rhoncus porttitor. Sapien dictum vitae lectus diam eget.
+            Hallo Davengers! <br />
+            Ayo berjelajah dan miliki merchandise resmi AKUDAV di Meezu Store!
           </h2>
+          
           <div className="flex items-center gap-4 justify-center">
             <Button
               type={2}
@@ -32,41 +32,72 @@ export default function Home() {
             <Box
               primaryBg={"bg-pink-400"}
               secondaryBg={"bg-pink-300"}
-              className={"max-w-md mx-auto text-xl text-white"}
+              className={"max-w-md mx-auto text-xl text-white mt-16"}
             >
-              <p>
-                Lorem ipsum dolor sit amet consectetur. Sit convallis aliquet
-                adipiscing accumsan cras amet integer ut porttitor. Nulla
-                consequat ut egestas nulla iaculis urna a quis. Mauris vel
-                habitant varius consequat ipsum aliquam. Quis dui egestas
-                hendrerit netus eu.
+              <p className="font-semibold ">
+              “Konsistensi adalah kunci menuju petualangan tak terbatas.  Bukan sekadar Subscriber, kalian adalah Davengers yang solid!”
               </p>
             </Box>
             <div className="mt-16 md:mt-0">
-              <h1 className="font-bold text-4xl md:text-[125px] leading-none">
-                LOGO AKUDAV
+              <h1 className="font-bold text-4xl md:text-[64px] leading-none">
+                About AKUDAV
               </h1>
-              <h2>
-                Lorem ipsum dolor sit amet consectetur. Sit convallis aliquet
-                adipiscing accumsan cras amet integer ut porttitor. Nulla
-                consequat ut egestas nulla iaculis urna a quis. Mauris vel
-                habitant varius consequat ipsum aliquam. Quis dui egestas
-                hendrerit netus eu.
-              </h2>
+              <div className="mt-8">
+                  <p className="mt-4">AKUDAV bisa panggil aku dav. </p>
+                  <p className="mt-4">1 Juli 2020 upload video pertama dan sekarang sudah memiliki 3.000.000++ subscribers. </p>
+                  <p className="mt-4">Itu bukan perjalanan yang mudah, tapi dengan dukungan kalian yang membuat perjalanan ini menjadi mengasyikkan.</p>
+                  <p className="mt-4">Perjalanan kita tidak berhenti disini, Ayo bergabung para Davengers untuk pergi ke pertualangan seru yang tak terbatas.</p>
+              </div>
+              <div className="flex justify-start mt-8">
+                  <Button
+                  type={2}
+                  href={'https://youtube.com/akudav'} 
+                  target={'_blank'} >
+                    Youtube
+                  </Button>
+                
+              </div>
             </div>
           </div>
         </div>
         <div id="add_merch">
-          <h1 className="text-center font-bold text-3xl sm:text-4xl lg:text-6xl p-2">
-            Dapatkan Merchandise Dari Lorem Ipsum Der Silit Ast Lorem Ipsum
+          <h1 className="text-center font-baloo font-bold text-3xl sm:text-4xl lg:text-6xl p-2">
+          Dapatkan Merchandise dari AKUDAV jadilah Davengers sejati
           </h1>
           <p className="text-center p-6 text-lg">
-            Lorem ipsum dolor sit amet consectetur. Tincidunt quam risus neque
-            quam laoreet. Ac quis neque ut cras velit. Porta et malesuada neque
-            rhoncus porttitor. Sapien dictum vitae lectus diam eget.
+            Tunjukkan kepada dunia bahwa kamu adalah seorang Davengers sejati dengan memiliki merchandise eksklusif dari AKUDAV. 
+            Ayo koleksi sekarang!
           </p>
           <div className="flex flex-row justify-center">
             <Button type={2}>Merchandise</Button>
+          </div>
+        </div>
+        <div id="buy-guide">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* left grid */}
+            <div>
+              <h1 className="font-baloo text-[64px] mt-16">
+                Bagaimana Cara Memesan?
+              </h1>
+              <div className="flex ">
+                <Button type={2} >Merchandise</Button>
+              </div>
+            
+            </div>
+            <div>
+              <Box
+              primaryBg={'bg-cyan-300'} 
+              secondaryBg={'bg-cyan-600'}
+              className='max-w-md mx-auto text-xl  text-white '>
+                <ul className="list-disc font-semibold">
+                  <li>Pergi ke Merchandise</li>
+                  <li>Cari produk yang kamu cari</li>
+                  <li>Kamu bisa memasukan ke keranjang atau Check Out langsung</li>
+                  <li>Isi form pengiriman , pastikan email dan data lainya sudah benar yah... gaboleh salah</li>
+                  <li>Setelah melakukan pembayaran. Cek email untuk melihat invoice</li>
+                </ul>
+              </Box>
+            </div>
           </div>
         </div>
       </div>
