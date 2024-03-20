@@ -1,0 +1,8 @@
+export const pending = "PENDING"
+export const awaitingPayment = "AWAITING PAYMENT"
+export const awaitingFulfillment = "AWAITING FULFILLMENT"
+export const awaitingShipment = "AWAITING SHIPMENT"
+export const awaitingPickup = "AWAITING PICKUP"
+export const shipped = "SHIPPED"
+export const cancelled = "CANCELLED"
+export const refunded = "REFUNDED"
