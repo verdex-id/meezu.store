@@ -25,24 +25,7 @@ export default function MerchPage() {
     },
   ]);
 
-  const [products, setProducts] = useState([
-    {
-      title: "JKT48 New Era T-Shirt",
-      description: "Description here...",
-      price: 179000,
-      sold: 48,
-      image:
-        "https://down-id.img.susercontent.com/file/531d3b57b1733fa6a8e5f549d73c6cee_tn",
-    },
-    {
-      title: "B-Day T-Shirt Ella JKT48",
-      description: "Description here...",
-      price: 129000,
-      discount_price: 99000,
-      sold: 72,
-      image: "https://pbs.twimg.com/media/Fzrhw0baQAATx_a.jpg:large",
-    },
-  ]);
+  const [products, setProducts] = useState();
   const [filteredProducts, setFilteredProducts] = useState(products);
 
   function handleSearch(event) {
@@ -51,6 +34,16 @@ export default function MerchPage() {
     );
     setFilteredProducts(filter);
   }
+
+  useEffect(() => {
+    async function getProducts() {
+      const res = await fetch("/api/products");
+      const body = await res.json();
+
+      setProducts(body.data);
+    }
+    getProducts();
+  });
 
   return (
     <>
@@ -70,14 +63,16 @@ export default function MerchPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-          {filteredProducts.map((product, i) => (
+          {filteredProducts?.map((product, i) => (
             <>
               <Card
-                image={product.image}
-                price={product.price}
-                discountPrice={product.discount_price}
-                sold={product.sold}
-                title={product.title}
+                image={
+                  product.product_iterations[0].iteration_images[0]
+                    .product_variant_image
+                }
+                price={product.product_iterations[0].product_variant_price}
+                sold={0}
+                title={product.product_name}
               />
             </>
           ))}
