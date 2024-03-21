@@ -230,3 +230,24 @@ export async function POST(request) {
 
   return NextResponse.json(...successResponse({ product: finalProduct }));
 }
+
+export async function GET() {
+  const products = await prisma.product.findMany({
+    select: {
+      product_slug: true,
+      product_name: true,
+      product_iterations: {
+        orderBy: { product_variant_price: "asc" },
+        take: 1,
+        select: {
+          product_variant_price: true,
+          id: true,
+        },
+      },
+    },
+  });
+
+  return NextResponse.json(...successResponse({ products: products }));
+}
+
+
