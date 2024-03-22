@@ -15,7 +15,7 @@ datasource db {
 
 
 model ProductCategory {
-  id               Int  @unique            @id @default(autoincrement())
+  product_category_id               Int  @unique            @id @default(autoincrement())
   product_category_slug String @db.VarChar(50) @unique
   product_category_name String @db.VarChar(50) @unique
 
@@ -23,22 +23,22 @@ model ProductCategory {
 }
 
 model Product {
-  id               Int  @unique            @id @default(autoincrement())
+  product_id               Int  @unique            @id @default(autoincrement())
   product_slug             String @db.VarChar(70) @unique
   product_name             String @db.VarChar(70) @unique
   product_description      String @db.VarChar(2000) 
-  product_category ProductCategory @relation(fields: [product_category_id], references: [id])
+  product_category ProductCategory @relation(fields: [product_category_id], references: [product_category_id])
   product_category_id      Int
   product_discounts ProductDiscount[] @relation(name: "ProductToProductDiscount")
   product_iterations  ProductIteration[] @relation(name: "ProductToProductIteration")
 }
 
 model ProductIteration {
-  id             Int   @unique         @id @default(autoincrement())
+  product_iteration_id             Int   @unique         @id @default(autoincrement())
   product_variant_weight         Int  // max 500.000 gram / 500 kg
   product_variant_price          Int            @db.UnsignedMediumInt
   product_variant_stock          Int            @db.UnsignedSmallInt
-  product        Product        @relation(name: "ProductToProductIteration", fields: [product_id], references: [id])
+  product        Product        @relation(name: "ProductToProductIteration", fields: [product_id], references: [product_id])
   product_id     Int
   order_item     OrderItem[]    @relation(name: "OrderItemToProductVariant")
   iteration_images IterationImage[] @relation(name: "ProductVariantToVariantImage")
@@ -46,50 +46,50 @@ model ProductIteration {
 }
 
 model ProductVariantMapping {
-  id             Int    @unique        @id @default(autoincrement())
-  product_iteration ProductIteration @relation(fields: [product_iteration_id], references: [id])
+  product_variant_mapping_id             Int    @unique        @id @default(autoincrement())
+  product_iteration ProductIteration @relation(fields: [product_iteration_id], references: [product_iteration_id])
   product_iteration_id Int
-  variant Variant @relation(fields: [variant_id], references: [id])
+  variant Variant @relation(fields: [variant_id], references: [variant_id])
   variant_id Int
-
+  @@unique([product_iteration_id, variant_id])
 }
 
 model VariantType {
-  id             Int  @unique          @id @default(autoincrement())
+  varian_type_id             Int  @unique          @id @default(autoincrement())
   variant_type_name String @db.VarChar(30) @unique
   variants Variant[]
 }
 
 model Variant {
-  id             Int  @unique          @id @default(autoincrement())
+  variant_id             Int  @unique          @id @default(autoincrement())
   variant_slug String @db.VarChar(15) @unique
   variant_name String @db.VarChar(15) @unique
-  varian_type VariantType @relation(fields: [varian_type_id], references: [id])
+  varian_type VariantType @relation(fields: [varian_type_id], references: [varian_type_id])
   varian_type_id Int
   product_variant_mapping ProductVariantMapping[]
 }
 
 model IterationImage {
-  id                 Int   @unique         @id @default(autoincrement())
+  iteration_image_id                 Int   @unique         @id @default(autoincrement())
   product_variant_image              String
-  product_iteration    ProductIteration @relation(name: "ProductVariantToVariantImage", fields: [product_variant_id], references: [id])
+  product_iteration    ProductIteration @relation(name: "ProductVariantToVariantImage", fields: [product_variant_id], references: [product_iteration_id])
   product_variant_id Int
 }
 
 model OrderItem {
-  id                 Int  @unique           @id @default(autoincrement())
+  order_item_id                 Int  @unique           @id @default(autoincrement())
   order_item_name    String
   order_item_perunit_price Int
   order_item_quantity Int            @db.UnsignedSmallInt
 
-  order              Order          @relation(name: "OrderToOrderItem", fields: [order_id], references: [id])
+  order              Order          @relation(name: "OrderToOrderItem", fields: [order_id], references: [order_id])
   order_id           String            @unique
-  product_iteration    ProductIteration @relation(name: "OrderItemToProductVariant", fields: [product_variant_id], references: [id])
+  product_iteration    ProductIteration @relation(name: "OrderItemToProductVariant", fields: [product_variant_id], references: [product_iteration_id])
   product_variant_id Int            @unique
 }
 
 model Invoice {
-  id       String    @id @unique @default(cuid())
+  invoice_id       String    @id @unique @default(cuid())
   invoice_date     DateTime @default(now())
   transaction_date DateTime
   payment_date     DateTime
@@ -98,13 +98,13 @@ model Invoice {
   discount_amount  Int      @db.UnsignedMediumInt
   total_price      Int      @db.UnsignedMediumInt
   bill             Int      @db.UnsignedMediumInt
-  order            Order    @relation(name: "InvoiceToOrder", fields: [order_id], references: [id])
+  order            Order    @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id])
   order_id         String      @unique
   invoice_item InvoiceItem[]
 }
 
 model InvoiceItem {
-  id Int @id @default(autoincrement()) @unique
+  invoice_item_id Int @id @default(autoincrement()) @unique
   invoice_item_quantity Int            @db.UnsignedSmallInt
   invoice_item_name String
   invoice_item_weight Int
@@ -113,13 +113,13 @@ model InvoiceItem {
   invoice_item_description String
    
 
-  invoice Invoice @relation(fields: [invoice_id], references: [id])
+  invoice Invoice @relation(fields: [invoice_id], references: [invoice_id])
   invoice_id String
 }
 
 
 model Order {
-  id          String    @id @unique @default(cuid())
+  order_id          String    @id @unique @default(cuid())
   order_date  DateTime    @default(now())
   order_status String @db.VarChar(50)
   discount_amount Int      @db.UnsignedMediumInt
@@ -132,29 +132,29 @@ model Order {
 }
 
 model Payment {
-  id                     String    @id @unique @default(cuid())
+  payment_id                     String    @id @unique @default(cuid())
   paygate_transaction_id String // tripay transaction reference code
   payment_date           DateTime
   payment_method         String
   total_payment          Int      @db.UnsignedMediumInt
 
-  order Order @relation(fields: [order_id], references: [id])
+  order Order @relation(fields: [order_id], references: [order_id])
   order_id String @unique
 }
 
 model Shipment {
-  id                  String    @id @unique @default(cuid())
+  shipment_id                  String    @id @unique @default(cuid())
   expedition_order_id String // biteship order id
   shipment_date       DateTime
-  courier_service CourierService @relation(fields: [courier_service_id], references: [id])
+  courier_service CourierService @relation(fields: [courier_service_id], references: [courier_service_id])
   courier_service_id Int 
 
-  order Order @relation(fields: [order_id], references: [id])
+  order Order @relation(fields: [order_id], references: [order_id])
   order_id String @unique
 }
 
 model CourierCompany {
-  id        Int   @unique    @id @default(autoincrement())
+  courier_company_id        Int   @unique    @id @default(autoincrement())
   courier_company_name String @unique
 
 
@@ -162,11 +162,11 @@ model CourierCompany {
 }
 
 model CourierService {
-  id        Int  @unique     @id @default(autoincrement())
+  courier_service_id        Int  @unique     @id @default(autoincrement())
   courier_service_name String
   courier_service_code String
 
-  courier_company CourierCompany @relation(fields: [courier_company_id], references: [id])
+  courier_company CourierCompany @relation(fields: [courier_company_id], references: [courier_company_id])
   courier_company_id Int
 
   shipments Shipment[]
@@ -174,63 +174,64 @@ model CourierService {
 
 
 model GuestOrder {
-  id           Int @unique   @id @default(autoincrement())
+  guest_order_id           Int @unique   @id @default(autoincrement())
   order_code         String    @unique @default(cuid())
   guest_full_name    String @db.VarChar(35)
   guest_phone_number String @db.TinyText
   guest_email        String @db.VarChar(75)
   guest_address      String   @db.VarChar(200)
-  order        Order  @relation(name: "GuestOrderToOrder", fields: [order_id], references: [id])
+  order        Order  @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id])
   order_id     String    @unique
 }
 
 model Discount {
-  id                           Int      @unique              @id @default(autoincrement())
+  discount_id                           Int      @unique              @id @default(autoincrement())
   discount_code                String
   discount_value               Int                    @db.UnsignedMediumInt
   is_percent_discount          Boolean
   maximum_discount_amount      Int                    @db.UnsignedMediumInt
   is_limited                   Boolean
   usage_limits                 Int                    @db.UnsignedSmallInt
-  product_discount             ProductDiscount        @relation(name: "DiscountToProductDiscount", fields: [product_discount_id], references: [id])
+  number_of_uses               Int                    @db.UnsignedSmallInt
+  product_discount             ProductDiscount        @relation(name: "DiscountToProductDiscount", fields: [product_discount_id], references: [product_discount_id])
   product_discount_id          Int                    @unique
-  threshold_discount           ThresholdDiscount      @relation(name: "DiscountToThresholdDiscount", fields: [threshold_discount_id], references: [id])
+  threshold_discount           ThresholdDiscount      @relation(name: "DiscountToThresholdDiscount", fields: [threshold_discount_id], references: [threshold_discount_id])
   threshold_discount_id        Int                    @unique
-  limited_time_discount        LimitedTimeDiscount    @relation(name: "DiscountToLimitedTimeDiscount", fields: [limited_time_discount_id], references: [id])
+  limited_time_discount        LimitedTimeDiscount    @relation(name: "DiscountToLimitedTimeDiscount", fields: [limited_time_discount_id], references: [limited_time_discount_id])
   limited_time_discount_id     Int                    @unique
-  daily_discount               DailyDiscount          @relation(name: "DailyDiscountToDiscount", fields: [daily_discount_id], references: [id])
+  daily_discount               DailyDiscount          @relation(name: "DailyDiscountToDiscount", fields: [daily_discount_id], references: [daily_discount_id])
   daily_discount_id            Int                    @unique
 }
 
 model ThresholdDiscount {
-  id             Int   @unique    @id @default(autoincrement())
+  threshold_discount_id             Int   @unique    @id @default(autoincrement())
   minimum_amount Int       @db.UnsignedMediumInt
   discount       Discount? @relation(name: "DiscountToThresholdDiscount")
 }
 
 model LimitedTimeDiscount {
-  id        Int   @unique    @id @default(autoincrement())
+  limited_time_discount_id        Int   @unique    @id @default(autoincrement())
   from_date DateTime
   to_date   DateTime
   discount  Discount? @relation(name: "DiscountToLimitedTimeDiscount")
 }
 
 model DailyDiscount {
-  id        Int  @unique     @id @default(autoincrement())
+  daily_discount_id        Int  @unique     @id @default(autoincrement())
   from_hour DateTime  @db.Time()
   to_hour   DateTime  @db.Time()
   discount  Discount? @relation(name: "DailyDiscountToDiscount")
 }
 
 model ProductDiscount {
-  id         Int   @unique     @id @default(autoincrement())
-  product    Product    @relation(name: "ProductToProductDiscount", fields: [product_id], references: [id])
+  product_discount_id         Int   @unique     @id @default(autoincrement())
+  product    Product    @relation(name: "ProductToProductDiscount", fields: [product_id], references: [product_id])
   product_id Int        @unique
   discount   Discount? @relation(name: "DiscountToProductDiscount")
 }
 
 model Admin {
-  id    String    @id @unique @default(cuid())
+  admin_id    String    @id @unique @default(cuid())
   admin_full_name        String @db.VarChar(35)
   admin_hashedPassword  String
   admin_email           String @db.VarChar(75)        @unique
@@ -239,13 +240,11 @@ model Admin {
 }
 
 model Session {
-  id           String    @id @unique @default(cuid())
+  session_id           String    @id @unique @default(cuid())
   refresh_token String   @unique @default(uuid())
   is_blocked    Boolean  @default(false)
   created_at    DateTime @default(now())
   expired_at    DateTime
-  admin        Admin?   @relation(fields: [admin_id], references: [id])
+  admin        Admin?   @relation(fields: [admin_id], references: [admin_id])
   admin_id      String?
 }
-
-
