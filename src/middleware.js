@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { failResponse } from "./utils/response";
+import { errorResponse, failResponse } from "./utils/response";
 import { verifyToken } from "./lib/jwt";
 
 export const authPayloadAccountId = "authorization_payload_account_id";
@@ -31,7 +31,7 @@ export async function middleware(request) {
 
     const authRoutes = [
         //["/api/user/settings"],
-        //["/api/admin/settings"],
+        ["/api/admins/settings"],
         //["/api/admin/access"],
         //["/api/course", ["POST", "DELETE", "PUT"]],
     ];
@@ -76,7 +76,7 @@ export async function middleware(request) {
         }
 
         const requestHeaders = new Headers(request.headers);
-        requestHeaders.set(authPayloadAccountId, payload.accountId);
+        requestHeaders.set(authPayloadAccountId, verificationResult.payload.accountId);
 
         return NextResponse.next({
             request: {
