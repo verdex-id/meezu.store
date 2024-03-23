@@ -146,30 +146,22 @@ model Shipment {
   shipment_id                  String    @id @unique @default(cuid())
   expedition_order_id String // biteship order id
   shipment_date       DateTime
-  courier_service CourierService @relation(fields: [courier_service_id], references: [courier_service_id])
-  courier_service_id Int 
+  courier Courier @relation(fields: [courier_id], references: [courier_id])
+  courier_id Int 
 
   order Order @relation(fields: [order_id], references: [order_id])
   order_id String @unique
 }
 
-model CourierCompany {
-  courier_company_id        Int   @unique    @id @default(autoincrement())
-  courier_company_name String @unique
-
-
-  courier_services CourierService[]
-}
-
-model CourierService {
-  courier_service_id        Int  @unique     @id @default(autoincrement())
+model Courier {
+  courier_id        Int  @unique     @id @default(autoincrement())
+  courier_name String
+  courier_code String
   courier_service_name String
   courier_service_code String
 
-  courier_company CourierCompany @relation(fields: [courier_company_id], references: [courier_company_id])
-  courier_company_id Int
-
   shipments Shipment[]
+  @@unique([courier_code, courier_service_code])
 }
 
 
@@ -248,3 +240,4 @@ model Session {
   admin        Admin?   @relation(fields: [admin_id], references: [admin_id])
   admin_id      String?
 }
+

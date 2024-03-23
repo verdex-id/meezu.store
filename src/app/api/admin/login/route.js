@@ -20,7 +20,7 @@ export async function POST(request) {
     );
   }
 
-  const admin = await prisma.Admin.findUnique({
+  const admin = await prisma.admin.findUnique({
     where: {
       admin_email: req.email,
     },

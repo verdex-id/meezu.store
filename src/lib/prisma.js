@@ -1,10 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
 
-<<<<<<< HEAD
-const prisma = new PrismaClient()
-
-export default prisma
-=======
 const prisma = new PrismaClient();
 
 export default prisma;
@@ -51,4 +46,3 @@ export const prismaErrorCode = {
   P2028: "Transaction AP,I error: {error}",
   P3000: "Failed to c,reate database: {database_error}",
 };
->>>>>>> development
