@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^5.11.0",
+    "joi": "^17.12.2",
     "bcrypt": "^5.1.1",
     "jose": "^5.2.3",
     "nanoid": "^5.0.6",
