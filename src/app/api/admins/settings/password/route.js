@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { Prisma } from "@prisma/client";
-import { prismaErrorCode } from "@/utils/prisma";
+import { prismaErrorCode } from "@/lib/prisma";
 import Joi from "joi";
 import { failResponse, successResponse, errorResponse } from "@/utils/response";
 import { authPayloadAccountId } from "@/middleware";
@@ -8,7 +8,7 @@ import { comparePassword, hashPassword } from "@/lib/password";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function PUT(request) {
+export async function PATCH(request) {
   const payloadAdminId = headers().get(authPayloadAccountId);
 
   const schema = Joi.object({
@@ -28,9 +28,9 @@ export async function PUT(request) {
     );
   }
 
-  let admin = await prisma.Admin.findUnique({
+  let admin = await prisma.admin.findUnique({
     where: {
-      id: payloadAdminId,
+      admin_id: payloadAdminId,
     },
   });
 
@@ -53,9 +53,9 @@ export async function PUT(request) {
   }
 
   try {
-    admin = await prisma.Admin.update({
+    admin = await prisma.admin.update({
       where: {
-        id: admin.id,
+        admin_id: admin.admin_id,
       },
       data: {
         admin_hashedPassword: newHashedPassword,

@@ -48,19 +48,43 @@ export async function POST(request) {
         process.env.ACCESS_TOKEN_DURATION,
     );
 
-
     if (accessToken.error) {
         return NextResponse.json(...errorResponse());
     }
 
+    const refreshToken = await createToken(
+        admin.admin_id,
+        process.env.REFRESH_TOKEN_DURATION,
+    );
+
+    if (refreshToken.error) {
+        return NextResponse.json(...errorResponse());
+    }
+
+    const createdSession = await prisma.session.create({
+        data: {
+            session_id: refreshToken.payload.id,
+            admin_id: admin.admin_id,
+            refresh_token: refreshToken.token,
+            expired_at: refreshToken.payload.expiredAt,
+        },
+    });
+
+    if (!createdSession) {
+        return NextResponse.json(...errorResponse());
+    }
+
     const res = {
+        session_id: createdSession.admin_id,
         access_token: accessToken.token,
         access_token_expire_at: accessToken.payload.expiredAt,
+        refresh_token: refreshToken.token,
+        refresh_token_expire_at: refreshToken.payload.expiredAt,
         admin: {
-            admin_full_name: admin.admin_full_name,
-            admin_email: admin.admin_email,
-            admin_created_at: admin.admin_created_at,
+            full_name: admin.fullName,
+            email: admin.email,
         },
     };
+
     return NextResponse.json(...successResponse(res));
 }

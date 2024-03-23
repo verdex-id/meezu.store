@@ -1,20 +1,18 @@
 import { headers } from "next/headers";
 import { Prisma } from "@prisma/client";
-import { prismaErrorCode } from "@/utils/prisma";
+import { prismaErrorCode } from "@/lib/prisma";
 import Joi from "joi";
 import { failResponse, successResponse, errorResponse } from "@/utils/response";
 import { authPayloadAccountId } from "@/middleware";
-import { comparePassword } from "@/lib/password";
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-export async function PUT(request) {
+export async function PATCH(request) {
     const payloadAdminId = headers().get(authPayloadAccountId);
 
     const req = await request.json();
 
     let schema = Joi.object({
-        password: Joi.string().required(),
         new_name: Joi.string()
             .pattern(/^[A-Za-z\s']+$/)
             .min(3)
@@ -28,33 +26,24 @@ export async function PUT(request) {
         );
     }
 
-    let admin = await prisma.Admin.findUnique({
+    let admin = await prisma.admin.findUnique({
         where: {
-            id: payloadAdminId,
+            admin_id: payloadAdminId,
         },
     });
-
-    if (admin.admin_full_name === req.new_name) {
-        return NextResponse.json(...failResponse("No changes were made.", 400));
-    }
 
     if (!admin) {
         return NextResponse.json(...errorResponse());
     }
 
-    const isCorrectPassword = await comparePassword(
-        req.password,
-        admin.admin_hashedPassword,
-    );
-
-    if (!isCorrectPassword) {
-        return NextResponse.json(...failResponse("Password incorrect.", 401));
+    if (admin.admin_full_name === req.new_name) {
+        return NextResponse.json(...failResponse("No changes were made.", 400));
     }
 
     try {
-        admin = await prisma.Admin.update({
+        admin = await prisma.admin.update({
             where: {
-                id: admin.id,
+                admin_id: admin.admin_id,
             },
             data: {
                 admin_full_name: req.new_name,

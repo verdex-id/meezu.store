@@ -233,7 +233,7 @@ model Admin {
 
 model Session {
   session_id           String    @id @unique @default(cuid())
-  refresh_token String   @unique @default(uuid())
+  refresh_token String   @default(uuid()) @db.Text
   is_blocked    Boolean  @default(false)
   created_at    DateTime @default(now())
   expired_at    DateTime
