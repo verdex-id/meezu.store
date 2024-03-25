@@ -11,7 +11,8 @@ export async function middleware(request) {
     //["/api/admin/verify-email"],
     //["/api/team"],
     //["/api/admin/settings/image"],
-    ["/api/couriers", ["GET"]],
+    ["/api/products", ["GET", "DELETE"]],
+    [("/api/couriers", ["GET"])],
   ];
 
   if (!checkRoute(jsonRoutes, request)) {
