@@ -159,15 +159,3 @@ export async function DELETE(req, { params }) {
     ...successResponse({ deleted_product: deletedProduct }),
   );
 }
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
