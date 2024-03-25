@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Meezu Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Fredoka", sans-serif;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          backgroundImage: {
+            "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+            "gradient-conic":
+              "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+          },
+          colors: {
+            cyan: {
+              50: "#edf9ff",
+              100: "#e4f6ff",
+              200: "#c8edff",
+              300: "#4cc6fe",
+              400: "#44b2e5",
+              500: "#3d9ecb",
+              600: "#3995bf",
+              700: "#2e7798",
+              800: "#225972",
+              900: "#1b4559",
+            },
+            pink: {
+              50: "#ffeff4",
+              100: "#ffe7ee",
+              200: "#ffcddc",
+              300: "#fe5d8f",
+              400: "#e55481",
+              500: "#cb4a72",
+              600: "#bf466b",
+              700: "#983856",
+              800: "#722a40",
+              900: "#592132",
+            },
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-cyan-200 max-w-screen-xl min-h-dvh mx-auto pb-96">
+  <div class="flex justify-center items-center p-8 mt-16">
+    <img src="/public/logo/akudav.png" alt="logo" class="w-[505px h-[505px]" />
+  </div>
+  <div class="grid grid-cols-2 mt-16 mb-4 border-y-4 border-black">
+    <div class="gap-8 text-left text-lg font-medium font-fredoka">
+      <p class="mt-8">Tanggal Invoice dibuat</p>
+      <p class="mt-8">Tanggal Transaksi</p>
+      <p class="mt-8">Tanggal Pembayaran</p>
+      <p class="mt-8">Alamat</p>
+    </div>
+    <div class="gap-8 text-right text-lg font-medium font-fredoka mb-8">
+      <p class="mt-8">17-03-2024</p>
+      <p class="mt-8">17-03-2024</p>
+      <p class="mt-8">17-03-2024</p>
+      <p class="mt-8">
+        Setran, Talun, Kemalang, Boyolali, Jawa Tengah, Indonesia, Kemalang,
+        Kab. Boyolali, Jawa Tengah
+      </p>
+    </div>
+  </div>
+  <div class="mt-4 p-8 border-b-4 border-black grid grid-cols-2 ">
+    <div class="grid grid-cols-[10%,90%] text-center">
+      <div class="w-10 h-10 bg-cyan-300"></div>
+      <div class="ml-4 text-left">
+        <h2 class="">Nama Produk</h2>
+        <p class="">Hoodie Akudav XL</p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-8 ">
+      <div class="flex flex-col items-center">
+        <h2>Harga Satuan</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2>Jumlah</h2>
+        <p>1</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2>Total</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="mt-4 p-8 border-b-4 border-black grid grid-cols-2 ">
+    <div class="grid grid-cols-[10%,90%] text-center">
+      <div class="w-10 h-10 bg-cyan-300"></div>
+      <div class="ml-4 text-left">
+        <h2>Nama Produk</h2>
+        <p class="">Hoodie Akudav XL</p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-8">
+      <div class="flex flex-col items-center">
+        <h2 class="">Harga Satuan</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2 class="">Jumlah</h2>
+        <p>1</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2 class="">Total</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-4 p-8 border-b-4 border-black grid grid-cols-2 ">
+    <div class="grid grid-cols-[10%,90%] text-center ">
+      <div class="w-10 h-10 bg-cyan-300 "></div>
+      <div class="ml-4 text-left">
+        <h2>Nama Produk</h2>
+        <p class="">Hoodie Akudav XL</p>
+      </div>
+    </div>
+    <div class="flex justify-end gap-8">
+      <div class="flex flex-col items-center">
+        <h2 class="">Harga Satuan</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2 class="">Jumlah</h2>
+        <p>1</p>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2 class="">Total</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+    </div>
+  </div>
+  <div id="subtotal">
+    <div class="flex justify-end  border-black mt-8">
+      <div>
+        <h2 class="text-center">Voucher Diskon</h2>
+        <p>Rp. 100.000,00</p>
+      </div>
+    </div>
+    <div class="flex justify-end  border-black mt-8 border-b-4 pb-8">
+      <div>
+        <h2 class="text-center">SubTotal</h2>
+        <p class="line-through text-xs text-center">Rp. 300.000,00</p>
+        <p>Rp. 100.000,00</p>
+      </div>
+    </div>
+  </div>
+  <div class="pembayaran ">
+    <div class="grid grid-cols-2 gap-8">
+      <div class="font-medium text-left">
+        <p class="mt-8">Metode Pembayaran</p>
+        <p class="mt-8">Total Pembayaran</p>
+      </div>
+      <div class="font-medium text-right">
+        <p class="mt-8">BANK BNI</p>
+        <p class="mt-8">Rp. 200.000</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
