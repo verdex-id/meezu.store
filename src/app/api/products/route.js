@@ -7,6 +7,48 @@ import Joi, { ref } from "joi";
 import { JSONPath } from "jsonpath-plus";
 import { NextResponse } from "next/server";
 
+export async function GET(request) {
+  const schema = Joi.object({
+    page: Joi.number().min(1).integer().required(),
+    limit: Joi.number().min(1).max(30).integer().required(),
+  });
+
+  const { searchParams } = new URL(request.url);
+  const page = searchParams.get("page");
+  const limit = searchParams.get("limit");
+
+  const invalidReq = schema.validate({
+    page,
+    limit,
+  });
+
+  if (invalidReq.error) {
+    return NextResponse.json(
+      ...failResponse("Invalid request format.", 400, invalidReq.error.details),
+    );
+  }
+
+  const products = await prisma.product.findMany({
+    skip: parseInt(limit) * (parseInt(page) - 1),
+    take: parseInt(limit),
+    select: {
+      product_id: true,
+      product_slug: true,
+      product_name: true,
+      product_iterations: {
+        orderBy: { product_variant_price: "asc" },
+        take: 1,
+        select: {
+          product_iteration_id: true,
+          product_variant_price: true,
+        },
+      },
+    },
+  });
+
+  return NextResponse.json(...successResponse({ products }));
+}
+
 export async function POST(request) {
   const productIterationSchema = Joi.object({
     product_variant_weight: Joi.number().max(500_000).integer().required(),
