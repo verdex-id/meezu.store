@@ -3,7 +3,6 @@ import Card from "@/components/card";
 import Input from "@/components/input";
 import Select from "@/components/select";
 import ListPesanan from "@/components/listPesanan";
-import Banner from "@/components/banner";
 
 export default function Test() {
   return (
@@ -77,9 +76,6 @@ export default function Test() {
           />
         </div>
       </div>
-
-      {/* Banner */}
-      <Banner></Banner>
 
       {/* ListPesanan */}
       <ListPesanan
