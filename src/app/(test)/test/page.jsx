@@ -2,14 +2,8 @@ import Button from "@/components/button";
 import Card from "@/components/card";
 import Input from "@/components/input";
 import Select from "@/components/select";
-import Link from "next/link";
-import Image from "next/image";
 import ListPesanan from "@/components/listPesanan";
 import Banner from "@/components/banner";
-import AccountCircleIcon from "@/icons/account_circle";
-import CalendarMonthIcon from "@/icons/calendar_month";
-import ContadtsProductIcon from "@/icons/contacts_product";
-import LocationOnIcon from "@/icons/location_on";
 
 export default function Test() {
   return (
@@ -94,14 +88,7 @@ export default function Test() {
         tanggal_pesan={"18-02-2024"}
         alamat={"Jl. Durian II"}
         nama_produk={"Baju"}
-      >
-      </ListPesanan>
-
-
-
-
-
-
+      ></ListPesanan>
     </div>
   );
 }
