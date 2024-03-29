@@ -2,6 +2,14 @@ import Button from "@/components/button";
 import Card from "@/components/card";
 import Input from "@/components/input";
 import Select from "@/components/select";
+import Link from "next/link";
+import Image from "next/image";
+import ListPesanan from "@/components/listPesanan";
+import Banner from "@/components/banner";
+import AccountCircleIcon from "@/icons/account_circle";
+import CalendarMonthIcon from "@/icons/calendar_month";
+import ContadtsProductIcon from "@/icons/contacts_product";
+import LocationOnIcon from "@/icons/location_on";
 
 export default function Test() {
   return (
@@ -12,6 +20,9 @@ export default function Test() {
         <div className="flex items-center gap-8 mt-2">
           <Button type={1}>Type 1</Button>
           <Button type={2}>Type 2</Button>
+          <Button type={3}>Type 3</Button>
+          <Button type={4}>Type 4</Button>
+          <Button type={5}>Type 5</Button>
         </div>
       </div>
 
@@ -72,6 +83,25 @@ export default function Test() {
           />
         </div>
       </div>
+
+      {/* Banner */}
+      <Banner></Banner>
+
+      {/* ListPesanan */}
+      <ListPesanan
+        nama={"Sultan Akmal Ghiffari"}
+        no_hp={"08123456789"}
+        tanggal_pesan={"18-02-2024"}
+        alamat={"Jl. Durian II"}
+        nama_produk={"Baju"}
+      >
+      </ListPesanan>
+
+
+
+
+
+
     </div>
   );
 }
