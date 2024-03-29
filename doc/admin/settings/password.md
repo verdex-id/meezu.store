@@ -1,8 +1,8 @@
-# User API Spec
+# admin API Spec
 
-## Update User Name
+## Update admin Password
 
-Endpoint : PUT /api/user/settings/name
+Endpoint : PATCH /api/admin/settings/password
 
 Request Header :
 - Authorization : bearer <access_token>
@@ -11,7 +11,8 @@ Request Header :
 
 ```json
 {
-  "new_name": "Rizkia AS"
+	"password":"admin321",
+	"new_password":"admin911"
 }
 ```
 
@@ -21,13 +22,12 @@ Request Header :
 {
   "status": "success",
   "data": {
-    "full_name": "Rizkia AS"
+    "message": "Password successfully updated"
   }
 }
 ```
 
 #### Response Body (Error) :
-
 ```json
 {
   "status": "error",
@@ -37,12 +37,10 @@ Request Header :
 
 #### Response Body (Failed) :
 
-###### no detail provided 
-
 ```json
 {
   "status": "fail",
-  "message": "An operation failed because it depends on one or more records that were required but not found. {cause}",
+  "message": "Password incorrect.",
   "detail": "No detail provided"
 }
 ```

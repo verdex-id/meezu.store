@@ -1,8 +1,8 @@
-# User API Spec
+# admin API Spec
 
-## Update User Email
+## Update admin Name
 
-Endpoint : PUT /api/user/settings/email
+Endpoint : PATCH /api/admin/settings/name
 
 Request Header :
 - Authorization : bearer <access_token>
@@ -11,8 +11,7 @@ Request Header :
 
 ```json
 {
-  "password":"rizkia", 
-  "new_email":"rizkia.as.actmp@gmail.com"
+  "new_name": "Rizkia AS"
 }
 ```
 
@@ -22,12 +21,13 @@ Request Header :
 {
   "status": "success",
   "data": {
-    "email": "rizkia.as.actmp@gmail.com"
+    "full_name": "Rizkia AS"
   }
 }
 ```
 
 #### Response Body (Error) :
+
 ```json
 {
   "status": "error",
@@ -35,23 +35,14 @@ Request Header :
 }
 ```
 
-
 #### Response Body (Failed) :
 
 ###### no detail provided 
 
 ```json
 {
-  "status": "fail",
-  "message": "Password incorrect.",
-  "detail": "No detail provided"
-}
-
-```
-```json
-{
-  "status": "fail",
-  "message": "Unique constraint failed on the {constraint}",
-  "detail": "No detail provided"
+	"status": "fail",
+	"message": "No changes were made.",
+	"detail": "No detail provided"
 }
 ```

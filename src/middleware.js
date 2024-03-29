@@ -12,7 +12,7 @@ export async function middleware(request) {
     //["/api/team"],
     //["/api/admin/settings/image"],
     ["/api/products", ["GET", "DELETE"]],
-    [("/api/couriers", ["GET"])],
+    ["/api/couriers", ["GET"]],
   ];
 
   if (!checkRoute(jsonRoutes, request)) {
