@@ -12,8 +12,8 @@ export default function Card({
 }) {
   return (
     <>
-      <div className="bg-white p-5 max-w-sm mx-auto" {...props}>
-        <div className="flex flex-col justify-between h-full">
+      <div className="bg-white w-full max-w-sm mx-auto p-5" {...props}>
+        <div className="flex flex-col justify-between h-full w-full">
           <div>
             <div>
               <Image
