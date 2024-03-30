@@ -35,6 +35,16 @@ export async function GET(req, { params }) {
       product_id: true,
       product_slug: true,
       product_name: true,
+      product_discounts: {
+        select: {
+          discount: {
+            select: {
+              discount_value: true,
+              is_percent_discount: true,
+            },
+          },
+        },
+      },
       product_description: true,
       product_category: {
         select: {
