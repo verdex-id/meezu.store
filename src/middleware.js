@@ -12,7 +12,8 @@ export async function middleware(request) {
     //["/api/team"],
     //["/api/admin/settings/image"],
     ["/api/products", ["GET", "DELETE"]],
-    [("/api/couriers", ["GET"])],
+    ["/api/couriers", ["GET"]],
+    ["/api/discounts", ["GET", "DELETE"]],
   ];
 
   if (!checkRoute(jsonRoutes, request)) {
@@ -31,10 +32,10 @@ export async function middleware(request) {
   }
 
   const authRoutes = [
-    //["/api/user/settings"],
+    ["/api/products", ["POST", "PATCH", "DELETE"]],
     ["/api/admins/settings"],
     ["/api/couriers", ["POST", "DELETE"]],
-    //["/api/admin/access"],
+    ["/api/discounts", ["POST"]],
     //["/api/course", ["POST", "DELETE", "PUT"]],
   ];
 
