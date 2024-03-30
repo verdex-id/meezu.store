@@ -205,16 +205,9 @@ CREATE TABLE `Discount` (
     `is_limited` BOOLEAN NOT NULL,
     `usage_limits` SMALLINT UNSIGNED NOT NULL,
     `number_of_uses` SMALLINT UNSIGNED NOT NULL,
-    `product_discount_id` INTEGER NOT NULL,
-    `threshold_discount_id` INTEGER NOT NULL,
-    `limited_time_discount_id` INTEGER NOT NULL,
-    `daily_discount_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `Discount_discount_id_key`(`discount_id`),
-    UNIQUE INDEX `Discount_product_discount_id_key`(`product_discount_id`),
-    UNIQUE INDEX `Discount_threshold_discount_id_key`(`threshold_discount_id`),
-    UNIQUE INDEX `Discount_limited_time_discount_id_key`(`limited_time_discount_id`),
-    UNIQUE INDEX `Discount_daily_discount_id_key`(`daily_discount_id`),
+    UNIQUE INDEX `Discount_discount_code_key`(`discount_code`),
     PRIMARY KEY (`discount_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -222,8 +215,10 @@ CREATE TABLE `Discount` (
 CREATE TABLE `ThresholdDiscount` (
     `threshold_discount_id` INTEGER NOT NULL AUTO_INCREMENT,
     `minimum_amount` MEDIUMINT UNSIGNED NOT NULL,
+    `discount_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `ThresholdDiscount_threshold_discount_id_key`(`threshold_discount_id`),
+    UNIQUE INDEX `ThresholdDiscount_discount_id_key`(`discount_id`),
     PRIMARY KEY (`threshold_discount_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -232,18 +227,22 @@ CREATE TABLE `LimitedTimeDiscount` (
     `limited_time_discount_id` INTEGER NOT NULL AUTO_INCREMENT,
     `from_date` DATETIME(3) NOT NULL,
     `to_date` DATETIME(3) NOT NULL,
+    `discount_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `LimitedTimeDiscount_limited_time_discount_id_key`(`limited_time_discount_id`),
+    UNIQUE INDEX `LimitedTimeDiscount_discount_id_key`(`discount_id`),
     PRIMARY KEY (`limited_time_discount_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `DailyDiscount` (
     `daily_discount_id` INTEGER NOT NULL AUTO_INCREMENT,
-    `from_hour` TIME NOT NULL,
-    `to_hour` TIME NOT NULL,
+    `from_hour` INTEGER NOT NULL,
+    `to_hour` INTEGER NOT NULL,
+    `discount_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `DailyDiscount_daily_discount_id_key`(`daily_discount_id`),
+    UNIQUE INDEX `DailyDiscount_discount_id_key`(`discount_id`),
     PRIMARY KEY (`daily_discount_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -251,9 +250,11 @@ CREATE TABLE `DailyDiscount` (
 CREATE TABLE `ProductDiscount` (
     `product_discount_id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
+    `discount_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `ProductDiscount_product_discount_id_key`(`product_discount_id`),
     UNIQUE INDEX `ProductDiscount_product_id_key`(`product_id`),
+    UNIQUE INDEX `ProductDiscount_discount_id_key`(`discount_id`),
     PRIMARY KEY (`product_discount_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -326,19 +327,19 @@ ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_order_id_fkey` FOREIGN KEY (`ord
 ALTER TABLE `GuestOrder` ADD CONSTRAINT `GuestOrder_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Discount` ADD CONSTRAINT `Discount_product_discount_id_fkey` FOREIGN KEY (`product_discount_id`) REFERENCES `ProductDiscount`(`product_discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ThresholdDiscount` ADD CONSTRAINT `ThresholdDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Discount` ADD CONSTRAINT `Discount_threshold_discount_id_fkey` FOREIGN KEY (`threshold_discount_id`) REFERENCES `ThresholdDiscount`(`threshold_discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `LimitedTimeDiscount` ADD CONSTRAINT `LimitedTimeDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Discount` ADD CONSTRAINT `Discount_limited_time_discount_id_fkey` FOREIGN KEY (`limited_time_discount_id`) REFERENCES `LimitedTimeDiscount`(`limited_time_discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Discount` ADD CONSTRAINT `Discount_daily_discount_id_fkey` FOREIGN KEY (`daily_discount_id`) REFERENCES `DailyDiscount`(`daily_discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `DailyDiscount` ADD CONSTRAINT `DailyDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ProductDiscount` ADD CONSTRAINT `ProductDiscount_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `Product`(`product_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ProductDiscount` ADD CONSTRAINT `ProductDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Session` ADD CONSTRAINT `Session_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE SET NULL ON UPDATE CASCADE;

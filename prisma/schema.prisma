@@ -29,7 +29,7 @@ model Product {
   product_description      String @db.VarChar(2000) 
   product_category ProductCategory @relation(fields: [product_category_id], references: [product_category_id])
   product_category_id      Int
-  product_discounts ProductDiscount[] @relation(name: "ProductToProductDiscount")
+  product_discounts ProductDiscount? @relation(name: "ProductToProductDiscount")
   product_iterations  ProductIteration[] @relation(name: "ProductToProductIteration")
 }
 
@@ -178,48 +178,54 @@ model GuestOrder {
 
 model Discount {
   discount_id                           Int      @unique              @id @default(autoincrement())
-  discount_code                String
+  discount_code                String         @unique
   discount_value               Int                    @db.UnsignedMediumInt
   is_percent_discount          Boolean
   maximum_discount_amount      Int                    @db.UnsignedMediumInt
   is_limited                   Boolean
   usage_limits                 Int                    @db.UnsignedSmallInt
   number_of_uses               Int                    @db.UnsignedSmallInt
-  product_discount             ProductDiscount        @relation(name: "DiscountToProductDiscount", fields: [product_discount_id], references: [product_discount_id])
-  product_discount_id          Int                    @unique
-  threshold_discount           ThresholdDiscount      @relation(name: "DiscountToThresholdDiscount", fields: [threshold_discount_id], references: [threshold_discount_id])
-  threshold_discount_id        Int                    @unique
-  limited_time_discount        LimitedTimeDiscount    @relation(name: "DiscountToLimitedTimeDiscount", fields: [limited_time_discount_id], references: [limited_time_discount_id])
-  limited_time_discount_id     Int                    @unique
-  daily_discount               DailyDiscount          @relation(name: "DailyDiscountToDiscount", fields: [daily_discount_id], references: [daily_discount_id])
-  daily_discount_id            Int                    @unique
+
+
+  product_discount             ProductDiscount?
+  threshold_discount           ThresholdDiscount?
+  limited_time_discount        LimitedTimeDiscount?
+  daily_discount               DailyDiscount?
 }
 
 model ThresholdDiscount {
   threshold_discount_id             Int   @unique    @id @default(autoincrement())
   minimum_amount Int       @db.UnsignedMediumInt
-  discount       Discount? @relation(name: "DiscountToThresholdDiscount")
+
+  discount Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int @unique
 }
 
 model LimitedTimeDiscount {
   limited_time_discount_id        Int   @unique    @id @default(autoincrement())
   from_date DateTime
   to_date   DateTime
-  discount  Discount? @relation(name: "DiscountToLimitedTimeDiscount")
+
+  discount Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int @unique
 }
 
 model DailyDiscount {
   daily_discount_id        Int  @unique     @id @default(autoincrement())
-  from_hour DateTime  @db.Time()
-  to_hour   DateTime  @db.Time()
-  discount  Discount? @relation(name: "DailyDiscountToDiscount")
+  from_hour Int 
+  to_hour   Int
+
+  discount Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int @unique
 }
 
 model ProductDiscount {
   product_discount_id         Int   @unique     @id @default(autoincrement())
   product    Product    @relation(name: "ProductToProductDiscount", fields: [product_id], references: [product_id])
-  product_id Int        @unique
-  discount   Discount? @relation(name: "DiscountToProductDiscount")
+  product_id Int    @unique
+  
+  discount Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int @unique
 }
 
 model Admin {
@@ -240,4 +246,9 @@ model Session {
   admin        Admin?   @relation(fields: [admin_id], references: [admin_id])
   admin_id      String?
 }
+
+
+
+
+
 
