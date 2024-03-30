@@ -1,5 +1,6 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
-import { failResponse, successResponse } from "@/utils/response";
+import { fetchAdminIfAuthorized } from "@/utils/check-admin";
+import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { createSlug } from "@/utils/slugify";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
@@ -7,9 +8,28 @@ import { JSONPath } from "jsonpath-plus";
 import { NextResponse } from "next/server";
 
 export async function GET(req, { params }) {
+  const schema = Joi.object({
+    product_slug: Joi.string().required(),
+  });
+
+  const slug = params.productSlug;
+
+  const validationResult = schema.validate({
+    product_slug: slug,
+  });
+
+  if (validationResult.error) {
+    return NextResponse.json(
+      ...failResponse(
+        "Invalid request format.",
+        400,
+        validationResult.error.details,
+      ),
+    );
+  }
   const product = await prisma.product.findUnique({
     where: {
-      product_slug: params.productSlug,
+      product_slug: slug,
     },
     select: {
       product_id: true,
@@ -48,38 +68,85 @@ export async function GET(req, { params }) {
     },
   });
 
+  if (!product) {
+    return NextResponse.json(...failResponse("Product not found", 404));
+  }
+
   return NextResponse.json(...successResponse({ product: product }));
 }
 
 export async function PATCH(request, { params }) {
-  const schema = Joi.object({
+  const admin = await fetchAdminIfAuthorized();
+  if (admin.error) {
+    if (admin.errorCode === 500) {
+      return NextResponse.json(...errorResponse());
+    }
+    return NextResponse.json(...failResponse(admin.error, admin.errorCode));
+  }
+
+  let schema = Joi.object({
+    product_slug: Joi.string().required(),
+  });
+
+  const slug = params.productSlug;
+
+  let validationResult = schema.validate({
+    product_slug: slug,
+  });
+
+  if (validationResult.error) {
+    return NextResponse.json(
+      ...failResponse(
+        "Invalid request format.",
+        400,
+        validationResult.error.details,
+      ),
+    );
+  }
+
+  schema = Joi.object({
     new_product_name: Joi.string().min(3).max(70).required(),
     new_product_description: Joi.string().min(3).max(2000).required(),
   });
 
   const req = await request.json();
 
-  const invalidReq = schema.validate(req);
-  if (invalidReq.error) {
+  validationResult = schema.validate(req);
+  if (validationResult.error) {
     return NextResponse.json(
-      ...failResponse("Invalid request format.", 403, invalidReq.error.details),
+      ...failResponse(
+        "Invalid request format.",
+        403,
+        validationResult.error.details,
+      ),
     );
   }
-  const updatedProduct = await prisma.product.update({
-    where: {
-      product_slug: params.productSlug,
-    },
-    data: {
-      product_slug: createSlug(req.new_product_name),
-      product_name: req.new_product_name,
-      product_description: req.new_product_description,
-    },
-    select: {
-      product_slug: true,
-      product_name: true,
-      product_description: true,
-    },
-  });
+
+  let updatedProduct;
+
+  try {
+    updatedProduct = await prisma.product.update({
+      where: {
+        product_slug: slug,
+      },
+      data: {
+        product_slug: createSlug(req.new_product_name),
+        product_name: req.new_product_name,
+        product_description: req.new_product_description,
+      },
+      select: {
+        product_slug: true,
+        product_name: true,
+        product_description: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
+    }
+
+    return NextResponse.json(...errorResponse());
+  }
 
   return NextResponse.json(
     ...successResponse({ updated_product: updatedProduct }),
@@ -87,9 +154,37 @@ export async function PATCH(request, { params }) {
 }
 
 export async function DELETE(req, { params }) {
+  const admin = await fetchAdminIfAuthorized();
+  if (admin.error) {
+    if (admin.errorCode === 500) {
+      return NextResponse.json(...errorResponse());
+    }
+    return NextResponse.json(...failResponse(admin.error, admin.errorCode));
+  }
+
+  const schema = Joi.object({
+    product_slug: Joi.string().required(),
+  });
+
+  const slug = params.productSlug;
+
+  const validationResult = schema.validate({
+    product_slug: slug,
+  });
+
+  if (validationResult.error) {
+    return NextResponse.json(
+      ...failResponse(
+        "Invalid request format.",
+        400,
+        validationResult.error.details,
+      ),
+    );
+  }
+
   const targetedProduct = await prisma.product.findUnique({
     where: {
-      product_slug: params.productSlug,
+      product_slug: slug,
     },
     select: {
       product_id: true,
@@ -137,7 +232,7 @@ export async function DELETE(req, { params }) {
 
       deletedProduct = await tx.product.delete({
         where: {
-          product_slug: params.productSlug,
+          product_slug: slug,
         },
         select: {
           product_id: true,
