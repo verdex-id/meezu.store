@@ -1,9 +1,11 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
+import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import { ErrorWithCode } from "@/utils/custom-error";
+import { unsignedMediumInt, unsignedSmallInt } from "@/utils/mysql";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { createSlug } from "@/utils/slugify";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import Joi, { ref } from "joi";
+import Joi from "joi";
 import { JSONPath } from "jsonpath-plus";
 import { NextResponse } from "next/server";
 
@@ -17,68 +19,114 @@ export async function GET(request) {
   const page = searchParams.get("page");
   const limit = searchParams.get("limit");
 
-  const invalidReq = schema.validate({
+  const validationResult = schema.validate({
     page,
     limit,
   });
 
-  if (invalidReq.error) {
+  if (validationResult.error) {
     return NextResponse.json(
-      ...failResponse("Invalid request format.", 400, invalidReq.error.details),
+      ...failResponse(
+        "Invalid request format.",
+        400,
+        validationResult.error.details,
+      ),
     );
   }
 
-  const products = await prisma.product.findMany({
-    skip: parseInt(limit) * (parseInt(page) - 1),
-    take: parseInt(limit),
-    select: {
-      product_id: true,
-      product_slug: true,
-      product_name: true,
-      product_iterations: {
-        orderBy: { product_variant_price: "asc" },
-        take: 1,
-        select: {
-          product_iteration_id: true,
-          product_variant_price: true,
+  let products;
+  try {
+    products = await prisma.product.findMany({
+      skip: parseInt(limit) * (parseInt(page) - 1),
+      take: parseInt(limit),
+      select: {
+        product_id: true,
+        product_slug: true,
+        product_name: true,
+        product_discounts: {
+          select: {
+            discount: {
+              select: {
+                discount_value: true,
+                is_percent_discount: true,
+              },
+            },
+          },
+        },
+        product_iterations: {
+          orderBy: { product_variant_price: "asc" },
+          take: 1,
+          select: {
+            product_iteration_id: true,
+            product_variant_price: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
+    }
+
+    return NextResponse.json(...errorResponse());
+  }
 
   return NextResponse.json(...successResponse({ products }));
 }
 
+export const productNameRegex = /^[a-zA-Z0-9\s_()&/\[\].,=-]+$/;
+export const productVariantNameRegex = /^[a-zA-Z0-9\s]+$/;
+
 export async function POST(request) {
+  const admin = await fetchAdminIfAuthorized();
+  if (admin.error) {
+    if (admin.errorCode === 500) {
+      return NextResponse.json(...errorResponse());
+    }
+    return NextResponse.json(...failResponse(admin.error, admin.errorCode));
+  }
+
   const productIterationSchema = Joi.object({
     product_variant_weight: Joi.number().max(500_000).integer().required(),
     product_variant_price: Joi.number()
       .min(500)
-      .max(16_500_000)
+      .max(unsignedMediumInt)
       .integer()
       .required(),
-    product_variant_stock: Joi.number().min(0).max(65_000).integer().required(),
+    product_variant_stock: Joi.number()
+      .min(0)
+      .max(unsignedSmallInt)
+      .integer()
+      .required(),
     variants: Joi.array().items(
       Joi.object({
-        variant_type_name: Joi.string().min(3).max(30),
-        variant_name: Joi.string().min(3).max(15),
+        variant_type_name: Joi.string().min(3).max(30).pattern(productVariantNameRegex).required(),
+        variant_name: Joi.string().min(3).max(15).pattern(productVariantNameRegex).required(),
       }),
     ),
   });
 
   const schema = Joi.object({
     product_category_name: Joi.string().min(3).max(50).required(),
-    product_name: Joi.string().min(3).max(70).required(),
+    product_name: Joi.string()
+      .pattern(productNameRegex)
+      .min(3)
+      .max(70)
+      .required(),
     product_description: Joi.string().min(3).max(2000).required(),
     product_iterations: Joi.array().items(productIterationSchema),
   });
 
   const req = await request.json();
 
-  const invalidReq = schema.validate(req);
-  if (invalidReq.error) {
+  const validationResult = schema.validate(req);
+  if (validationResult.error) {
     return NextResponse.json(
-      ...failResponse("Invalid request format.", 403, invalidReq.error.details),
+      ...failResponse(
+        "Invalid request format.",
+        403,
+        validationResult.error.details,
+      ),
     );
   }
 
