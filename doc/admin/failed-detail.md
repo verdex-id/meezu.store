@@ -47,21 +47,21 @@
 
 ```json
 {
-  "status": "fail",
-  "message": "Invalid request format.",
-  "detail": [
-    {
-      "message": "\"full_name\" is required",
-      "path": [
-        "full_name"
-      ],
-      "type": "any.required",
-      "context": {
-        "label": "full_name",
-        "key": "full_name"
-      }
-    }
-  ]
+	"status": "fail",
+	"message": "Invalid request format.",
+	"detail": [
+		{
+			"message": "\"admin_full_name\" is required",
+			"path": [
+				"admin_full_name"
+			],
+			"type": "any.required",
+			"context": {
+				"label": "admin_full_name",
+				"key": "admin_full_name"
+			}
+		}
+	]
 }
 ```
 
@@ -79,9 +79,9 @@
       ],
       "type": "string.email",
       "context": {
-        "value": "rizkia.as.pac@gmail",
+        "value": "admin.as.pac@gmail",
         "invalids": [
-          "rizkia.as.pac@gmail"
+          "admin.as.pac@gmail"
         ],
         "label": "email",
         "key": "email"
@@ -93,22 +93,22 @@
 
 ```json
 {
-  "status": "fail",
-  "message": "Invalid request format.",
-  "detail": [
-    {
-      "message": "\"full_name\" with value \"rizkia adhy syahputra 123\" fails to match the required pattern: /^[A-Za-z\\s']+$/",
-      "path": [
-        "full_name"
-      ],
-      "type": "string.pattern.base",
-      "context": {
-        "regex": {},
-        "value": "rizkia adhy syahputra 123",
-        "label": "full_name",
-        "key": "full_name"
-      }
-    }
-  ]
+	"status": "fail",
+	"message": "Invalid request format.",
+	"detail": [
+		{
+			"message": "\"admin_full_name\" with value \"AdminJohn adi 311\" fails to match the required pattern: /^[A-Za-z\\s']+$/",
+			"path": [
+				"admin_full_name"
+			],
+			"type": "string.pattern.base",
+			"context": {
+				"regex": {},
+				"value": "AdminJohn adi 311",
+				"label": "admin_full_name",
+				"key": "admin_full_name"
+			}
+		}
+	]
 }
 ```
