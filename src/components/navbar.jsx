@@ -13,7 +13,7 @@ export default function Navbar() {
       <div className="flex justify-between items-center w-full max-w-screen-xl p-5 mx-auto border-b-4 border-white font-baloo">
         <div>
           <Link href={"/"}>
-            <Image src={"/logo/akudav.png"} width={100} height={100} />
+            <Image src={"/logo/logo_meezu.png"} width={64} height={64} />
           </Link>
         </div>
         <div className="flex items-center justify-between text-cyan-900 gap-8">
@@ -23,7 +23,7 @@ export default function Navbar() {
               pathname == "/" ? "text-cyan-900 font-bold" : "text-cyan-900/70"
             }`}
           >
-            Home
+            Beranda
           </Link>
           <Link
             href={"/merch"}
@@ -33,7 +33,7 @@ export default function Navbar() {
                 : "text-cyan-900/70"
             }`}
           >
-            Merch
+            Merchandise
           </Link>
           <button>
             <CartIcon className="w-6" />

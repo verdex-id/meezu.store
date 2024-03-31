@@ -12,17 +12,21 @@ export default function MerchDetail() {
           </div>
           <div className="space-y-8">
             <h1 className="font-bold font-baloo text-3xl md:text-6xl">
-              Product Name
+              AKUDAV T-Shirt “Adventure”
             </h1>
             <p className="font-fredoka">
-              Lorem ipsum dolor sit amet consectetur. Fames ornare nibh iaculis
-              placerat diam. Ullamcorper at accumsan dictum sed arcu adipiscing
-              adipiscing. Sem mollis id integer rhoncus vitae adipiscing iaculis
-              quis tellus. Enim egestas sed posuere elit arcu ornare.
+              Bawa petualangan Minecraftmu ke dunia nyata dengan kaos
+              "Adventure" dari AKUDAV. Material Cotton Combed 30s yang lembut,
+              tidak panas, kaos ini tidak hanya nyaman dipakai tetapi juga
+              menampilkan desain yang stylish. Spesifikasi - Material Cotton
+              Combed 30S - Sablon Plastisol Jangan lupa ambil voucher Diskon dan
+              Gratis Ongkos Kirim, Silakan klik 'Beli Sekarang' atau 'Masukan
+              Keranjang'.
             </p>
             <p className="font-fredoka font-semibold text-xl md:text-3xl">
               Rp100.000
             </p>
+            <p className="text-lg">Terjual 1078</p>
             <div className="space-y-4">
               <button className="p-3 w-full bg-pink-300 text-white">
                 Add to cart
