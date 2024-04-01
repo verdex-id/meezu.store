@@ -35,9 +35,9 @@ export default function Navbar() {
           >
             Merchandise
           </Link>
-          <button>
+          <Link href={"/cart"}>
             <CartIcon className="w-6" />
-          </button>
+          </Link>
         </div>
       </div>
     </>
