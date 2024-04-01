@@ -18,7 +18,6 @@ export async function DELETE(req, { params }) {
   const schema = Joi.object({
     discount_id: Joi.number().integer().min(0).required(),
   });
-
   const validationResult = schema.validate({ discount_id: params.discountId });
   if (validationResult.error) {
     return NextResponse.json(
@@ -37,8 +36,12 @@ export async function DELETE(req, { params }) {
       const existingDiscount = await tx.discount.findUnique({
         where: {
           discount_id: discountId,
+          product_discount: {
+            is: null,
+          },
         },
         select: {
+          discount_id: true,
           product_discount: true,
           threshold_discount: true,
           limited_time_discount: true,
@@ -49,13 +52,6 @@ export async function DELETE(req, { params }) {
       if (!existingDiscount) {
         throw new ErrorWithCode("Discount not found", 404);
       }
-
-      existingDiscount.product_discount &&
-        (await tx.productDiscount.delete({
-          where: {
-            discount_id: discountId,
-          },
-        }));
 
       existingDiscount.threshold_discount &&
         (await tx.thresholdDiscount.delete({
@@ -78,9 +74,13 @@ export async function DELETE(req, { params }) {
           },
         }));
 
+      if (discountId !== existingDiscount.discount_id) {
+        throw new ErrorWithCode("Failed to delete discount", 400);
+      }
+
       deletedDiscount = await tx.discount.delete({
         where: {
-          discount_id: discountId,
+          discount_id: existingDiscount.discount_id,
         },
       });
     });
