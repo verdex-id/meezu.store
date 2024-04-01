@@ -35,6 +35,7 @@ export async function middleware(request) {
     ["/api/products", ["POST", "PATCH", "DELETE"]],
     ["/api/admins/settings"],
     ["/api/couriers", ["POST", "DELETE"]],
+    ["/api/discounts/product", ["GET", "POST", "DELETE"]],
     ["/api/discounts", ["POST", "DELETE"]],
     //["/api/course", ["POST", "DELETE", "PUT"]],
   ];
