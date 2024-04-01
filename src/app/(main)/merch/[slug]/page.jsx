@@ -12,7 +12,7 @@ export default function MerchDetail() {
           </div>
           <div className="space-y-8">
             <h1 className="font-bold font-baloo text-3xl md:text-6xl">
-              AKUDAV T-Shirt Adventure
+              AKUDAV Adventure T-Shirt
             </h1>
             <p className="font-fredoka">
               Bawa petualangan Minecraftmu ke dunia nyata dengan kaos Adventure
