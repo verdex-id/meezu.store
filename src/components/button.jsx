@@ -51,7 +51,7 @@ export default function Button({
               <Link
                 href={href}
                 target={target}
-                className="px-8 py-5 text-white relative h-[48px] flex items-center"
+                className="px-8 py-5 text-white relative h-[48px] flex items-center group"
               >
                 <p className="z-50">{children}</p>
                 <div className="absolute top-0 left-0 w-full mx-auto h-full -z-10">
@@ -78,72 +78,69 @@ export default function Button({
           </>
         )
       )}
-        {type == 3 && (
-          <>
-            {href ? (
-              <Link
-                href={href}
-                target={target}
-                className="px-10 py-6 text-white relative h-[48px] flex items-center"
-              >
-              </Link>
-            ) : (
-              <button
-                onClick={onClick}
-                className="px-10 py-6 text-cyan-900 relative w-[336px] h-[48px] flex items-center justify-center group border-2 border-cyan-500"
-              >
-                <p className="z-50">{children}</p>
-                <div className="absolute top-0 left-0 w-full mx-auto h-full">
-                  <div className="bg-cyan-200 w-full h-full mx-auto"></div>
-                </div>
-              </button>
-            )}
-          </>
+      {type == 3 && (
+        <>
+          {href ? (
+            <Link
+              href={href}
+              target={target}
+              className="px-10 py-6 text-white relative h-[48px] flex items-center"
+            ></Link>
+          ) : (
+            <button
+              onClick={onClick}
+              className="px-10 py-6 text-cyan-900 relative w-[336px] h-[48px] flex items-center justify-center group border-2 border-cyan-500"
+            >
+              <p className="z-50">{children}</p>
+              <div className="absolute top-0 left-0 w-full mx-auto h-full">
+                <div className="bg-cyan-200 w-full h-full mx-auto"></div>
+              </div>
+            </button>
+          )}
+        </>
       )}
-        {type == 4 && (
-          <>
-            {href ? (
-              <Link
-                href={href}
-                target={target}
-                className="px-10 py-6 text-white relative h-[48px] flex items-center"
-              >
-              </Link>
-            ) : (
-              <button
-                onClick={onClick}
-                className="px-10 py-6 text-white relative w-[336px] h-[48px] flex items-center justify-center group border-2 border-pink-300"
-              >
-                <p className="z-50">{children}</p>
-                <div className="absolute top-0 left-0 w-full mx-auto h-full">
-                  <div className="bg-pink-300 w-full h-full mx-auto"></div>
-                </div>
-              </button>
-            )}
-          </>
-        )}
-                {type == 5 && (
-          <>
-            {href ? (
-              <Link
-                href={href}
-                target={target}
-                className="px-10 py-6 text-white relative h-[48px] flex items-center"
-              >
-              </Link>
-            ) : (
-              <button
-                onClick={onClick}
-                className="px-10 py-6 text-white relative w-[336px] h-[48px] flex items-center justify-center group border-2 border-cyan-400"
-              >
-                <p className="z-50">{children}</p>
-                <div className="absolute top-0 left-0 w-full mx-auto h-full">
-                  <div className="bg-cyan-400 w-full h-full mx-auto"></div>
-                </div>
-              </button>
-            )}
-          </>
-        )}
+      {type == 4 && (
+        <>
+          {href ? (
+            <Link
+              href={href}
+              target={target}
+              className="px-10 py-6 text-white relative h-[48px] flex items-center"
+            ></Link>
+          ) : (
+            <button
+              onClick={onClick}
+              className="px-10 py-6 text-white relative w-[336px] h-[48px] flex items-center justify-center group border-2 border-pink-300"
+            >
+              <p className="z-50">{children}</p>
+              <div className="absolute top-0 left-0 w-full mx-auto h-full">
+                <div className="bg-pink-300 w-full h-full mx-auto"></div>
+              </div>
+            </button>
+          )}
+        </>
+      )}
+      {type == 5 && (
+        <>
+          {href ? (
+            <Link
+              href={href}
+              target={target}
+              className="px-10 py-6 text-white relative h-[48px] flex items-center"
+            ></Link>
+          ) : (
+            <button
+              onClick={onClick}
+              className="px-10 py-6 text-white relative w-[336px] h-[48px] flex items-center justify-center group border-2 border-cyan-400"
+            >
+              <p className="z-50">{children}</p>
+              <div className="absolute top-0 left-0 w-full mx-auto h-full">
+                <div className="bg-cyan-400 w-full h-full mx-auto"></div>
+              </div>
+            </button>
+          )}
+        </>
+      )}
     </>
   );
 }
