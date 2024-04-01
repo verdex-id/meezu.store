@@ -17,13 +17,11 @@ export default function MerchPage() {
     },
     {
       title: "Promo 2",
-      image:
-        "https://o-cdn-cas.sirclocdn.com/parenting/images/promo-ramadan-berkah.width-800.format-webp.webp",
+      image: "/banner/banner_1.png",
     },
     {
       title: "Promo 3",
-      image:
-        "https://www.blibli.com/friends-backend/wp-content/uploads/2022/03/daftar-promo-ramadhan-2022-fix.jpg",
+      image: "/banner/banner_1.png",
     },
   ]);
 
