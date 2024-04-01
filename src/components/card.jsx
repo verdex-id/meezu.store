@@ -21,6 +21,7 @@ export default function Card({
                 width={1080}
                 height={1080}
                 className="h-[400px] object-contain"
+                fill
               />
             </div>
             <div className="space-y-1">

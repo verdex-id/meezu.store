@@ -12,12 +12,7 @@ export default function Carousel({ data, ...props }) {
             key={i}
             className={`min-w-[90%] aspect-[4/1] bg-white relative flex-grow overflow-hidden`}
           >
-            <Image
-              src={d.image}
-              layout="fill"
-              objectFit="cover"
-              quality={100}
-            />
+            <Image src={d.image} fill quality={100} className="object-cover" />
           </div>
         ))}
       </div>
