@@ -1,5 +1,6 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
+import { ErrorWithCode } from "@/utils/custom-error";
 import { unsignedMediumInt, unsignedSmallInt } from "@/utils/mysql";
 import { generateRandomString } from "@/utils/random";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
@@ -8,17 +9,31 @@ import Joi from "joi";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const discounts = await prisma.discount.findMany({
-    select: {
-      discount_code: true,
-      discount_id: true,
-      discount_value: true,
-      threshold_discount: true,
-      limited_time_discount: true,
-      daily_discount: true,
-      product_discount: true,
-    },
-  });
+  let discounts;
+  try {
+    discounts = await prisma.discount.findMany({
+      where: {
+        product_discount: {
+          is: null,
+        },
+      },
+      select: {
+        discount_code: true,
+        discount_id: true,
+        discount_value: true,
+        threshold_discount: true,
+        limited_time_discount: true,
+        daily_discount: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.target),
+      );
+    }
+    return NextResponse.json(...errorResponse());
+  }
 
   return NextResponse.json(...successResponse({ discounts }));
 }
@@ -33,9 +48,7 @@ export async function POST(request) {
   }
 
   const req = await request.json();
-
   const validationResult = validateDiscountPost(req);
-
   if (validationResult.error) {
     return NextResponse.json(
       ...failResponse(
@@ -65,21 +78,9 @@ export async function POST(request) {
       discount_value: true,
       usage_limits: true,
       number_of_uses: true,
+      product_discount: true,
     },
   };
-
-  if (req.is_product_discount) {
-    discountArg.data["product_discount"] = {
-      create: {
-        product_id: req.product_id,
-      },
-    };
-    discountArg.select["product_discount"] = {
-      select: {
-        product_id: true,
-      },
-    };
-  }
 
   if (req.is_threshold_discount) {
     discountArg.data["threshold_discount"] = {
@@ -127,15 +128,30 @@ export async function POST(request) {
   let discount;
   try {
     discount = await prisma.discount.create(discountArg);
+
+    if (discount.product_discount) {
+      throw new ErrorWithCode("Failed to create discount", 400);
+    }
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
         ...failResponse(prismaErrorCode[e.code], 409, e.meta.target),
       );
     }
+    if (e instanceof ErrorWithCode) {
+      return NextResponse.json(...failResponse(e.message, e.code));
+    }
     return NextResponse.json(...errorResponse());
   }
-  return NextResponse.json(...successResponse({ discount }));
+
+  const res = {
+    discount_code: discount.discount_code,
+    discount_value: discount.discount_value,
+    usage_limits: discount.usage_limits,
+    number_of_uses: discount.number_of_uses,
+  };
+
+  return NextResponse.json(...successResponse({ discount: res }));
 }
 
 function validateDiscountPost(request) {
@@ -159,13 +175,6 @@ function validateDiscountPost(request) {
         otherwise: Joi.number().min(500).max(unsignedMediumInt).integer(),
       },
     ),
-
-    is_product_discount: Joi.boolean().required(),
-    product_id: Joi.alternatives().conditional("is_product_discount", {
-      is: true,
-      then: Joi.number().min(1).integer().required(),
-      otherwise: Joi.number().min(1).integer(),
-    }),
 
     is_limited_discount: Joi.boolean().required(),
     discount_usage_limits: Joi.alternatives().conditional(

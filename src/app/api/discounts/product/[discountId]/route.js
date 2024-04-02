@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import { ErrorWithCode } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
@@ -18,6 +18,7 @@ export async function DELETE(req, { params }) {
   const schema = Joi.object({
     discount_id: Joi.number().integer().min(0).required(),
   });
+
   const validationResult = schema.validate({ discount_id: params.discountId });
   if (validationResult.error) {
     return NextResponse.json(
@@ -36,16 +37,10 @@ export async function DELETE(req, { params }) {
       const existingDiscount = await tx.discount.findUnique({
         where: {
           discount_id: discountId,
-          product_discount: {
-            is: null,
-          },
+          product_discount: { isNot: null },
         },
         select: {
-          discount_id: true,
           product_discount: true,
-          threshold_discount: true,
-          limited_time_discount: true,
-          daily_discount: true,
         },
       });
 
@@ -53,34 +48,19 @@ export async function DELETE(req, { params }) {
         throw new ErrorWithCode("Discount not found", 404);
       }
 
-      existingDiscount.threshold_discount &&
-        (await tx.thresholdDiscount.delete({
-          where: {
-            discount_id: discountId,
-          },
-        }));
-
-      existingDiscount.limited_time_discount &&
-        (await tx.limitedTimeDiscount.delete({
-          where: {
-            discount_id: discountId,
-          },
-        }));
-
-      existingDiscount.daily_discount &&
-        (await tx.dailyDiscount.delete({
-          where: {
-            discount_id: discountId,
-          },
-        }));
-
-      if (discountId !== existingDiscount.discount_id) {
-        throw new ErrorWithCode("Failed to delete discount", 400);
+      if (!existingDiscount.product_discount) {
+        throw new ErrorWithCode("Discount not found", 404);
       }
+
+      await tx.productDiscount.delete({
+        where: {
+          discount_id: discountId,
+        },
+      });
 
       deletedDiscount = await tx.discount.delete({
         where: {
-          discount_id: existingDiscount.discount_id,
+          discount_id: discountId,
         },
       });
     });
