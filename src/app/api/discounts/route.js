@@ -18,9 +18,13 @@ export async function GET() {
         },
       },
       select: {
-        discount_code: true,
         discount_id: true,
+        discount_code: true,
+        is_percent_discount: true,
         discount_value: true,
+        is_limited: true,
+        usage_limits: true,
+        number_of_uses: true,
         threshold_discount: true,
         limited_time_discount: true,
         daily_discount: true,
@@ -158,7 +162,7 @@ function validateDiscountPost(request) {
   const schema = Joi.object({
     discount_code: Joi.string().min(3).max(35),
     is_percent_discount: Joi.boolean().required(),
-    discount_value: Joi.alternatives().conditional("discount_is_percent", {
+    discount_value: Joi.alternatives().conditional("is_percent_discount", {
       is: true,
       then: Joi.number().min(1).max(100).integer().required(),
       otherwise: Joi.number()
