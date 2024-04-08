@@ -127,7 +127,7 @@ Request Header :
 
 ## GET product
 
-Endpoint : GET /api/products?page=1&limit=30
+Endpoint : GET /api/products?page=2&limit=30
 
 #### Response (Success) :
 
