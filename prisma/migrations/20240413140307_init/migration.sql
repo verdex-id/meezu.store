@@ -81,31 +81,18 @@ CREATE TABLE `IterationImage` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `OrderItem` (
-    `order_item_id` INTEGER NOT NULL AUTO_INCREMENT,
-    `order_item_name` VARCHAR(191) NOT NULL,
-    `order_item_perunit_price` INTEGER NOT NULL,
-    `order_item_quantity` SMALLINT UNSIGNED NOT NULL,
-    `order_id` VARCHAR(191) NOT NULL,
-    `product_variant_id` INTEGER NOT NULL,
-
-    UNIQUE INDEX `OrderItem_order_item_id_key`(`order_item_id`),
-    UNIQUE INDEX `OrderItem_order_id_key`(`order_id`),
-    UNIQUE INDEX `OrderItem_product_variant_id_key`(`product_variant_id`),
-    PRIMARY KEY (`order_item_id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Invoice` (
     `invoice_id` VARCHAR(191) NOT NULL,
     `invoice_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `transaction_date` DATETIME(3) NOT NULL,
-    `payment_date` DATETIME(3) NOT NULL,
-    `customer_name` VARCHAR(35) NOT NULL,
+    `payment_date` DATETIME(3) NULL,
+    `customer_full_name` VARCHAR(35) NOT NULL,
+    `customer_phone_number` TINYTEXT NOT NULL,
     `customer_address` VARCHAR(200) NOT NULL,
     `discount_amount` MEDIUMINT UNSIGNED NOT NULL,
-    `total_price` MEDIUMINT UNSIGNED NOT NULL,
-    `bill` MEDIUMINT UNSIGNED NOT NULL,
+    `total_weight` INTEGER NOT NULL,
+    `shipping_cost` MEDIUMINT UNSIGNED NOT NULL,
+    `gross_price` MEDIUMINT UNSIGNED NOT NULL,
+    `net_price` MEDIUMINT UNSIGNED NOT NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Invoice_invoice_id_key`(`invoice_id`),
@@ -119,10 +106,11 @@ CREATE TABLE `InvoiceItem` (
     `invoice_item_quantity` SMALLINT UNSIGNED NOT NULL,
     `invoice_item_name` VARCHAR(191) NOT NULL,
     `invoice_item_weight` INTEGER NOT NULL,
+    `invoice_item_total_weight` INTEGER NOT NULL,
     `invoice_perunit_price` MEDIUMINT UNSIGNED NOT NULL,
     `invoice_item_total_price` MEDIUMINT UNSIGNED NOT NULL,
-    `invoice_item_description` VARCHAR(191) NOT NULL,
     `invoice_id` VARCHAR(191) NOT NULL,
+    `product_iteration_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `InvoiceItem_invoice_item_id_key`(`invoice_item_id`),
     PRIMARY KEY (`invoice_item_id`)
@@ -133,7 +121,6 @@ CREATE TABLE `Order` (
     `order_id` VARCHAR(191) NOT NULL,
     `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `order_status` VARCHAR(50) NOT NULL,
-    `discount_amount` MEDIUMINT UNSIGNED NOT NULL,
 
     UNIQUE INDEX `Order_order_id_key`(`order_id`),
     PRIMARY KEY (`order_id`)
@@ -183,10 +170,7 @@ CREATE TABLE `Courier` (
 CREATE TABLE `GuestOrder` (
     `guest_order_id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_code` VARCHAR(191) NOT NULL,
-    `guest_full_name` VARCHAR(35) NOT NULL,
-    `guest_phone_number` TINYTEXT NOT NULL,
     `guest_email` VARCHAR(75) NOT NULL,
-    `guest_address` VARCHAR(200) NOT NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `GuestOrder_guest_order_id_key`(`guest_order_id`),
@@ -259,6 +243,22 @@ CREATE TABLE `ProductDiscount` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
+CREATE TABLE `AdminAddress` (
+    `admin_address_id` VARCHAR(191) NOT NULL,
+    `phone_number` TINYTEXT NOT NULL,
+    `address` VARCHAR(200) NOT NULL,
+    `province` VARCHAR(40) NOT NULL,
+    `city` VARCHAR(40) NOT NULL,
+    `district` VARCHAR(40) NOT NULL,
+    `postal_code` TINYTEXT NOT NULL,
+    `area_id` VARCHAR(191) NOT NULL,
+    `admin_id` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `AdminAddress_admin_address_id_key`(`admin_address_id`),
+    PRIMARY KEY (`admin_address_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Admin` (
     `admin_id` VARCHAR(191) NOT NULL,
     `admin_full_name` VARCHAR(35) NOT NULL,
@@ -303,16 +303,13 @@ ALTER TABLE `Variant` ADD CONSTRAINT `Variant_varian_type_id_fkey` FOREIGN KEY (
 ALTER TABLE `IterationImage` ADD CONSTRAINT `IterationImage_product_variant_id_fkey` FOREIGN KEY (`product_variant_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `OrderItem` ADD CONSTRAINT `OrderItem_product_variant_id_fkey` FOREIGN KEY (`product_variant_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`invoice_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -340,6 +337,9 @@ ALTER TABLE `ProductDiscount` ADD CONSTRAINT `ProductDiscount_product_id_fkey` F
 
 -- AddForeignKey
 ALTER TABLE `ProductDiscount` ADD CONSTRAINT `ProductDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `AdminAddress` ADD CONSTRAINT `AdminAddress_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Session` ADD CONSTRAINT `Session_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE SET NULL ON UPDATE CASCADE;
