@@ -10,6 +10,8 @@ export async function middleware(request) {
         //["/api/user/verify-email"],
         //["/api/team"],
         //["/api/admin/settings/image"],
+        ["/api/areas", ["GET"]],
+        ["/api/admins/address", ["GET", "DELETE"]],
         ["/api/products", ["GET", "DELETE"]],
         ["/api/couriers", ["GET"]],
         ["/api/discounts", ["GET", "DELETE"]],

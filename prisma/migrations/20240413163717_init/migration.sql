@@ -244,7 +244,7 @@ CREATE TABLE `ProductDiscount` (
 
 -- CreateTable
 CREATE TABLE `AdminAddress` (
-    `admin_address_id` VARCHAR(191) NOT NULL,
+    `admin_address_id` INTEGER NOT NULL AUTO_INCREMENT,
     `phone_number` TINYTEXT NOT NULL,
     `address` VARCHAR(200) NOT NULL,
     `province` VARCHAR(40) NOT NULL,

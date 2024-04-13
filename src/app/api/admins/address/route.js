@@ -1,7 +1,6 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { authPayloadAccountId } from "@/middleware";
 import { mapsDoubleSearch } from "@/services/biteship";
-import { ErrorWithCode } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
@@ -68,11 +67,6 @@ export async function POST(request) {
         if (e instanceof PrismaClientKnownRequestError) {
             return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
         }
-
-        if (e instanceof ErrorWithCode) {
-            return NextResponse.json(...failResponse(e.message, e.code));
-        }
-
         return NextResponse.json(...errorResponse());
     }
 

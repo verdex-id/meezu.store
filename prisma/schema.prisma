@@ -216,7 +216,7 @@ model ProductDiscount {
 }
 
 model AdminAddress {
-  admin_address_id      String     @unique  @default(cuid())  @id 
+  admin_address_id      Int        @unique          @default(autoincrement())  @id 
   phone_number          String     @db.TinyText
   address               String     @db.VarChar(200)
   province              String     @db.VarChar(40)
