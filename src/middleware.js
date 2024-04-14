@@ -11,7 +11,7 @@ export async function middleware(request) {
         //["/api/team"],
         //["/api/admin/settings/image"],
         ["/api/areas", ["GET"]],
-        ["/api/admins/address", ["GET", "DELETE"]],
+        ["/api/addresses/origin", ["GET", "DELETE"]],
         ["/api/products", ["GET", "DELETE"]],
         ["/api/couriers", ["GET"]],
         ["/api/discounts", ["GET", "DELETE"]],
@@ -33,7 +33,7 @@ export async function middleware(request) {
     }
 
     const authRoutes = [
-        ["/api/admins/address"],
+        ["/api/addresses/origin"],
         ["/api/products", ["POST", "PATCH", "DELETE"]],
         ["/api/admins/settings"],
         ["/api/couriers", ["POST", "DELETE"]],

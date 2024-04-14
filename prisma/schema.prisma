@@ -215,8 +215,8 @@ model ProductDiscount {
   discount_id            Int       @unique
 }
 
-model AdminAddress {
-  admin_address_id      Int        @unique          @default(autoincrement())  @id 
+model OriginAddress {
+  origin_address_id      Int        @unique          @default(autoincrement())  @id 
   phone_number          String     @db.TinyText
   address               String     @db.VarChar(200)
   province              String     @db.VarChar(40)
@@ -224,8 +224,7 @@ model AdminAddress {
   district              String     @db.VarChar(40)
   postal_code           String     @db.TinyText
   area_id               String
-  admin                 Admin?      @relation(fields: [admin_id], references: [admin_id])
-  admin_id              String?
+  is_active             Boolean    @default(false)
 }
 
 model Admin {
@@ -235,7 +234,6 @@ model Admin {
   admin_email               String     @unique  @db.VarChar(75)       
   admin_created_at          DateTime            @default(now())
   sessions                  Session[]
-  admin_addresses           AdminAddress[]
 }
 
 model Session {
@@ -247,3 +245,4 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
+

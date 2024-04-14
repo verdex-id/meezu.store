@@ -243,8 +243,8 @@ CREATE TABLE `ProductDiscount` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `AdminAddress` (
-    `admin_address_id` INTEGER NOT NULL AUTO_INCREMENT,
+CREATE TABLE `OriginAddress` (
+    `origin_address_id` INTEGER NOT NULL AUTO_INCREMENT,
     `phone_number` TINYTEXT NOT NULL,
     `address` VARCHAR(200) NOT NULL,
     `province` VARCHAR(40) NOT NULL,
@@ -252,10 +252,10 @@ CREATE TABLE `AdminAddress` (
     `district` VARCHAR(40) NOT NULL,
     `postal_code` TINYTEXT NOT NULL,
     `area_id` VARCHAR(191) NOT NULL,
-    `admin_id` VARCHAR(191) NULL,
+    `is_active` BOOLEAN NOT NULL DEFAULT false,
 
-    UNIQUE INDEX `AdminAddress_admin_address_id_key`(`admin_address_id`),
-    PRIMARY KEY (`admin_address_id`)
+    UNIQUE INDEX `OriginAddress_origin_address_id_key`(`origin_address_id`),
+    PRIMARY KEY (`origin_address_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -337,9 +337,6 @@ ALTER TABLE `ProductDiscount` ADD CONSTRAINT `ProductDiscount_product_id_fkey` F
 
 -- AddForeignKey
 ALTER TABLE `ProductDiscount` ADD CONSTRAINT `ProductDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `AdminAddress` ADD CONSTRAINT `AdminAddress_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Session` ADD CONSTRAINT `Session_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `Admin`(`admin_id`) ON DELETE SET NULL ON UPDATE CASCADE;

@@ -1,4 +1,4 @@
-import prisma, { prismaErrorCode } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { authPayloadAccountId } from "@/middleware";
 import { mapsDoubleSearch } from "@/services/biteship";
 import { ErrorWithCode } from "@/utils/custom-error";
@@ -23,9 +23,9 @@ export async function GET(request, { params }) {
 
     let address;
     try {
-        address = await prisma.adminAddress.findUnique({
+        address = await prisma.originAddress.findUnique({
             where: {
-                admin_address_id: parseInt(params.addressId),
+                origin_address_id: parseInt(params.addressId),
             },
         });
 
@@ -91,9 +91,9 @@ export async function PUT(request, { params }) {
 
     let newAddress;
     try {
-        newAddress = await prisma.adminAddress.update({
+        newAddress = await prisma.originAddress.update({
             where: {
-                admin_address_id: parseInt(params.addressId),
+                origin_address_id: parseInt(params.addressId),
             },
             data: {
                 phone_number: req.new_phone_number,
@@ -140,9 +140,9 @@ export async function DELETE(request, { params }) {
 
     let deletedAddress;
     try {
-        deletedAddress = await prisma.adminAddress.delete({
+        deletedAddress = await prisma.originAddress.delete({
             where: {
-                admin_address_id: parseInt(params.addressId),
+                origin_address_id: parseInt(params.addressId),
             },
         });
     } catch (e) {
