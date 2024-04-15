@@ -22,6 +22,7 @@ export async function GET() {
         discount_code: true,
         is_percent_discount: true,
         discount_value: true,
+        maximum_discount_amount: true,
         is_limited: true,
         usage_limits: true,
         number_of_uses: true,

@@ -73,7 +73,7 @@ CREATE TABLE `Variant` (
 -- CreateTable
 CREATE TABLE `IterationImage` (
     `iteration_image_id` INTEGER NOT NULL AUTO_INCREMENT,
-    `product_variant_image` VARCHAR(191) NOT NULL,
+    `iteration_image_path` VARCHAR(191) NOT NULL,
     `product_variant_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `IterationImage_iteration_image_id_key`(`iteration_image_id`),
@@ -162,6 +162,7 @@ CREATE TABLE `Courier` (
     `courier_service_code` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Courier_courier_id_key`(`courier_id`),
+    UNIQUE INDEX `Courier_courier_code_key`(`courier_code`),
     UNIQUE INDEX `Courier_courier_code_courier_service_code_key`(`courier_code`, `courier_service_code`),
     PRIMARY KEY (`courier_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

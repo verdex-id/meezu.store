@@ -71,7 +71,7 @@ model Variant {
 
 model IterationImage {
   iteration_image_id      Int               @default(autoincrement())  @unique  @id
-  product_variant_image   String  
+  iteration_image_path    String  
   product_iteration       ProductIteration  @relation(name: "ProductVariantToVariantImage", fields: [product_variant_id], references: [product_iteration_id])
   product_variant_id      Int
 }
@@ -146,7 +146,7 @@ model Shipment {
 model Courier {
   courier_id              Int  @unique  @default(autoincrement())  @id
   courier_name            String
-  courier_code            String
+  courier_code            String    @unique
   courier_service_name    String
   courier_service_code    String
 
@@ -245,4 +245,6 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
+
+
 
