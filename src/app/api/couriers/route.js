@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { headers } from "next/headers";
 import { authPayloadAccountId } from "@/middleware";
+import { retrieveCouriers } from "@/services/biteship";
 
 export async function GET(request) {
   const schema = Joi.object({
@@ -24,7 +25,7 @@ export async function GET(request) {
     );
   }
 
-  let biteshipCouriers = await getCouriers();
+  let biteshipCouriers = await retrieveCouriers();
 
   const existingCouriers = await prisma.courier.findMany({
     select: {
@@ -52,7 +53,7 @@ export async function GET(request) {
   } else {
     biteshipCouriers.couriers = biteshipCouriers.couriers.filter((courier) => {
       if (
-        !existingCourierCodes.includes(courier.courier_code) &&
+        !existingCourierCodes.includes(courier.courier_code) ||
         !existingCourierServiceCodes.includes(courier.courier_service_code)
       ) {
         return courier;
@@ -99,7 +100,7 @@ export async function POST(request) {
       ...failResponse("invalid request format.", 403, invalidReq.error.details),
     );
   }
-  const biteshipCouriers = await getCouriers();
+  const biteshipCouriers = await retrieveCouriers();
 
   const isSupported = biteshipCouriers.couriers.find(
     (courier) =>
@@ -209,20 +210,3 @@ export async function DELETE(request) {
   );
 }
 
-async function getCouriers() {
-  const options = {
-    method: "GET",
-    headers: {
-      Authorization: process.env.BITESHIP_API_KEY,
-    },
-  };
-
-  let biteshipCouriers = await fetch(
-    "https://api.biteship.com/v1/couriers",
-    options,
-  )
-    .then((response) => response.json())
-    .then((response) => response);
-
-  return biteshipCouriers;
-}

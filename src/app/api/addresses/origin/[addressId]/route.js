@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { authPayloadAccountId } from "@/middleware";
-import { mapsDoubleSearch } from "@/services/biteship";
+import { retriveAreaDoubleSearch } from "@/services/biteship";
 import { ErrorWithCode } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -81,7 +81,7 @@ export async function PUT(request, { params }) {
         );
     }
 
-    const area = await mapsDoubleSearch(req.new_area_id);
+    const area = await retriveAreaDoubleSearch(req.new_area_id);
 
     if (!area.area) {
         return NextResponse.json(
