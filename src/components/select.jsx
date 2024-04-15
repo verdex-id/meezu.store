@@ -1,3 +1,4 @@
+import ChevronDownIcon from "@/icons/chevron_down";
 import Image from "next/image";
 
 export default function Select({ id, name, title, type, children, ...props }) {
@@ -7,20 +8,15 @@ export default function Select({ id, name, title, type, children, ...props }) {
         <label htmlFor={id} className="font-bold text-2xl">
           {title}
         </label>
-        <div className="relative">
+        <div className="relative flex p-5 mt-1 bg-white border-l-4 border-white focus:border-cyan-900">
           <select
             name={name}
             id={id}
-            className="p-5 mt-1 outline-none bg-white w-full text-black/70 border-l-4 border-white focus:border-cyan-900"
+            className="outline-none w-full text-black/70 bg-transparent"
           >
             {children}
           </select>
-          <Image
-            src={"/icons/arrow_drop_down_circle.svg"}
-            height={24}
-            width={24}
-            className="absolute top-0 right-3 h-full opacity-50"
-          />
+          <ChevronDownIcon className="w-6" />
         </div>
       </div>
     </>
