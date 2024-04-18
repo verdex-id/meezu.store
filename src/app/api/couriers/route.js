@@ -29,6 +29,7 @@ export async function GET(request) {
 
   const existingCouriers = await prisma.courier.findMany({
     select: {
+      courier_id: true,
       courier_code: true,
       courier_service_code: true,
     },
@@ -42,16 +43,21 @@ export async function GET(request) {
   );
 
   if (available === "true") {
-    biteshipCouriers.couriers = biteshipCouriers.couriers.filter((courier) => {
+    biteshipCouriers = biteshipCouriers.couriers.filter((courier) => {
       if (
         existingCourierCodes.includes(courier.courier_code) &&
         existingCourierServiceCodes.includes(courier.courier_service_code)
       ) {
+        courier["courier_id"] = existingCouriers.find(
+          (ecourier) =>
+            ecourier.courier_service_code === courier.courier_service_code,
+        ).courier_id;
+
         return courier;
       }
     });
   } else {
-    biteshipCouriers.couriers = biteshipCouriers.couriers.filter((courier) => {
+    biteshipCouriers = biteshipCouriers.couriers.filter((courier) => {
       if (
         !existingCourierCodes.includes(courier.courier_code) ||
         !existingCourierServiceCodes.includes(courier.courier_service_code)
@@ -209,4 +215,3 @@ export async function DELETE(request) {
     ...successResponse({ deleted_courier_company: deletedCourierCompany }),
   );
 }
-
