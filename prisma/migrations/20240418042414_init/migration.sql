@@ -87,7 +87,7 @@ CREATE TABLE `Invoice` (
     `payment_date` DATETIME(3) NULL,
     `customer_full_name` VARCHAR(35) NOT NULL,
     `customer_phone_number` TINYTEXT NOT NULL,
-    `customer_address` VARCHAR(200) NOT NULL,
+    `customer_full_address` VARCHAR(200) NOT NULL,
     `discount_amount` MEDIUMINT UNSIGNED NOT NULL,
     `total_weight` INTEGER NOT NULL,
     `shipping_cost` MEDIUMINT UNSIGNED NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE `InvoiceItem` (
     `invoice_item_name` VARCHAR(191) NOT NULL,
     `invoice_item_weight` INTEGER NOT NULL,
     `invoice_item_total_weight` INTEGER NOT NULL,
-    `invoice_perunit_price` MEDIUMINT UNSIGNED NOT NULL,
+    `invoice_item_price` MEDIUMINT UNSIGNED NOT NULL,
     `invoice_item_total_price` MEDIUMINT UNSIGNED NOT NULL,
     `invoice_id` VARCHAR(191) NOT NULL,
     `product_iteration_id` INTEGER NOT NULL,
@@ -121,6 +121,7 @@ CREATE TABLE `Order` (
     `order_id` VARCHAR(191) NOT NULL,
     `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `order_status` VARCHAR(50) NOT NULL,
+    `note_for_seller` VARCHAR(150) NULL,
 
     UNIQUE INDEX `Order_order_id_key`(`order_id`),
     PRIMARY KEY (`order_id`)
@@ -130,9 +131,7 @@ CREATE TABLE `Order` (
 CREATE TABLE `Payment` (
     `payment_id` VARCHAR(191) NOT NULL,
     `paygate_transaction_id` VARCHAR(191) NOT NULL,
-    `payment_date` DATETIME(3) NOT NULL,
     `payment_method` VARCHAR(191) NOT NULL,
-    `total_payment` MEDIUMINT UNSIGNED NOT NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Payment_payment_id_key`(`payment_id`),
@@ -143,8 +142,8 @@ CREATE TABLE `Payment` (
 -- CreateTable
 CREATE TABLE `Shipment` (
     `shipment_id` VARCHAR(191) NOT NULL,
-    `expedition_order_id` VARCHAR(191) NOT NULL,
-    `shipment_date` DATETIME(3) NOT NULL,
+    `expedition_order_id` VARCHAR(191) NULL,
+    `shipment_date` DATETIME(3) NULL,
     `courier_id` INTEGER NOT NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
@@ -172,6 +171,8 @@ CREATE TABLE `GuestOrder` (
     `guest_order_id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_code` VARCHAR(191) NOT NULL,
     `guest_email` VARCHAR(75) NOT NULL,
+    `guest_area_id` VARCHAR(191) NOT NULL,
+    `guest_note_for_courier` VARCHAR(45) NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `GuestOrder_guest_order_id_key`(`guest_order_id`),
