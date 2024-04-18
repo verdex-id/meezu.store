@@ -1,5 +1,3 @@
-import prisma from "@/lib/prisma";
-import { ErrorWithCode } from "@/utils/custom-error";
 
 const biteshipBaseURL = "https://api.biteship.com";
 
