@@ -84,6 +84,7 @@ CREATE TABLE `IterationImage` (
 CREATE TABLE `Invoice` (
     `invoice_id` VARCHAR(191) NOT NULL,
     `invoice_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `payment_status` ENUM('UNPAID', 'PAID', 'FAILED', 'EXPIRED', 'REFUND') NOT NULL DEFAULT 'UNPAID',
     `payment_date` DATETIME(3) NULL,
     `customer_full_name` VARCHAR(35) NOT NULL,
     `customer_phone_number` TINYTEXT NOT NULL,
@@ -120,7 +121,7 @@ CREATE TABLE `InvoiceItem` (
 CREATE TABLE `Order` (
     `order_id` VARCHAR(191) NOT NULL,
     `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `order_status` VARCHAR(50) NOT NULL,
+    `order_status` ENUM('PENDING', 'AWAITING_PAYMENT', 'AWAITING_FULFILLMENT', 'AWAITING_SHIPMENT', 'AWAITING_PICKUP', 'SHIPPED', 'CANCELLED', 'REFUNDED') NOT NULL DEFAULT 'AWAITING_PAYMENT',
     `note_for_seller` VARCHAR(150) NULL,
 
     UNIQUE INDEX `Order_order_id_key`(`order_id`),

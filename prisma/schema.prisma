@@ -76,9 +76,18 @@ model IterationImage {
   product_variant_id      Int
 }
 
+enum PaymentStatus {
+  UNPAID
+  PAID
+  FAILED
+  EXPIRED
+  REFUND
+}
+
 model Invoice {
   invoice_id                String          @default(cuid())  @unique  @id 
-  invoice_date              DateTime        @default(now())       
+  invoice_date              DateTime        @default(now())
+  payment_status            PaymentStatus   @default(UNPAID)       
   payment_date              DateTime?        
   customer_full_name        String          @db.VarChar(35)
   customer_phone_number     String          @db.TinyText
@@ -108,12 +117,21 @@ model InvoiceItem {
   product_iteration_id        Int
 }
 
-
+enum OrderStatus {
+  PENDING
+  AWAITING_PAYMENT
+  AWAITING_FULFILLMENT
+  AWAITING_SHIPMENT
+  AWAITING_PICKUP
+  SHIPPED
+  CANCELLED
+  REFUNDED
+}
 
 model Order {
   order_id        String        @default(cuid())  @unique  @id
   order_date      DateTime      @default(now())
-  order_status    String        @db.VarChar(50)
+  order_status    OrderStatus   @default(AWAITING_PAYMENT)
   note_for_seller String?       @db.VarChar(150)
 
   guest_order     GuestOrder?   @relation(name: "GuestOrderToOrder")
@@ -247,5 +265,3 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
-
-
