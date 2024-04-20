@@ -111,7 +111,7 @@ CREATE TABLE `InvoiceItem` (
     `invoice_item_price` MEDIUMINT UNSIGNED NOT NULL,
     `invoice_item_total_price` MEDIUMINT UNSIGNED NOT NULL,
     `invoice_id` VARCHAR(191) NOT NULL,
-    `product_iteration_id` INTEGER NOT NULL,
+    `product_iteration_id` INTEGER NULL,
 
     UNIQUE INDEX `InvoiceItem_invoice_item_id_key`(`invoice_item_id`),
     PRIMARY KEY (`invoice_item_id`)
@@ -120,11 +120,14 @@ CREATE TABLE `InvoiceItem` (
 -- CreateTable
 CREATE TABLE `Order` (
     `order_id` VARCHAR(191) NOT NULL,
+    `order_code` VARCHAR(191) NOT NULL,
+    `discount_code` VARCHAR(191) NULL,
     `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `order_status` ENUM('PENDING', 'AWAITING_PAYMENT', 'AWAITING_FULFILLMENT', 'AWAITING_SHIPMENT', 'AWAITING_PICKUP', 'SHIPPED', 'CANCELLED', 'REFUNDED') NOT NULL DEFAULT 'AWAITING_PAYMENT',
     `note_for_seller` VARCHAR(150) NULL,
 
     UNIQUE INDEX `Order_order_id_key`(`order_id`),
+    UNIQUE INDEX `Order_order_code_key`(`order_code`),
     PRIMARY KEY (`order_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -145,6 +148,8 @@ CREATE TABLE `Shipment` (
     `shipment_id` VARCHAR(191) NOT NULL,
     `expedition_order_id` VARCHAR(191) NULL,
     `shipment_date` DATETIME(3) NULL,
+    `origin_area_id` VARCHAR(191) NULL,
+    `destination_area_id` VARCHAR(191) NOT NULL,
     `courier_id` INTEGER NOT NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
@@ -170,14 +175,11 @@ CREATE TABLE `Courier` (
 -- CreateTable
 CREATE TABLE `GuestOrder` (
     `guest_order_id` INTEGER NOT NULL AUTO_INCREMENT,
-    `order_code` VARCHAR(191) NOT NULL,
     `guest_email` VARCHAR(75) NOT NULL,
-    `guest_area_id` VARCHAR(191) NOT NULL,
     `guest_note_for_courier` VARCHAR(45) NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `GuestOrder_guest_order_id_key`(`guest_order_id`),
-    UNIQUE INDEX `GuestOrder_order_code_key`(`order_code`),
     UNIQUE INDEX `GuestOrder_order_id_key`(`order_id`),
     PRIMARY KEY (`guest_order_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -312,7 +314,7 @@ ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_order_id_fkey` FOREIGN KEY (`order
 ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`invoice_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;

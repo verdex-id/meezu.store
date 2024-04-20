@@ -73,6 +73,8 @@ export async function makeShipment(tx, orderId, request, invoiceItems) {
   }
   await tx.shipment.create({
     data: {
+      origin_area_id: activeOriginAddress.area_id,
+      destination_area_id: request.guest_area_id,
       courier_id: selectedCourier.courier_id,
       order_id: orderId,
     },

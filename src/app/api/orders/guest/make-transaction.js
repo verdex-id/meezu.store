@@ -1,4 +1,5 @@
 import { requestTransaction } from "@/services/tripay";
+import { FailError } from "@/utils/custom-error";
 
 export async function makeTransaction(
   request,
@@ -20,7 +21,7 @@ export async function makeTransaction(
   if (!response.success) {
     return {
       transaction: null,
-      error: new Error(response.message),
+      error: new FailError(response.message, 400),
     };
   }
 

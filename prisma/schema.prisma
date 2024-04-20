@@ -113,8 +113,8 @@ model InvoiceItem {
 
   invoice                     Invoice           @relation(fields: [invoice_id], references: [invoice_id])
   invoice_id                  String
-  product_iteration           ProductIteration  @relation(fields: [product_iteration_id], references: [product_iteration_id])
-  product_iteration_id        Int
+  product_iteration           ProductIteration?  @relation(fields: [product_iteration_id], references: [product_iteration_id])
+  product_iteration_id        Int?
 }
 
 enum OrderStatus {
@@ -129,15 +129,19 @@ enum OrderStatus {
 }
 
 model Order {
-  order_id        String        @default(cuid())  @unique  @id
-  order_date      DateTime      @default(now())
-  order_status    OrderStatus   @default(AWAITING_PAYMENT)
-  note_for_seller String?       @db.VarChar(150)
+  order_id            String        @default(cuid())  @unique  @id
+  order_code          String        @default(cuid())  @unique
+  discount_code       String?
+  order_date          DateTime      @default(now())
+  order_status        OrderStatus   @default(AWAITING_PAYMENT)
+  note_for_seller     String?       @db.VarChar(150)
 
-  guest_order     GuestOrder?   @relation(name: "GuestOrderToOrder")
-  invoice         Invoice?      @relation(name: "InvoiceToOrder")
-  shipment        Shipment?
-  payment         Payment?
+  
+
+  guest_order         GuestOrder?   @relation(name: "GuestOrderToOrder")
+  invoice             Invoice?      @relation(name: "InvoiceToOrder")
+  shipment            Shipment?
+  payment             Payment?
 }
 
 model Payment {
@@ -153,6 +157,8 @@ model Shipment {
   shipment_id             String  @unique  @default(cuid())  @id
   expedition_order_id     String?           // biteship order id
   shipment_date           DateTime?
+  origin_area_id          String?
+  destination_area_id     String
   courier                 Courier          @relation(fields: [courier_id], references: [courier_id])
   courier_id              Int 
               
@@ -174,10 +180,8 @@ model Courier {
 
 model GuestOrder {
   guest_order_id              Int      @unique   @default(autoincrement())  @id 
-  order_code                  String   @unique   @default(cuid())
   guest_email                 String             @db.VarChar(75)
-  guest_area_id               String
-  guest_note_for_courier      String?             @db.VarChar(45)
+  guest_note_for_courier      String?            @db.VarChar(45)
   
   order                       Order              @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id])
   order_id                    String   @unique
@@ -265,3 +269,4 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
+

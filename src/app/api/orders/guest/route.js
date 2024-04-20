@@ -1,6 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { FailError } from "@/utils/custom-error";
-import { awaitingPayment } from "@/utils/order-status";
 import { generateOrderCode } from "@/utils/random";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -12,6 +11,8 @@ import { makeTransaction } from "./make-transaction";
 import { makeRequestValidation } from "./make-validation";
 import { makeInvoiceItemsList } from "./make-invoice-items";
 import { makeResponse } from "./make-response";
+import { orderStatus } from "@/utils/order-status";
+import { paymentStatus } from "@/utils/payment-status";
 
 export async function POST(request) {
   let response;
@@ -25,18 +26,25 @@ export async function POST(request) {
     await prisma.$transaction(async (tx) => {
       const createOrderArg = {
         data: {
-          order_status: awaitingPayment,
+          order_code: generateOrderCode(),
+          order_status: orderStatus.awaitingPayment,
         },
         select: {
           order_id: true,
+          order_code: true,
         },
       };
       if (req.note_for_seller) {
         createOrderArg.data["note_for_seller"] = req.note_for_seller;
       }
+
+      if (req.discount_code) {
+        createOrderArg.data["discount_code"] = req.discount_code;
+      }
+
       const createdOrder = await tx.order.create(createOrderArg);
 
-      let invoiceItems = await makeInvoiceItemsList(req);
+      let invoiceItems = await makeInvoiceItemsList(tx, req);
       if (invoiceItems.error) {
         throw invoiceItems.error;
       }
@@ -66,7 +74,6 @@ export async function POST(request) {
       }, 0);
 
       let discount = 0;
-
       if (req.discount_code) {
         discount = await makeDiscount(tx, req.discount_code, grossPrice);
 
@@ -94,9 +101,7 @@ export async function POST(request) {
       const guestOrderArg = {
         data: {
           order_id: createdOrder.order_id,
-          order_code: generateOrderCode(),
           guest_email: req.guest_email,
-          guest_area_id: req.guest_area_id,
         },
       };
 
@@ -104,11 +109,11 @@ export async function POST(request) {
         guestOrderArg.data["guest_note_for_courier"] = req.note_for_courier;
       }
 
-      const createdGuestOrder = await tx.guestOrder.create(guestOrderArg);
+      await tx.guestOrder.create(guestOrderArg);
 
       const tripayTransaction = await makeTransaction(
         req,
-        createdGuestOrder.order_code,
+        createdOrder.order_code,
         netPrice,
         tripayItems,
       );
@@ -126,6 +131,7 @@ export async function POST(request) {
 
       const createdInvoice = await tx.invoice.create({
         data: {
+          payment_status: paymentStatus.unpaid,
           customer_full_name: tripayTransaction.transaction.customer_name,
           customer_phone_number: tripayTransaction.transaction.customer_phone,
           customer_full_address: req.guest_address,
