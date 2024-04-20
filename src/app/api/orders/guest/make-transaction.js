@@ -1,4 +1,4 @@
-import { requestTransaction } from "@/services/tripay";
+import { requestClosedTransaction } from "@/services/tripay";
 import { FailError } from "@/utils/custom-error";
 
 export async function makeTransaction(
@@ -7,7 +7,7 @@ export async function makeTransaction(
   amount,
   tripayItems,
 ) {
-  const response = await requestTransaction(
+  const response = await requestClosedTransaction(
     merchanRef,
     amount,
     request.payment_method,
