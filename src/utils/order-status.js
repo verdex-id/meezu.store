@@ -42,6 +42,30 @@ export const orderStatus = {
   shipped: "SHIPPED",
 
   /**
+   * Represents the order status when it has arrived at the destination.
+   * @type {string}
+   */
+  arrived: "ARRIVED", 
+
+  /**
+   * Represents the order status when it has been completed by the user.
+   * @type {string}
+   */
+  completed: "COMPLETED", 
+
+  /**
+   * Represents the order status when cancellation has been requested by the user.
+   * @type {string}
+   */
+  cancellationRequested: "CANCELLATION_REQUESTED", 
+
+  /**
+   * Represents the order status when the user is awaiting a refund.
+   * @type {string}
+   */
+  awaitingRefund: "AWAITING_REFUND", 
+
+  /**
    * Represents the order status when it is cancelled.
    * This status indicates that the order has been cancelled either by the customer or by the merchant before fulfillment or shipment.
    * @type {string}
@@ -53,5 +77,5 @@ export const orderStatus = {
    * This status indicates that the order has been refunded either partially or fully to the customer.
    * @type {string}
    */
-  refunded: "REFUNDED"
+  refunded: "REFUNDED",
 };

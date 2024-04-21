@@ -1,5 +1,6 @@
 export function makeResponse(shipment, transaction, invoice, purchasedItems) {
   const response = {
+    temp_trip_ref: transaction.reference, // delete after
     guest_order_code: transaction.merchant_ref,
     payment_details: {
       total_purchases: {
@@ -24,7 +25,6 @@ export function makeResponse(shipment, transaction, invoice, purchasedItems) {
     tripay_checkout_url: transaction.checkout_url,
     payment_instructions: transaction.instructions,
   };
-
 
   return response;
 }
