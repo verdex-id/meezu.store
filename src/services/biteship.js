@@ -62,7 +62,6 @@ export async function retriveAreaSingleSearch(searchInput) {
   const response = await fetch(url, options)
     .then((res) => res.json())
     .then((json) => json)
-    .catch((err) => console.error("error:" + err));
 
   if (response.error) {
     return {
@@ -92,7 +91,6 @@ export async function retriveAreaDoubleSearch(areaId) {
   const response = await fetch(url, options)
     .then((res) => res.json())
     .then((json) => json)
-    .catch((err) => console.error("error:" + err));
 
   if (response.error) {
     return {

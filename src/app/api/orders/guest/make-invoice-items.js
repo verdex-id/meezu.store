@@ -8,8 +8,6 @@ export async function makeInvoiceItemsList(tx, request) {
     json: request,
   });
 
-  console.log(request);
-
   if (new Set(invoiceItemIds).size !== invoiceItemIds.length) {
     return {
       invoiceItems: null,
@@ -20,7 +18,6 @@ export async function makeInvoiceItemsList(tx, request) {
     };
   }
 
-  console.log("bjir");
   const productIterations = await prisma.productIteration.findMany({
     where: {
       product_iteration_id: { in: invoiceItemIds },
