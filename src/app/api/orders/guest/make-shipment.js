@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import { retriveCourierRates } from "@/services/biteship";
 import { FailError } from "@/utils/custom-error";
-import { invoiceItemsListToBiteshipItemList } from "./order-items";
 
 export async function makeShipment(tx, orderId, request, biteshipItems) {
   let activeOriginAddress;
@@ -71,9 +70,10 @@ export async function makeShipment(tx, orderId, request, biteshipItems) {
       error: new FailError("Courier not available", 404),
     };
   }
+
   await tx.shipment.create({
     data: {
-      origin_area_id: activeOriginAddress.area_id,
+      origin_address_id: activeOriginAddress.origin_address_id,
       destination_area_id: request.guest_area_id,
       courier_id: selectedCourier.courier_id,
       order_id: orderId,
