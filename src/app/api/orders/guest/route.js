@@ -4,7 +4,6 @@ import { generateOrderCode } from "@/utils/random";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
-import { invoiceItemsListToTripayItems } from "./order-items";
 import { makeShipment } from "./make-shipment";
 import { makeDiscount } from "./make-discount";
 import { makeTransaction } from "./make-transaction";
@@ -13,6 +12,7 @@ import { makeInvoiceItemsList } from "./make-invoice-items";
 import { makeResponse } from "./make-response";
 import { orderStatus } from "@/utils/order-status";
 import { paymentStatus } from "@/utils/payment-status";
+import { prepareData } from "./prepare-data";
 
 export async function POST(request) {
   let response;
@@ -50,14 +50,16 @@ export async function POST(request) {
       }
       invoiceItems = invoiceItems.invoiceItems;
 
-      const tripayItems = invoiceItemsListToTripayItems(invoiceItems);
+      let { tripayItems, biteshipItems, grossPrice, totalWeight } =
+        prepareData(invoiceItems);
+
       const purchasedItems = [...tripayItems];
 
       const shipment = await makeShipment(
         tx,
         createdOrder.order_id,
         req,
-        invoiceItems,
+        biteshipItems,
       );
       if (shipment.error) {
         throw shipment.error;
@@ -68,10 +70,6 @@ export async function POST(request) {
         price: shipment.pricing.price,
         quantity: 1,
       });
-
-      let grossPrice = invoiceItems.reduce((accu, item) => {
-        return accu + item.invoice_item_total_price;
-      }, 0);
 
       let discount = 0;
       if (req.discount_code) {
@@ -91,10 +89,6 @@ export async function POST(request) {
       }
 
       grossPrice = grossPrice + shipment.pricing.price;
-
-      const totalWeight = invoiceItems.reduce((accu, item) => {
-        return accu + item.invoice_item_total_weight;
-      }, 0);
 
       const netPrice = grossPrice - discount;
 
