@@ -3,7 +3,7 @@ import { retriveCourierRates } from "@/services/biteship";
 import { FailError } from "@/utils/custom-error";
 import { invoiceItemsListToBiteshipItemList } from "./order-items";
 
-export async function makeShipment(tx, orderId, request, invoiceItems) {
+export async function makeShipment(tx, orderId, request, biteshipItems) {
   let activeOriginAddress;
   let selectedCourier;
   try {
@@ -45,7 +45,7 @@ export async function makeShipment(tx, orderId, request, invoiceItems) {
     activeOriginAddress.area_id,
     request.guest_area_id,
     selectedCourier.courier_code,
-    invoiceItemsListToBiteshipItemList(invoiceItems),
+    biteshipItems,
   );
 
   if (response.error) {
