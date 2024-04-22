@@ -174,10 +174,7 @@ export async function POST(request) {
     }
 
     if (e instanceof FailError) {
-      if (e.detail) {
-        return NextResponse.json(...failResponse(e.message, e.code, e.detail));
-      }
-      return NextResponse.json(...failResponse(e.message, e.code));
+      return NextResponse.json(...failResponse(e.message, e.code, e.detail));
     }
 
     return NextResponse.json(...errorResponse());

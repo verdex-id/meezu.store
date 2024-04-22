@@ -11,6 +11,7 @@ export async function middleware(request) {
         //["/api/team"],
         //["/api/admin/settings/image"],
         ["/api/areas", ["GET"]],
+        ["/api/orders", ["GET"]],
         ["/api/addresses/origin", ["GET", "DELETE"]],
         ["/api/products", ["GET", "DELETE"]],
         ["/api/couriers", ["GET"]],
@@ -39,6 +40,7 @@ export async function middleware(request) {
         ["/api/couriers", ["POST", "DELETE"]],
         ["/api/discounts/product", ["GET", "POST", "DELETE"]],
         ["/api/discounts", ["POST", "DELETE"]],
+        ["/api/orders", ["GET"]]
         //["/api/course", ["POST", "DELETE", "PUT"]],
     ];
 

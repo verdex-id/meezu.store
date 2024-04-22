@@ -57,7 +57,7 @@ export const orderStatus = {
    * Represents the order status when cancellation has been requested by the user.
    * @type {string}
    */
-  cancellationRequested: "CANCELLATION_REQUESTED", 
+  cancellationRequest: "CANCELLATION_REQUEST", 
 
   /**
    * Represents the order status when the user is awaiting a refund.
