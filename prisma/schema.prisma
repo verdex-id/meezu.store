@@ -161,10 +161,11 @@ model Shipment {
   shipment_id             String  @unique  @default(cuid())  @id
   expedition_order_id     String?           // biteship order id
   shipment_date           DateTime?
-  origin_area_id          String?
   destination_area_id     String
-  courier                 Courier          @relation(fields: [courier_id], references: [courier_id])
-  courier_id              Int 
+  courier                 Courier?          @relation(fields: [courier_id], references: [courier_id])
+  courier_id              Int?
+  origin_address          OriginAddress?    @relation(fields: [origin_address_id], references: [origin_address_id])
+  origin_address_id       Int?  
               
   order                   Order            @relation(fields: [order_id], references: [order_id])
   order_id                String  @unique
@@ -253,6 +254,8 @@ model OriginAddress {
   postal_code           String     @db.TinyText
   area_id               String
   is_active             Boolean    @default(false)
+
+  shipments             Shipment[]
 }
 
 model Admin {
@@ -273,4 +276,5 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
+
 

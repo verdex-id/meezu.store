@@ -148,9 +148,9 @@ CREATE TABLE `Shipment` (
     `shipment_id` VARCHAR(191) NOT NULL,
     `expedition_order_id` VARCHAR(191) NULL,
     `shipment_date` DATETIME(3) NULL,
-    `origin_area_id` VARCHAR(191) NULL,
     `destination_area_id` VARCHAR(191) NOT NULL,
-    `courier_id` INTEGER NOT NULL,
+    `courier_id` INTEGER NULL,
+    `origin_address_id` INTEGER NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Shipment_shipment_id_key`(`shipment_id`),
@@ -320,7 +320,10 @@ ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_product_iteration_id_fkey`
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_courier_id_fkey` FOREIGN KEY (`courier_id`) REFERENCES `Courier`(`courier_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_courier_id_fkey` FOREIGN KEY (`courier_id`) REFERENCES `Courier`(`courier_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_origin_address_id_fkey` FOREIGN KEY (`origin_address_id`) REFERENCES `OriginAddress`(`origin_address_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
