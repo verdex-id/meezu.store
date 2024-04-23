@@ -10,6 +10,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+export async function sendEmail(to, content) {
+  return await transporter.sendMail({
+    from: process.env.EMAIL_SENDER,
+    to: to,
+    subject: "Verdex Email Verification",
+    text: `${content}`,
+    html: `${content}`,
+  });
+}
+
 export async function sendEmailVerification(to, link) {
   return await transporter.sendMail({
     from: process.env.EMAIL_SENDER,

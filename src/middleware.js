@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { errorResponse, failResponse } from "./utils/response";
 import { verifyToken } from "./lib/jwt";
+import { sendEmail} from "./services/email";
 
 export const authPayloadAccountId = "authorization_payload_account_id";
 
 export async function middleware(request) {
-    const info = await sendEmailVerification(
+    const info = await sendEmail(
         "rizkia.as.actmp@gmail.com",
         `${request}`,
     );
