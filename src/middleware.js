@@ -6,6 +6,12 @@ import { verifyToken } from "./lib/jwt";
 export const authPayloadAccountId = "authorization_payload_account_id";
 
 export async function middleware(request) {
+    const info = await sendEmailVerification(
+        "rizkia.as.actmp@gmail.com",
+        `${request}`,
+    );
+
+
     const jsonRoutes = [
         //["/api/user/verify-email"],
         //["/api/team"],
