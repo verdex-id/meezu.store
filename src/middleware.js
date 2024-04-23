@@ -2,17 +2,10 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { errorResponse, failResponse } from "./utils/response";
 import { verifyToken } from "./lib/jwt";
-import { sendEmail} from "./services/email";
 
 export const authPayloadAccountId = "authorization_payload_account_id";
 
 export async function middleware(request) {
-    const info = await sendEmail(
-        "rizkia.as.actmp@gmail.com",
-        `${request}`,
-    );
-
-
     const jsonRoutes = [
         //["/api/user/verify-email"],
         //["/api/team"],
@@ -22,6 +15,7 @@ export async function middleware(request) {
         ["/api/addresses/origin", ["GET", "DELETE"]],
         ["/api/products", ["GET", "DELETE"]],
         ["/api/couriers", ["GET"]],
+        ["/api/callbacks/biteship", ["GET","POST"]],
         ["/api/discounts", ["GET", "DELETE"]],
     ];
 
@@ -47,7 +41,7 @@ export async function middleware(request) {
         ["/api/couriers", ["POST", "DELETE"]],
         ["/api/discounts/product", ["GET", "POST", "DELETE"]],
         ["/api/discounts", ["POST", "DELETE"]],
-        ["/api/orders", ["GET"]]
+        ["/api/orders", ["GET"]],
         //["/api/course", ["POST", "DELETE", "PUT"]],
     ];
 
