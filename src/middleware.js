@@ -16,6 +16,7 @@ export async function middleware(request) {
         ["/api/products", ["GET", "DELETE"]],
         ["/api/couriers", ["GET"]],
         ["/api/discounts", ["GET", "DELETE"]],
+        ["api/callbacks/biteship", ["POST"]]
     ];
 
     if (!checkRoute(jsonRoutes, request)) {
@@ -40,7 +41,8 @@ export async function middleware(request) {
         ["/api/couriers", ["POST", "DELETE"]],
         ["/api/discounts/product", ["GET", "POST", "DELETE"]],
         ["/api/discounts", ["POST", "DELETE"]],
-        ["/api/orders", ["GET"]]
+        ["/api/orders", ["GET"]],
+        ["/api/shipments/guest", ["POST"]]
         //["/api/course", ["POST", "DELETE", "PUT"]],
     ];
 
