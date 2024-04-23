@@ -1,6 +1,6 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { authPayloadAccountId } from "@/middleware";
-import { mapsDoubleSearch } from "@/services/biteship";
+import { retriveAreaDoubleSearch } from "@/services/biteship";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
@@ -41,7 +41,7 @@ export async function POST(request) {
     );
   }
 
-  const area = await mapsDoubleSearch(req.area_id);
+  const area = await retriveAreaDoubleSearch(req.area_id);
 
   if (!area.area) {
     return NextResponse.json(
