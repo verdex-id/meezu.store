@@ -17,6 +17,7 @@ export async function middleware(request) {
         ["/api/couriers", ["GET"]],
         ["/api/callbacks/biteship", ["GET","POST"]],
         ["/api/discounts", ["GET", "DELETE"]],
+        ["/api/vouchers", ["GET"]]
     ];
 
     if (!checkRoute(jsonRoutes, request)) {
