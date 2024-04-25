@@ -8,7 +8,7 @@ import {
 import { FailError } from "@/utils/custom-error";
 import { orderStatus } from "@/utils/order-status";
 import { paymentStatus } from "@/utils/payment-status";
-import { errorResponse, failResponse } from "@/utils/response";
+import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
 import { headers } from "next/headers";
@@ -211,6 +211,8 @@ export async function POST(request) {
 
     return NextResponse.json(...errorResponse());
   }
+
+  return NextResponse.json(...successResponse(response));
 }
 
 function invoiceItemsToBiteshipItems(invoiceItems) {
