@@ -147,13 +147,20 @@ CREATE TABLE `Payment` (
 CREATE TABLE `Shipment` (
     `shipment_id` VARCHAR(191) NOT NULL,
     `expedition_order_id` VARCHAR(191) NULL,
+    `courier_tracking_id` VARCHAR(191) NULL,
+    `shipment_status` VARCHAR(191) NULL,
     `shipment_date` DATETIME(3) NULL,
+    `cash_on_delivery_fee` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+    `proof_of_delivery_fee` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+    `shippment_fee` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+    `price` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
     `destination_area_id` VARCHAR(191) NOT NULL,
     `courier_id` INTEGER NULL,
     `origin_address_id` INTEGER NULL,
     `order_id` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Shipment_shipment_id_key`(`shipment_id`),
+    UNIQUE INDEX `Shipment_expedition_order_id_key`(`expedition_order_id`),
     UNIQUE INDEX `Shipment_order_id_key`(`order_id`),
     PRIMARY KEY (`shipment_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -1,5 +1,73 @@
-
 const biteshipBaseURL = "https://api.biteship.com";
+
+export async function createExpeditionOrder(
+  originContactName,
+  originContactPhone,
+  originAddress,
+  originNote,
+  originAreaId,
+  originPostalCode,
+
+  destinationContactName,
+  destinationContactPhone,
+  destinationAddress,
+  destinationContactEmail,
+  destinationNote,
+  destinationAreaId,
+  destinationPostalCode,
+
+  courierCompany,
+  corierType,
+  corierInsurance,
+  deliveryType,
+  deliveryDate,
+  deliveryTime,
+  orderNote,
+  biteshipItems,
+) {
+  const url = `${biteshipBaseURL}/v1/orders`;
+
+  const biteshipApiKey = process.env.BITESHIP_API_KEY;
+
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${biteshipApiKey}`,
+    },
+    body: JSON.stringify({
+      origin_contact_name: originContactName,
+      origin_contact_phone: originContactPhone,
+      origin_address: originAddress,
+      origin_note: originNote,
+      origin_area_id: originAreaId,
+      origin_postal_code: originPostalCode,
+
+      destination_contact_name: destinationContactName,
+      destination_contact_phone: destinationContactPhone,
+      destination_address: destinationAddress,
+      destination_contact_email: destinationContactEmail,
+      destination_note: destinationNote,
+      destination_area_id: destinationAreaId,
+      destination_postal_code: destinationPostalCode,
+
+      courier_company: courierCompany,
+      courier_type: corierType,
+      courier_insurance: corierInsurance ? corierInsurance : null,
+      delivery_type: deliveryType,
+      delivery_date: deliveryDate,
+      delivery_time: deliveryTime,
+      order_note: orderNote,
+      items: biteshipItems,
+    }),
+  };
+
+  const response = await fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => json);
+
+  return response;
+}
 
 export async function retrieveCouriers() {
   const options = {
@@ -61,7 +129,7 @@ export async function retriveAreaSingleSearch(searchInput) {
 
   const response = await fetch(url, options)
     .then((res) => res.json())
-    .then((json) => json)
+    .then((json) => json);
 
   if (response.error) {
     return {
@@ -90,7 +158,7 @@ export async function retriveAreaDoubleSearch(areaId) {
 
   const response = await fetch(url, options)
     .then((res) => res.json())
-    .then((json) => json)
+    .then((json) => json);
 
   if (response.error) {
     return {
