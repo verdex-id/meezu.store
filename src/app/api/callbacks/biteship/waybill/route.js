@@ -12,26 +12,6 @@ export async function POST(request) {
         status: Joi.string().required(),
         courier_tracking_id: Joi.string().required(),
         courier_waybill_id: Joi.string().required(),
-        price: Joi.number()
-            .min(0)
-            .max(unsignedMediumInt)
-            .integer()
-            .required(),
-        cash_on_delivery_fee: Joi.number()
-            .min(0)
-            .max(unsignedMediumInt)
-            .integer()
-            .required(),
-        proof_of_delivery_fee: Joi.number()
-            .min(0)
-            .max(unsignedMediumInt)
-            .integer()
-            .required(),
-        shippment_fee: Joi.number()
-            .min(0)
-            .max(unsignedMediumInt)
-            .integer()
-            .required(),
     });
 
     let req = await request.json();
