@@ -158,9 +158,18 @@ model Payment {
 }
 
 model Shipment {
-  shipment_id             String  @unique  @default(cuid())  @id
-  expedition_order_id     String?           // biteship order id
+  shipment_id             String      @unique  @default(cuid())  @id
+  expedition_order_id     String?     @unique           // biteship order id
+  courier_tracking_id     String?
+  shipment_status         String?
   shipment_date           DateTime?
+
+  cash_on_delivery_fee    Int         @db.UnsignedMediumInt   @default(0)
+  proof_of_delivery_fee   Int         @db.UnsignedMediumInt   @default(0)
+  shippment_fee           Int         @db.UnsignedMediumInt   @default(0)
+  price                   Int         @db.UnsignedMediumInt   @default(0)
+
+
   destination_area_id     String
   courier                 Courier?          @relation(fields: [courier_id], references: [courier_id])
   courier_id              Int?
@@ -181,7 +190,6 @@ model Courier {
   shipments               Shipment[]
   @@unique([courier_code, courier_service_code])
 }
-
 
 model GuestOrder {
   guest_order_id              Int      @unique   @default(autoincrement())  @id 
@@ -276,5 +284,4 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
-
 
