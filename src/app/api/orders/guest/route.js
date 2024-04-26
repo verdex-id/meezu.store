@@ -156,6 +156,7 @@ export async function POST(request) {
       );
     });
   } catch (e) {
+    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
