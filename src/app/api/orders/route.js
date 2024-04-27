@@ -1,6 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { authPayloadAccountId } from "@/middleware";
-//import { cetak } from "@/utils/cetak";
 import { FailError } from "@/utils/custom-error";
 import { orderStatus } from "@/utils/order-status";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
@@ -121,9 +120,7 @@ export async function GET(request) {
       },
     });
 
-    //cetak(orders, "PAID ORDERS", true);
   } catch (e) {
-    //cetak(e, "E orders/get");
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
     }

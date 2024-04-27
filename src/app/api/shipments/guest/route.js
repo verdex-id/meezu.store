@@ -4,7 +4,6 @@ import {
   createExpeditionOrder,
   retriveAreaDoubleSearch,
 } from "@/services/biteship";
-//import { cetak } from "@/utils/cetak";
 import { FailError } from "@/utils/custom-error";
 import { orderStatus } from "@/utils/order-status";
 import { paymentStatus } from "@/utils/payment-status";
@@ -158,7 +157,7 @@ export async function POST(request) {
         throw new FailError(expedition.error, 400);
       }
 
-      const updatedShipment = await tx.shipment.update({
+      await tx.shipment.update({
         where: {
           shipment_id: updatedOrder.shipment.shipment_id,
         },
@@ -192,15 +191,8 @@ export async function POST(request) {
         price: expedition.price,
         note: expedition.note,
       };
-
-      //cetak(updatedShipment, "SHIPTMENT");
-
-      //cetak(expedition, "EXPED");
-      //cetak(response, "RESPONSE");
-      //throw new Error("SHIT");
     });
   } catch (e) {
-    //cetak(e, "E shipment/route");
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
     }
