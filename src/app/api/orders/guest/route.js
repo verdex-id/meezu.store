@@ -4,15 +4,14 @@ import { generateOrderCode } from "@/utils/random";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
-import { makeShipment } from "./make-shipment";
 import { makeDiscount } from "./make-discount";
 import { makeTransaction } from "./make-transaction";
 import { makeRequestValidation } from "./make-validation";
-import { makeInvoiceItemsList } from "./make-invoice-items";
 import { makeResponse } from "./make-response";
 import { orderStatus } from "@/utils/order-status";
 import { paymentStatus } from "@/utils/payment-status";
 import { prepareData } from "./prepare-data";
+import { makeCourierRates } from "./make-courier-rates";
 
 export async function POST(request) {
   let response;
@@ -23,8 +22,32 @@ export async function POST(request) {
     }
     req = req.request;
 
+    const datas = await prepareData(req);
+    if (datas.error) {
+      throw datas.error;
+    }
+
+    let {
+      invoiceItems,
+      tripayItems,
+      biteshipItems,
+      grossPrice,
+      totalWeight,
+      prouductIterationBulkUpdateQuery,
+      prouductIterationBulkUpdateValues,
+    } = datas.datas;
+    const purchasedItems = [...tripayItems];
+
+    const shipment = await makeCourierRates(req, biteshipItems);
+    if (shipment.error) {
+      throw shipment.error;
+    }
+
+    let createdOrder;
+    let netPrice;
+    let createdInvoice;
     await prisma.$transaction(async (tx) => {
-      const createdOrder = await tx.order.create({
+      createdOrder = await tx.order.create({
         data: {
           order_code: generateOrderCode(),
           order_status: orderStatus.awaitingPayment,
@@ -37,26 +60,22 @@ export async function POST(request) {
         },
       });
 
-      let invoiceItems = await makeInvoiceItemsList(tx, req);
-      if (invoiceItems.error) {
-        throw invoiceItems.error;
-      }
-      invoiceItems = invoiceItems.invoiceItems;
-
-      let { tripayItems, biteshipItems, grossPrice, totalWeight } =
-        prepareData(invoiceItems);
-
-      const purchasedItems = [...tripayItems];
-
-      const shipment = await makeShipment(
-        tx,
-        createdOrder.order_id,
-        req,
-        biteshipItems,
+      const affected = await tx.$executeRawUnsafe(
+        prouductIterationBulkUpdateQuery,
+        ...prouductIterationBulkUpdateValues,
       );
-      if (shipment.error) {
-        throw shipment.error;
+      if (affected !== invoiceItems.length) {
+        throw new FailError("Several records not found for update", 404);
       }
+
+      await tx.shipment.create({
+        data: {
+          origin_address_id: shipment.origin.origin_address_id,
+          destination_area_id: req.guest_area_id,
+          courier_id: shipment.courier.courier_id,
+          order_id: createdOrder.order_id,
+        },
+      });
 
       tripayItems.push({
         name: "Shipping cost",
@@ -83,31 +102,13 @@ export async function POST(request) {
 
       grossPrice = grossPrice + shipment.pricing.price;
 
-      const netPrice = grossPrice - discount;
+      netPrice = grossPrice - discount;
 
-      const tripayTransaction = await makeTransaction(
-        req,
-        createdOrder.order_code,
-        netPrice,
-        tripayItems,
-      );
-      if (tripayTransaction.error) {
-        throw tripayTransaction.error;
-      }
-
-      await tx.payment.create({
-        data: {
-          paygate_transaction_id: tripayTransaction.transaction.reference,
-          payment_method: tripayTransaction.transaction.payment_method,
-          order_id: createdOrder.order_id,
-        },
-      });
-
-      const createdInvoice = await tx.invoice.create({
+      createdInvoice = await tx.invoice.create({
         data: {
           payment_status: paymentStatus.unpaid,
-          customer_full_name: tripayTransaction.transaction.customer_name,
-          customer_phone_number: tripayTransaction.transaction.customer_phone,
+          customer_full_name: req.guest_full_name,
+          customer_phone_number: req.guest_phone_number,
           customer_full_address: req.guest_address,
           discount_amount: discount,
           total_weight: totalWeight,
@@ -127,14 +128,31 @@ export async function POST(request) {
           },
         },
       });
-
-      response = makeResponse(
-        shipment,
-        tripayTransaction.transaction,
-        createdInvoice,
-        purchasedItems,
-      );
     });
+    const tripayTransaction = await makeTransaction(
+      req,
+      createdOrder.order_code,
+      netPrice,
+      tripayItems,
+    );
+    if (tripayTransaction.error) {
+      throw tripayTransaction.error;
+    }
+
+    await prisma.payment.create({
+      data: {
+        paygate_transaction_id: tripayTransaction.transaction.reference,
+        payment_method: tripayTransaction.transaction.payment_method,
+        order_id: createdOrder.order_id,
+      },
+    });
+
+    response = makeResponse(
+      shipment.pricing,
+      tripayTransaction.transaction,
+      createdInvoice,
+      purchasedItems,
+    );
   } catch (e) {
     console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {

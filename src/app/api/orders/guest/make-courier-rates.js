@@ -1,8 +1,7 @@
 import prisma from "@/lib/prisma";
 import { retriveCourierRates } from "@/services/biteship";
-import { FailError } from "@/utils/custom-error";
 
-export async function makeShipment(tx, orderId, request, biteshipItems) {
+export async function makeCourierRates(request, biteshipItems) {
   let activeOriginAddress;
   let selectedCourier;
   try {
@@ -13,10 +12,7 @@ export async function makeShipment(tx, orderId, request, biteshipItems) {
     });
 
     if (!activeOriginAddress) {
-      return {
-        pricing: null,
-        error: new FailError("Can't place an order for now", 503),
-      };
+      throw new FailError("Can't place an order for now", 503);
     }
 
     selectedCourier = await prisma.courier.findFirst({
@@ -28,13 +24,12 @@ export async function makeShipment(tx, orderId, request, biteshipItems) {
     });
 
     if (!selectedCourier) {
-      return {
-        pricing: null,
-        error: new FailError("Courier not available", 404),
-      };
+      throw new FailError("Courier not available", 404);
     }
   } catch (e) {
     return {
+      origin: null,
+      courier: null,
       pricing: null,
       error: e,
     };
@@ -50,11 +45,14 @@ export async function makeShipment(tx, orderId, request, biteshipItems) {
   if (response.error) {
     if (response.code === 40001001 || response.code === 40001010) {
       return {
+        origin: null,
         pricing: null,
         error: new FailError(response.error, 404),
       };
     }
     return {
+      origin: null,
+      courier: null,
       pricing: null,
       error: new Error(),
     };
@@ -66,21 +64,16 @@ export async function makeShipment(tx, orderId, request, biteshipItems) {
 
   if (!pricing) {
     return {
+      origin: null,
+      courier: null,
       pricing: null,
       error: new FailError("Courier not available", 404),
     };
   }
 
-  await tx.shipment.create({
-    data: {
-      origin_address_id: activeOriginAddress.origin_address_id,
-      destination_area_id: request.guest_area_id,
-      courier_id: selectedCourier.courier_id,
-      order_id: orderId,
-    },
-  });
-
   return {
+    origin: activeOriginAddress,
+    courier: selectedCourier,
     pricing: pricing,
     error: null,
   };
