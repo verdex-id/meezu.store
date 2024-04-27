@@ -28,7 +28,7 @@ export async function POST(request) {
 
     if (!admin) {
         return NextResponse.json(
-            ...failResponse("Username and/or password are incorrect.", 401),
+            ...failResponse("Email and/or password are incorrect.", 401),
         );
     }
 
