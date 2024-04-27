@@ -24,25 +24,18 @@ export async function POST(request) {
     req = req.request;
 
     await prisma.$transaction(async (tx) => {
-      const createOrderArg = {
+      const createdOrder = await tx.order.create({
         data: {
           order_code: generateOrderCode(),
           order_status: orderStatus.awaitingPayment,
+          note_for_seller: req.note_for_seller ? req.note_for_seller : null,
+          discount_code: req.discount_code ? req.discount_code : null,
         },
         select: {
           order_id: true,
           order_code: true,
         },
-      };
-      if (req.note_for_seller) {
-        createOrderArg.data["note_for_seller"] = req.note_for_seller;
-      }
-
-      if (req.discount_code) {
-        createOrderArg.data["discount_code"] = req.discount_code;
-      }
-
-      const createdOrder = await tx.order.create(createOrderArg);
+      });
 
       let invoiceItems = await makeInvoiceItemsList(tx, req);
       if (invoiceItems.error) {
@@ -91,19 +84,6 @@ export async function POST(request) {
       grossPrice = grossPrice + shipment.pricing.price;
 
       const netPrice = grossPrice - discount;
-
-      const guestOrderArg = {
-        data: {
-          order_id: createdOrder.order_id,
-          guest_email: req.guest_email,
-        },
-      };
-
-      if (req.note_for_courier) {
-        guestOrderArg.data["guest_note_for_courier"] = req.note_for_courier;
-      }
-
-      await tx.guestOrder.create(guestOrderArg);
 
       const tripayTransaction = await makeTransaction(
         req,

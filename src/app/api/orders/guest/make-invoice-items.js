@@ -59,9 +59,8 @@ export async function makeInvoiceItemsList(tx, request) {
   const invoiceItems = [];
 
   try {
-    let values = [];
-    let cases = ``;
-    let wheres = ``;
+    let subqueries = ``;
+    const values = [];
 
     productIterations.forEach((itr, i) => {
       const combinedVariantName =
@@ -97,11 +96,6 @@ export async function makeInvoiceItemsList(tx, request) {
           itr.product.product_discounts.discount.discount_value;
       }
 
-      cases += `WHEN product_iteration_id = ? THEN product_variant_stock - ? `;
-      values.push(itr.product_iteration_id);
-      values.push(invoiceItemQuantity);
-      wheres += i > 0 ? ",?" : "?";
-
       invoiceItems.push({
         invoice_item_name: combinedVariantName,
         invoice_item_quantity: invoiceItemQuantity,
@@ -112,15 +106,21 @@ export async function makeInvoiceItemsList(tx, request) {
         invoice_item_total_price: invoiceItemPrice * invoiceItemQuantity,
         product_iteration_id: itr.product_iteration_id,
       });
+
+      subqueries +=
+        i < productIterations.length - 1
+          ? `SELECT ? AS product_iteration_id, ? AS quantity UNION ALL `
+          : `SELECT ? AS product_iteration_id, ? AS quantity `;
+      values.push(itr.product_iteration_id, invoiceItemQuantity);
     });
 
-    let query = `UPDATE ProductIteration SET product_variant_stock = CASE ${cases} ELSE product_variant_stock END WHERE product_iteration_id IN (${wheres})`;
+    let query = `
+UPDATE ProductIteration AS p 
+JOIN(${subqueries}) AS t 
+ON p.product_iteration_id = t.product_iteration_id 
+SET p.product_variant_stock = p.product_variant_stock - t.quantity `;
 
-    const affected = await tx.$executeRawUnsafe(
-      query,
-      ...values,
-      ...invoiceItemIds,
-    );
+    const affected = await tx.$executeRawUnsafe(query, ...values);
     if (affected !== invoiceItemIds.length) {
       throw new FailError("Several records not found for update", 404);
     }
