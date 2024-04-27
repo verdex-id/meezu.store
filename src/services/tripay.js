@@ -50,6 +50,7 @@ export async function requestClosedTransaction(
     customer_email: customerEmail,
     customer_phone: customerPhone,
     order_items: tripayItems,
+    callback_url: process.env.TRIPAY_CALLBACK_URL,
     return_url: returnUrl,
     expired_time: expiry,
     signature: signature,
