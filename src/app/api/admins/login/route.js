@@ -7,17 +7,35 @@ import prisma from "@/lib/prisma";
 import { cookies } from "next/headers";
 
 export async function POST(request) {
-  const schema = Joi.object({
-    password: Joi.string().required(),
-    email: Joi.string().email().required(),
-  });
+    const schema = Joi.object({
+        password: Joi.string().required(),
+        email: Joi.string().email().required(),
+    });
 
-  const req = await request.json();
+    const req = await request.json();
 
-  const invalidReq = schema.validate(req);
-  if (invalidReq.error) {
-    return NextResponse.json(
-      ...failResponse("Invalid request format.", 400, invalidReq.error.details)
+    const invalidReq = schema.validate(req);
+    if (invalidReq.error) {
+        return NextResponse.json(
+            ...failResponse("Invalid request format.", 400, invalidReq.error.details),
+        );
+    }
+
+    const admin = await prisma.admin.findUnique({
+        where: {
+            admin_email: req.email,
+        },
+    });
+
+    if (!admin) {
+        return NextResponse.json(
+            ...failResponse("Email and/or password are incorrect.", 401),
+        );
+    }
+
+    const isCorrectPassword = await comparePassword(
+        req.password,
+        admin.admin_hashedPassword,
     );
   }
 

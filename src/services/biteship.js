@@ -1,61 +1,174 @@
 const biteshipBaseURL = "https://api.biteship.com";
 
-export async function mapsSingleSearch(searchInput) {
-    const url = `${biteshipBaseURL}/v1/maps/areas?countries=ID&input=${searchInput}&type=single`;
+export async function createExpeditionOrder(
+  originContactName,
+  originContactPhone,
+  originAddress,
+  originNote,
+  originAreaId,
+  originPostalCode,
 
-    const biteshipApiKey = process.env.BITESHIP_API_KEY;
+  destinationContactName,
+  destinationContactPhone,
+  destinationAddress,
+  destinationContactEmail,
+  destinationNote,
+  destinationAreaId,
+  destinationPostalCode,
 
-    const options = {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${biteshipApiKey}`,
-        },
-    };
+  courierCompany,
+  corierType,
+  corierInsurance,
+  deliveryType,
+  deliveryDate,
+  deliveryTime,
+  orderNote,
+  biteshipItems,
+) {
+  const url = `${biteshipBaseURL}/v1/orders`;
 
-    const response = await fetch(url, options)
-        .then((res) => res.json())
-        .then((json) => json)
-        .catch((err) => console.error("error:" + err));
+  const biteshipApiKey = process.env.BITESHIP_API_KEY;
 
-    if (response.error) {
-        return {
-            areas: [],
-            error: response.error,
-        };
-    }
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${biteshipApiKey}`,
+    },
+    body: JSON.stringify({
+      origin_contact_name: originContactName,
+      origin_contact_phone: originContactPhone,
+      origin_address: originAddress,
+      origin_note: originNote,
+      origin_area_id: originAreaId,
+      origin_postal_code: originPostalCode,
 
-    return {
-        areas: response.areas,
-        error: null,
-    };
+      destination_contact_name: destinationContactName,
+      destination_contact_phone: destinationContactPhone,
+      destination_address: destinationAddress,
+      destination_contact_email: destinationContactEmail,
+      destination_note: destinationNote,
+      destination_area_id: destinationAreaId,
+      destination_postal_code: destinationPostalCode,
+
+      courier_company: courierCompany,
+      courier_type: corierType,
+      courier_insurance: corierInsurance ? corierInsurance : null,
+      delivery_type: deliveryType,
+      delivery_date: deliveryDate,
+      delivery_time: deliveryTime,
+      order_note: orderNote,
+      items: biteshipItems,
+    }),
+  };
+
+  const response = await fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => json);
+
+  return response;
 }
 
-export async function mapsDoubleSearch(areaId) {
-    const url = `${biteshipBaseURL}/v1/maps/areas/${areaId}`;
+export async function retrieveCouriers() {
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: process.env.BITESHIP_API_KEY,
+    },
+  };
 
-    const biteshipApiKey = process.env.BITESHIP_API_KEY;
+  let response = await fetch("https://api.biteship.com/v1/couriers", options)
+    .then((response) => response.json())
+    .then((response) => response);
 
-    const options = {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${biteshipApiKey}`,
-        },
-    };
+  return response;
+}
 
-    const response = await fetch(url, options)
-        .then((res) => res.json())
-        .then((json) => json)
-        .catch((err) => console.error("error:" + err));
+export async function retriveCourierRates(
+  originAreaId,
+  destinationAreaId,
+  courierCode,
+  biteshipItems,
+) {
+  const url = `${biteshipBaseURL}/v1/rates/couriers`;
 
-    if (response.error) {
-        return {
-            area: null,
-            error: response.error,
-        };
-    }
+  const biteshipApiKey = process.env.BITESHIP_API_KEY;
 
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${biteshipApiKey}`,
+    },
+    body: JSON.stringify({
+      origin_area_id: originAreaId,
+      destination_area_id: destinationAreaId,
+      couriers: courierCode,
+      items: biteshipItems,
+    }),
+  };
+
+  const response = await fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => json);
+
+  return response;
+}
+
+export async function retriveAreaSingleSearch(searchInput) {
+  const url = `${biteshipBaseURL}/v1/maps/areas?countries=ID&input=${searchInput}&type=single`;
+
+  const biteshipApiKey = process.env.BITESHIP_API_KEY;
+
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${biteshipApiKey}`,
+    },
+  };
+
+  const response = await fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => json);
+
+  if (response.error) {
     return {
-        area: response.areas[0],
-        error: null,
+      areas: [],
+      error: response.error,
     };
+  }
+
+  return {
+    areas: response.areas,
+    error: null,
+  };
+}
+
+export async function retriveAreaDoubleSearch(areaId) {
+  const url = `${biteshipBaseURL}/v1/maps/areas/${areaId}`;
+
+  const biteshipApiKey = process.env.BITESHIP_API_KEY;
+
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${biteshipApiKey}`,
+    },
+  };
+
+  const response = await fetch(url, options)
+    .then((res) => res.json())
+    .then((json) => json);
+
+  if (response.error) {
+    return {
+      area: null,
+      error: response.error,
+    };
+  }
+
+  return {
+    area: response.areas[0],
+    error: null,
+  };
 }

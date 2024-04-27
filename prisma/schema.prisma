@@ -76,21 +76,30 @@ model IterationImage {
   product_variant_id      Int
 }
 
+enum PaymentStatus {
+  UNPAID
+  PAID
+  FAILED
+  EXPIRED
+  REFUND
+}
+
 model Invoice {
-  invoice_id              String          @default(cuid())  @unique  @id 
-  invoice_date            DateTime        @default(now())       
-  payment_date            DateTime?        
-  customer_full_name      String          @db.VarChar(35)
-  customer_phone_number   String          @db.TinyText
-  customer_address        String          @db.VarChar(200)
-  discount_amount         Int             @db.UnsignedMediumInt
-  total_weight            Int             // max 500.000 gram / 500 kg\
-  shipping_cost           Int             @db.UnsignedMediumInt
-  gross_price             Int             @db.UnsignedMediumInt
-  net_price               Int             @db.UnsignedMediumInt
-  order                   Order           @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id])
-  order_id                String          @unique
-  invoice_item            InvoiceItem[]
+  invoice_id                String          @default(cuid())  @unique  @id 
+  invoice_date              DateTime        @default(now())
+  payment_status            PaymentStatus   @default(UNPAID)       
+  payment_date              DateTime?        
+  customer_full_name        String          @db.VarChar(35)
+  customer_phone_number     String          @db.TinyText
+  customer_full_address     String          @db.VarChar(200)
+  discount_amount           Int             @db.UnsignedMediumInt
+  total_weight              Int             // max 500.000 gram / 500 kg\
+  shipping_cost             Int             @db.UnsignedMediumInt
+  gross_price               Int             @db.UnsignedMediumInt
+  net_price                 Int             @db.UnsignedMediumInt
+  order                     Order           @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id])
+  order_id                  String          @unique
+  invoice_item              InvoiceItem[]
 }
 
 model InvoiceItem {
@@ -99,45 +108,73 @@ model InvoiceItem {
   invoice_item_name           String
   invoice_item_weight         Int       // max 500.000 gram / 500 kg
   invoice_item_total_weight   Int       // max 500.000 gram / 500 kg
-  invoice_perunit_price       Int       @db.UnsignedMediumInt
+  invoice_item_price          Int       @db.UnsignedMediumInt
   invoice_item_total_price    Int       @db.UnsignedMediumInt
 
   invoice                     Invoice           @relation(fields: [invoice_id], references: [invoice_id])
   invoice_id                  String
-  product_iteration           ProductIteration  @relation(fields: [product_iteration_id], references: [product_iteration_id])
-  product_iteration_id        Int
+  product_iteration           ProductIteration?  @relation(fields: [product_iteration_id], references: [product_iteration_id])
+  product_iteration_id        Int?
 }
 
-
+enum OrderStatus {
+  PENDING
+  AWAITING_PAYMENT
+  AWAITING_FULFILLMENT
+  AWAITING_SHIPMENT
+  AWAITING_PICKUP
+  SHIPPED
+  ARRIVED
+  COMPLETED
+  CANCELLATION_REQUEST
+  AWAITING_REFUND
+  CANCELLED
+  REFUNDED
+}
 
 model Order {
-  order_id        String        @default(cuid())  @unique  @id
-  order_date      DateTime      @default(now())
-  order_status    String        @db.VarChar(50)
+  order_id            String        @default(cuid())  @unique  @id
+  order_code          String        @default(cuid())  @unique
+  discount_code       String?
+  order_date          DateTime      @default(now())
+  order_status        OrderStatus   @default(AWAITING_PAYMENT)
+  note_for_seller     String?       @db.VarChar(150)
 
-  guest_order     GuestOrder?   @relation(name: "GuestOrderToOrder")
-  invoice         Invoice?      @relation(name: "InvoiceToOrder")
-  shipment        Shipment?
-  payment         Payment?
+  
+
+  guest_order         GuestOrder?   @relation(name: "GuestOrderToOrder")
+  invoice             Invoice?      @relation(name: "InvoiceToOrder")
+  shipment            Shipment?
+  payment             Payment?
 }
 
 model Payment {
   payment_id                String     @unique   @default(cuid())  @id
   paygate_transaction_id    String               // tripay transaction reference code
-  payment_date              DateTime
   payment_method            String
-  total_payment             Int                  @db.UnsignedMediumInt
 
   order                     Order                @relation(fields: [order_id], references: [order_id])
   order_id                  String     @unique
 }
 
 model Shipment {
-  shipment_id             String  @unique  @default(cuid())  @id
-  expedition_order_id     String           // biteship order id
-  shipment_date           DateTime
-  courier                 Courier          @relation(fields: [courier_id], references: [courier_id])
-  courier_id              Int 
+  shipment_id             String      @unique  @default(cuid())  @id
+  expedition_order_id     String?     @unique           // biteship order id
+  courier_tracking_id     String?
+  shipment_status         String?
+  shipment_date           DateTime?
+
+  cash_on_delivery_fee    Int         @db.UnsignedMediumInt   @default(0)
+  proof_of_delivery_fee   Int         @db.UnsignedMediumInt   @default(0)
+  shippment_fee           Int         @db.UnsignedMediumInt   @default(0)
+  price                   Int         @db.UnsignedMediumInt   @default(0)
+
+
+  destination_area_id     String
+  courier                 Courier?          @relation(fields: [courier_id], references: [courier_id])
+  courier_id              Int?
+  origin_address          OriginAddress?    @relation(fields: [origin_address_id], references: [origin_address_id])
+  origin_address_id       Int?  
               
   order                   Order            @relation(fields: [order_id], references: [order_id])
   order_id                String  @unique
@@ -154,13 +191,13 @@ model Courier {
   @@unique([courier_code, courier_service_code])
 }
 
-
 model GuestOrder {
-  guest_order_id      Int      @unique   @default(autoincrement())  @id 
-  order_code          String   @unique   @default(cuid())
-  guest_email         String             @db.VarChar(75)
-  order               Order              @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id])
-  order_id            String   @unique
+  guest_order_id              Int      @unique   @default(autoincrement())  @id 
+  guest_email                 String             @db.VarChar(75)
+  guest_note_for_courier      String?            @db.VarChar(45)
+  
+  order                       Order              @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id])
+  order_id                    String   @unique
 }
 
 model Discount {
@@ -225,6 +262,8 @@ model OriginAddress {
   postal_code           String     @db.TinyText
   area_id               String
   is_active             Boolean    @default(false)
+
+  shipments             Shipment[]
 }
 
 model Admin {
@@ -245,6 +284,4 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
-
-
 
