@@ -12,33 +12,16 @@ export async function makeFailedStatus(order) {
       throw new FailError("This order cannot be processed further", 400);
     }
 
-    await prisma.$transaction(async (tx) => {
-      const selectedOrder = await tx.order.findUnique({
-        where: {
-          order_id: order.order_id,
-          order_status: orderStatus.awaitingPayment,
-        },
-        select: {
-          order_id: true,
-          discount_code: true,
-          invoice: {
-            select: {
-              invoice_id: true,
-              invoice_item: {
-                select: {
-                  invoice_item_quantity: true,
-                  product_iteration_id: true,
-                },
-              },
-            },
-          },
-        },
-      });
+    const {
+      prouductIterationBulkUpdateQuery,
+      prouductIterationBulkUpdateValues,
+    } = createRestoreProductQuery(order.invoice.invoice_item);
 
-      if (selectedOrder.discount_code) {
+    await prisma.$transaction(async (tx) => {
+      if (order.discount_code) {
         await tx.discount.update({
           where: {
-            discount_code: selectedOrder.discount_code,
+            discount_code: order.discount_code,
           },
           data: {
             number_of_uses: { decrement: 1 },
@@ -48,7 +31,7 @@ export async function makeFailedStatus(order) {
 
       const deleteBasedOnOrderId = {
         where: {
-          order_id: selectedOrder.order_id,
+          order_id: order.order_id,
         },
       };
       await tx.guestOrder.delete(deleteBasedOnOrderId);
@@ -57,19 +40,19 @@ export async function makeFailedStatus(order) {
 
       const deletedInvoiceItemsCount = await tx.invoiceItem.deleteMany({
         where: {
-          invoice_id: selectedOrder.invoice.invoice_id,
+          invoice_id: order.invoice.invoice_id,
         },
       });
 
       await tx.invoice.delete(deleteBasedOnOrderId);
 
-      const error = await restoreProductIterationStock(
-        tx,
-        selectedOrder.invoice.invoice_item,
-        deletedInvoiceItemsCount,
+      const affected = await tx.$executeRawUnsafe(
+        prouductIterationBulkUpdateQuery,
+        ...prouductIterationBulkUpdateValues,
       );
-      if (error) {
-        throw error.error;
+
+      if (affected !== deletedInvoiceItemsCount.count) {
+        throw new FailError("Several records not found for update", 404);
       }
 
       await tx.order.delete(deleteBasedOnOrderId);
@@ -81,27 +64,29 @@ export async function makeFailedStatus(order) {
   }
 }
 
-export async function restoreProductIterationStock(tx, invoiceItems) {
-  const ids = [];
-  const values = [];
-  let cases = ``;
-  let wheres = ``;
+export function createRestoreProductQuery(invoiceItems) {
+  const prouductIterationBulkUpdateValues = [];
+  let subqueries = ``;
 
   invoiceItems.forEach((item, i) => {
-    cases += `WHEN product_iteration_id = ? THEN product_variant_stock + ? `;
-    ids.push(item.product_iteration_id);
-    values.push(item.product_iteration_id);
-    values.push(item.invoice_item_quantity);
-    wheres += i > 0 ? ",?" : "?";
+    subqueries +=
+      i < invoiceItems.length - 1
+        ? `SELECT ? AS product_iteration_id, ? AS quantity UNION ALL `
+        : `SELECT ? AS product_iteration_id, ? AS quantity `;
+
+    prouductIterationBulkUpdateValues.push(
+      item.product_iteration_id,
+      item.invoice_item_quantity,
+    );
   });
 
-  let query = `UPDATE ProductIteration SET product_variant_stock = CASE ${cases} ELSE product_variant_stock END WHERE product_iteration_id IN (${wheres})`;
+  const prouductIterationBulkUpdateQuery = ` UPDATE ProductIteration AS p 
+JOIN(${subqueries}) AS t 
+ON p.product_iteration_id = t.product_iteration_id 
+SET p.product_variant_stock = p.product_variant_stock + t.quantity `;
 
-  const affected = await tx.$executeRawUnsafe(query, ...values, ...ids);
-
-  if (affected !== ids.length) {
-    return {
-      error: new FailError("Several records not found for update", 404),
-    };
-  }
+  return {
+    prouductIterationBulkUpdateQuery,
+    prouductIterationBulkUpdateValues,
+  };
 }

@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { FailError } from "@/utils/custom-error";
 import { orderStatus } from "@/utils/order-status";
 import { paymentStatus } from "@/utils/payment-status";
-import { restoreProductIterationStock } from "./make-failed-status";
+import { createRestoreProductQuery } from "./make-failed-status";
 
 export async function makeRefundStatus(order) {
   try {
@@ -12,6 +12,11 @@ export async function makeRefundStatus(order) {
     ) {
       throw new FailError("This order cannot be refunded", 400);
     }
+
+    const {
+      prouductIterationBulkUpdateQuery,
+      prouductIterationBulkUpdateValues,
+    } = createRestoreProductQuery(order.invoice.invoice_item);
 
     await prisma.$transaction(async (tx) => {
       const updatedOrder = await tx.order.update({
@@ -27,12 +32,6 @@ export async function makeRefundStatus(order) {
           invoice: {
             select: {
               invoice_id: true,
-              invoice_item: {
-                select: {
-                  invoice_item_quantity: true,
-                  product_iteration_id: true,
-                },
-              },
             },
           },
         },
@@ -72,12 +71,13 @@ export async function makeRefundStatus(order) {
         });
       }
 
-      const error = await restoreProductIterationStock(
-        tx,
-        updatedOrder.invoice.invoice_item
+      const affected = await tx.$executeRawUnsafe(
+        prouductIterationBulkUpdateQuery,
+        ...prouductIterationBulkUpdateValues,
       );
-      if (error) {
-        throw error.error;
+
+      if (affected !== order.invoice.invoice_item.length) {
+        throw new FailError("Several records not found for update", 404);
       }
     });
   } catch (e) {

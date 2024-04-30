@@ -22,6 +22,8 @@ export async function makePaidStatus(order) {
       );
     }
 
+    const currentTime = new Date().toISOString();
+
     await prisma.$transaction(async (tx) => {
       const updatedOrder = await tx.order.update({
         where: {
@@ -40,8 +42,6 @@ export async function makePaidStatus(order) {
           },
         },
       });
-
-      const currentTime = new Date().toISOString();
 
       await tx.invoice.update({
         where: {

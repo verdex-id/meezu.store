@@ -59,6 +59,13 @@ export async function POST(request) {
           order_code: true,
         },
       });
+      await tx.guestOrder.create({
+        data: {
+          order_id: createdOrder.order_id,
+          guest_email: req.guest_email,
+          guest_note_for_courier: req.note_for_courier,
+        },
+      });
 
       const affected = await tx.$executeRawUnsafe(
         prouductIterationBulkUpdateQuery,
