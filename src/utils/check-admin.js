@@ -32,7 +32,6 @@ export async function fetchAdminIfAuthorized() {
           "Unauthorized: You do not have permission to perform this action.",
       };
     }
-    console.log(e);
     return {
       admin: null,
       errorCode: 500,
