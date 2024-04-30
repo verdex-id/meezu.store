@@ -2,9 +2,6 @@ import { FailError } from "@/utils/custom-error";
 import { unsignedMediumInt, unsignedSmallInt } from "@/utils/mysql";
 import Joi from "joi";
 
-export const productNameRegex = /^[a-zA-Z0-9\s_()&/\[\].,=-]+$/;
-export const productVariantNameRegex = /^[a-zA-Z0-9\s]+$/;
-
 export function makeRequestValidation(request) {
   const productIterationSchema = Joi.object({
     product_variant_weight: Joi.number().max(500_000).integer().required(),
@@ -23,12 +20,12 @@ export function makeRequestValidation(request) {
         variant_type_name: Joi.string()
           .min(3)
           .max(30)
-          .pattern(productVariantNameRegex)
+          .pattern(/^[a-zA-Z0-9\s_()&/\[\].,=-]+$/)
           .required(),
         variant_name: Joi.string()
           .min(3)
           .max(15)
-          .pattern(productVariantNameRegex)
+          .pattern(/^[a-zA-Z0-9\s]+$/)
           .required(),
       }),
     ),
