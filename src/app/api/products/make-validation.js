@@ -34,7 +34,7 @@ export function makeRequestValidation(request) {
   const schema = Joi.object({
     product_category_name: Joi.string().min(3).max(50).required(),
     product_name: Joi.string()
-      .pattern(productNameRegex)
+      .pattern(/^[a-zA-Z0-9\s_()&/\[\].,=-]+$/)
       .min(3)
       .max(70)
       .required(),
