@@ -9,9 +9,11 @@ export async function middleware(request) {
   const jsonRoutes = [
     ["/api/areas", ["GET"]],
     ["/api/orders", ["GET"]],
+    ["/api/myshop_orders", ["GET"]],
     ["/api/addresses/origin", ["GET", "DELETE"]],
     ["/api/products", ["GET", "DELETE"]],
-    ["/api/variants", ["DELETE"]],
+    ["/api/product_variants", ["DELETE"]],
+    ["/api/variants", ["GET"]],
     ["/api/couriers", ["GET"]],
     ["/api/callbacks/biteship", ["GET", "POST"]],
     ["/api/discounts", ["GET", "DELETE"]],
@@ -42,7 +44,8 @@ export async function middleware(request) {
     ["/api/discounts/product", ["GET", "POST", "DELETE"]],
     ["/api/discounts", ["POST", "DELETE"]],
     ["/api/shipments/guest", ["POST"]],
-    ["/api/variants", ["POST", "PATCH", "DELETE"]],
+    ["/api/product_variants", ["POST", "PATCH", "DELETE"]],
+    ["/api/myshop_orders", ["GET"]],
   ];
 
   if (checkRoute(authRoutes, request)) {
