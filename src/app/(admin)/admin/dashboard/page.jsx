@@ -10,6 +10,7 @@ export default function AdminDashboardPage() {
     "voucher",
     "transaction",
     "link",
+    "courier",
   ]);
   return (
     <>

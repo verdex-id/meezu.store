@@ -1,134 +1,85 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
-import { authPayloadAccountId } from "@/middleware";
-import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import { FailError } from "@/utils/custom-error";
-import { orderStatus } from "@/utils/order-status";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-    const payloadAdminId = headers().get(authPayloadAccountId);
-    let admin = await prisma.admin.findUnique({
-        where: {
-            admin_id: payloadAdminId,
-        },
-    });
-
-    if (!admin) {
-        return NextResponse.json(...errorResponse());
-    }
-
+  let orders;
+  try {
     const schema = Joi.object({
-        status: Joi.string()
-            .pattern(/^[a-z_]+$/)
-            .required(),
+      order_code: Joi.string()
+        .pattern(/^[A-Z0-9-]{27,}$/)
+        .required(),
     });
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+    const orderCode = searchParams.get("order_code");
 
     let req = schema.validate({
-        status: status,
+      order_code: orderCode,
     });
     if (req.error) {
-        return NextResponse.json(
-            ...failResponse("Invalid request format", 400, req.error.details),
-        );
+      throw new FailError("invalid request format", 400, req.error.details);
     }
     req = req.value;
 
-    let orders;
-    try {
-        const query = [];
-        switch (req.status) {
-            case "all_order":
-                query.push(
-                    orderStatus.awaitingFulfillment,
-                    orderStatus.awaitingPickup,
-                    orderStatus.shipped,
-                    orderStatus.arrived,
-                    orderStatus.completed,
-                    orderStatus.cancellationRequest,
-                    orderStatus.awaitingRefund,
-                    orderStatus.refunded,
-                );
-                break;
-            case "new_order":
-                query.push(orderStatus.awaitingFulfillment);
-                break;
-            case "confirm_shipping":
-                query.push(orderStatus.awaitingPickup);
-                break;
-            case "in_shipping":
-                query.push(orderStatus.shipped);
-                break;
-            case "arrived":
-                query.push(orderStatus.arrived);
-                break;
-            case "done":
-                query.push(orderStatus.completed);
-                break;
-            case "cancellation_request":
-                query.push(orderStatus.cancellationRequest);
-                break;
-            case "awaiting_refund":
-                query.push(orderStatus.awaitingRefund);
-                break;
-            case "refund":
-                query.push(orderStatus.refunded);
-                break;
-            default:
-                throw new FailError("Unrecognized status", 400);
-        }
-
-        orders = await prisma.order.findMany({
-            where: {
-                order_status: {
-                    in: query,
-                },
+    orders = await prisma.order.findUnique({
+      where: {
+        order_code: req.order_code,
+      },
+      select: {
+        guest_order: true,
+        order_status: true,
+        invoice: {
+          select: {
+            invoice_id: true,
+            payment_date: true,
+            customer_full_address: true,
+            gross_price: true,
+            shipping_cost: true,
+            discount_amount: true,
+            net_price: true,
+            invoice_item: {
+              select: {
+                invoice_item_name: true,
+                invoice_item_quantity: true,
+                invoice_item_price: true,
+                invoice_item_total_price: true,
+              },
             },
-            select: {
-                order_status: true,
-                order_code: true,
-                invoice: {
-                    select: {
-                        customer_full_name: true,
-                        payment_date: true,
-                        payment_status: true,
-                        invoice_item: {
-                            orderBy: { invoice_item_total_price: "asc" },
-                            take: 1,
-                            select: {
-                                invoice_item_name: true,
-                            },
-                        },
-                    },
-                },
-                shipment: {
-                    select: {
-                        courier: {
-                            select: {
-                                courier_name: true,
-                                courier_service_name: true,
-                            },
-                        },
-                    },
-                },
+          },
+        },
+        payment: {
+          select: {
+            payment_method: true,
+          },
+        },
+        shipment: {
+          select: {
+            courier_tracking_id: true,
+            courier: {
+              select: {
+                courier_name: true,
+                courier_service_name: true,
+              },
             },
-        });
-
-    } catch (e) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
-        }
-
-        if (e instanceof FailError) {
-            return NextResponse.json(...failResponse(e.message, e.code, e.detail));
-        }
-
+          },
+        },
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === "P2025") {
+        return NextResponse.json(
+          ...failResponse(`${e.meta.modelName} not found`, 404),
+        );
+      }
+      return NextResponse.json(
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+      );
+    }
         return NextResponse.json(...errorResponse());
     }
 
@@ -138,11 +89,6 @@ export async function GET(request) {
 export async function PATCH(request) {
     let updatedOrder;
     try {
-        const admin = await fetchAdminIfAuthorized();
-        if (admin.error) {
-            throw new FailError(admin.error, admin.errorCode);
-        }
-
         const schema = Joi.object({
             order_code: Joi.string()
                 .pattern(/^[a-z0-9]{16,}$/)

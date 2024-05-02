@@ -1,6 +1,6 @@
 "use client";
 
-import Card from "@/components/card";
+import Image from "next/image";
 import Carousel from "@/components/carousel";
 import Input from "@/components/input";
 import Select from "@/components/select";
@@ -30,6 +30,11 @@ export default function MerchPage() {
   const [selectedCategory, setSelectedCategory] = useState();
   const [filteredProducts, setFilteredProducts] = useState(products);
 
+  const [page, setPage] = useState(1);
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
   function handleSearch(event) {
     const filter = products.filter((p) =>
       p.title.toLowerCase().includes(event.target.value.toLowerCase())
@@ -39,10 +44,18 @@ export default function MerchPage() {
 
   useEffect(() => {
     async function getProducts() {
-      const res = await fetch("/api/products");
-      const body = await res.json();
-
-      if (body.status == "success") setProducts(body.data.products);
+      setLoading(true);
+      setError("");
+      const res = await fetch(`/api/products?page=${page}&limit=30`).then((r) =>
+        r.json()
+      );
+      setLoading(false);
+      if (res.status == "success") {
+        setProducts(res.data.products);
+        setFilteredProducts(res.data.products);
+      } else {
+        setError(res.message);
+      }
     }
     getProducts();
 
@@ -53,7 +66,7 @@ export default function MerchPage() {
       if (body.status == "success") setCategories(body.data.categories);
     }
     getCategories();
-  });
+  }, []);
 
   return (
     <>
@@ -94,18 +107,35 @@ export default function MerchPage() {
               ? `Product Category: ${selectedCategory.product_category_name}`
               : `All Products (${filteredProducts.length} products)`}
           </h1>
+          {loading && <p>Loading...</p>}
+          {error && (
+            <div className="px-5 py-2 border-l-4 border-red-400 bg-red-200">
+              Error: {error}
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {filteredProducts?.map((product, i) => (
               <Link key={i} href={`/merch/${product.product_slug}`}>
-                <Card
-                  image={
-                    product.product_iterations[0].iteration_images[0]
-                      .product_variant_image
-                  }
-                  price={product.product_iterations[0].product_variant_price}
-                  sold={0}
-                  title={product.product_name}
-                />
+                <div className="w-full max-w-sm mx-auto p-5 bg-white">
+                  <div className="relative w-full aspect-video object-cover">
+                    <Image
+                      src={"/banner/banner_1.png"}
+                      layout="fill"
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <h1 className="font-bold text-xl">
+                      {product.product_name}
+                    </h1>
+                    <p>
+                      Rp
+                      {Intl.NumberFormat("id-ID").format(
+                        product.product_iterations[0].product_variant_price
+                      )}
+                    </p>
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
