@@ -30,8 +30,8 @@ export async function GET(request) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
 
@@ -129,7 +129,7 @@ export async function POST(request) {
             variant_slug: createSlug(variant),
             variant_name: variant,
             varian_type_id: type.varian_type_id,
-          }),
+          })
         );
       });
 
@@ -188,7 +188,7 @@ export async function POST(request) {
           productVariantMappings.push({
             product_iteration_id: itr.product_iteration_id,
             variant_id: createdVariants.find(
-              (createdVariant) => createdVariant.variant_slug === variant,
+              (createdVariant) => createdVariant.variant_slug === variant
             ).variant_id,
           });
         });
@@ -243,11 +243,11 @@ export async function POST(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
