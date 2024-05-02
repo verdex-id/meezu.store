@@ -1,5 +1,6 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { FailError } from "@/utils/custom-error";
+import { orderStatus } from "@/utils/order-status";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
@@ -80,74 +81,75 @@ export async function GET(request) {
         ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
-        return NextResponse.json(...errorResponse());
-    }
+    return NextResponse.json(...errorResponse());
+  }
 
-    return NextResponse.json(...successResponse({ orders: orders }));
+  return NextResponse.json(...successResponse({ orders: orders }));
 }
 
 export async function PATCH(request) {
-    let updatedOrder;
-    try {
-        const schema = Joi.object({
-            order_code: Joi.string()
-                .pattern(/^[a-z0-9]{16,}$/)
-                .required(),
-            new_status: Joi.string().valid(orderStatus.cancellationRequest).required(),
-        });
+  let updatedOrder;
+  try {
+    const schema = Joi.object({
+      order_code: Joi.string()
+        .pattern(/^[A-Z0-9-]{27,}$/)
+        .required(),
+      new_status: Joi.string()
+        .valid(orderStatus.cancellationRequest)
+        .required(),
+    });
 
-        const { searchParams } = new URL(request.url);
-        const orderCode = searchParams.get("order_code");
+    const { searchParams } = new URL(request.url);
+    const orderCode = searchParams.get("order_code");
 
-        let req = await request.json()
+    let req = await request.json();
+    req = schema.validate({
+      order_code: orderCode,
+      ...req,
+    });
+    if (req.error) {
+      throw new FailError("invalid request format", 400, req.error.details);
+    }
+    req = req.value;
 
-        req = schema.validate({
-            order_code: orderCode,
-            ...req
-        });
-        if (req.error) {
-            throw new FailError("invalid request format", 400, req.error.details);
-        }
-        req = req.value;
-
-        updatedOrder = await prisma.order.update({
-            where: {
-                order_code: req.order_code,
-                OR: [
-                    {
-                        order_status: orderStatus.awaitingFulfillment
-                    },
-                    {
-                        order_status: orderStatus.awaitingShipment
-                    }
-                ]
-            },
-            data: {
-                order_status: req.new_status
-            },
-            select: {
-                order_code: true,
-                order_status: true,
-            }
-        })
-    } catch (e) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            if (e.code === "P2025") {
-                return NextResponse.json(
-                    ...failResponse(`${e.meta.modelName} not found`, 404),
-                );
-            }
-            return NextResponse.json(
-                ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
-            );
-        }
-
-        if (e instanceof FailError) {
-            return NextResponse.json(...failResponse(e.message, e.code, e.detail));
-        }
-
-        return NextResponse.json(...errorResponse());
+    updatedOrder = await prisma.order.update({
+      where: {
+        order_code: req.order_code,
+        OR: [
+          {
+            order_status: orderStatus.awaitingFulfillment,
+          },
+          {
+            order_status: orderStatus.awaitingShipment,
+          },
+        ],
+      },
+      data: {
+        order_status: req.new_status,
+      },
+      select: {
+        order_code: true,
+        order_status: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === "P2025") {
+        return NextResponse.json(
+          ...failResponse(`${e.meta.modelName} not found`, 404),
+        );
+      }
+      return NextResponse.json(
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+      );
     }
 
-    return NextResponse.json(...successResponse({ updated_order: updatedOrder }));
+    if (e instanceof FailError) {
+      return NextResponse.json(...failResponse(e.message, e.code, e.detail));
+    }
+
+    return NextResponse.json(...errorResponse());
+  }
+
+  return NextResponse.json(...successResponse({ updated_order: updatedOrder }));
 }
