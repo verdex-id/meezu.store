@@ -18,12 +18,12 @@ export function makeRequestValidation(request) {
     variants: Joi.array().items(
       Joi.object({
         variant_type_name: Joi.string()
-          .min(3)
+          .min(1)
           .max(30)
           .pattern(/^[a-zA-Z0-9\s_()&/\[\].,=-]+$/)
           .required(),
         variant_name: Joi.string()
-          .min(3)
+          .min(1)
           .max(15)
           .pattern(/^[a-zA-Z0-9\s]+$/)
           .required(),
