@@ -23,11 +23,11 @@ export function makeRequestValidation(request) {
           .pattern(/^[a-zA-Z0-9\s_()&/\[\].,=-]+$/)
           .required(),
         variant_name: Joi.string()
-          .min(3)
+          .min(1)
           .max(15)
           .pattern(/^[a-zA-Z0-9\s]+$/)
           .required(),
-      }),
+      })
     ),
   });
 
@@ -49,7 +49,7 @@ export function makeRequestValidation(request) {
       error: new FailError(
         "Invalid request format",
         403,
-        validationResult.error.details,
+        validationResult.error.details
       ),
     };
   }

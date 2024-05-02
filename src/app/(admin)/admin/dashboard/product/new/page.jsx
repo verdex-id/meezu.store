@@ -2,7 +2,6 @@
 
 import Button from "@/components/button";
 import Input from "@/components/input";
-import CardAdmin from "@/components/card_admin";
 import { useState } from "react";
 import { useCookies } from "next-client-cookies";
 
@@ -18,6 +17,8 @@ export default function DashboardPage() {
   const [product, setProduct] = useState();
 
   const [errors, setErrors] = useState();
+
+  const [toggleIteration, setToggleIteration] = useState(false);
 
   const cookie = useCookies();
 
@@ -43,6 +44,8 @@ export default function DashboardPage() {
   function handleSaveVariant() {
     const product_iterations = { ...tempProductIteration, variants: variants };
     setProductIteration([...productIteration, product_iterations]);
+    setToggleIteration(false);
+    setVariants([]);
   }
 
   async function handleSaveProduct() {
@@ -53,7 +56,10 @@ export default function DashboardPage() {
 
     const accessToken = cookie.get("access_token");
 
-    console.log(products);
+    console.log({
+      ...product,
+      product_iterations: productIteration,
+    });
 
     const res = await fetch("/api/products", {
       method: "POST",
@@ -61,9 +67,18 @@ export default function DashboardPage() {
         "Content-Type": "application/json",
         Authorization: "Bearer " + accessToken,
       },
-      body: JSON.stringify(products),
-    }).then((r) => r.json());
-    console.log(res);
+      body: JSON.stringify({
+        ...product,
+        product_iterations: productIteration,
+      }),
+    })
+      .then((r) => r.json())
+      .catch((err) => console.log(err));
+
+    if (res.status == "fail") {
+      setErrors(res.message);
+      return;
+    }
   }
 
   function handleDeleteIteration(pi) {
@@ -169,105 +184,118 @@ export default function DashboardPage() {
               </>
             ))}
           </div>
-          <div className="mt-2 p-5 border-4 border-white">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <div>
-                <Input
-                  type={"number"}
-                  id={"product_variant_price"}
-                  name={"product_variant_price"}
-                  title={"Harga Produk"}
-                  placeholder="Harga Produk"
-                  onChange={(e) =>
-                    setTempProductIteration({
-                      ...tempProductIteration,
-                      product_variant_price: e.target.value,
-                    })
-                  }
-                />
+          <button
+            className="px-5 py-2 bg-cyan-400 text-white block w-max my-2"
+            onClick={() => setToggleIteration(!toggleIteration)}
+          >
+            Klik untuk menambahkan opsi produk
+          </button>
+          {toggleIteration && (
+            <div className="mt-2 p-5 border-4 border-white">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div>
+                  <Input
+                    type={"number"}
+                    id={"product_variant_price"}
+                    name={"product_variant_price"}
+                    title={"Harga Produk"}
+                    placeholder="Harga Produk"
+                    onChange={(e) =>
+                      setTempProductIteration({
+                        ...tempProductIteration,
+                        product_variant_price: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Input
+                    type={"number"}
+                    id={"product_variant_weight"}
+                    name={"product_variant_weight"}
+                    title={"Berat Produk (kg)"}
+                    placeholder="Berat Produk (kg)"
+                    onChange={(e) =>
+                      setTempProductIteration({
+                        ...tempProductIteration,
+                        product_variant_weight: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <Input
+                    type={"number"}
+                    id={"product_variant_stock"}
+                    name={"product_variant_stock"}
+                    title={"Stok Produk"}
+                    placeholder="Stok Produk"
+                    onChange={(e) =>
+                      setTempProductIteration({
+                        ...tempProductIteration,
+                        product_variant_stock: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
               </div>
-              <div>
-                <Input
-                  type={"number"}
-                  id={"product_variant_weight"}
-                  name={"product_variant_weight"}
-                  title={"Berat Produk (kg)"}
-                  placeholder="Berat Produk (kg)"
-                  onChange={(e) =>
-                    setTempProductIteration({
-                      ...tempProductIteration,
-                      product_variant_weight: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div>
-                <Input
-                  type={"number"}
-                  id={"product_variant_stock"}
-                  name={"product_variant_stock"}
-                  title={"Stok Produk"}
-                  placeholder="Stok Produk"
-                  onChange={(e) =>
-                    setTempProductIteration({
-                      ...tempProductIteration,
-                      product_variant_stock: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            </div>
 
-            <div className="mt-2">
-              <h1 className="text-3xl font-bold">Opsi</h1>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
-              {variants.map((v, i) => (
-                <>
-                  <div key={i} className="px-3 py-1 bg-white text-xs">
-                    <p>Tipe: {v.variant_type_name}</p>
-                    <p>Nama: {v.variant_name}</p>
+              <div className="mt-2">
+                <h1 className="text-3xl font-bold">Opsi</h1>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+                {variants.map((v, i) => (
+                  <>
+                    <div key={i} className="px-3 py-1 bg-white text-xs">
+                      <p>Tipe: {v.variant_type_name}</p>
+                      <p>Nama: {v.variant_name}</p>
+                    </div>
+                  </>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <Input
+                  type={"text"}
+                  id={"product_variant_type_name"}
+                  name={"product_variant_type_name"}
+                  placeholder="Tipe Varian (contoh: Ukuran)"
+                  onChange={(e) => setTempVariantType(e.target.value)}
+                />
+                <Input
+                  type={"text"}
+                  id={"product_variant_name"}
+                  name={"product_variant_name"}
+                  placeholder="Nama Varian (contoh: L)"
+                  onChange={(e) => setTempVariantName(e.target.value)}
+                />
+                <div className="grid grid-cols-2 gap-2">
+                  <div
+                    className="p-5 bg-cyan-400 text-white !cursor-pointer text-center mt-1"
+                    onClick={handleSaveVariantOption}
+                  >
+                    <p>Tambah Varian</p>
                   </div>
-                </>
-              ))}
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <Input
-                type={"text"}
-                id={"product_variant_type_name"}
-                name={"product_variant_type_name"}
-                placeholder="Tipe Varian (contoh: Ukuran)"
-                onChange={(e) => setTempVariantType(e.target.value)}
-              />
-              <Input
-                type={"text"}
-                id={"product_variant_name"}
-                name={"product_variant_name"}
-                placeholder="Nama Varian (contoh: L)"
-                onChange={(e) => setTempVariantName(e.target.value)}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <div
-                  className="p-5 bg-cyan-400 text-white !cursor-pointer text-center mt-1"
-                  onClick={handleSaveVariantOption}
-                >
-                  <p>Tambah Varian</p>
+                  <div
+                    className="p-5 bg-red-400 text-white !cursor-pointer text-center mt-1"
+                    onClick={() => setVariants([])}
+                  >
+                    <p>Reset Varian</p>
+                  </div>
                 </div>
                 <div
-                  className="p-5 bg-red-400 text-white !cursor-pointer text-center mt-1"
-                  onClick={() => setVariants([])}
+                  className="p-5 bg-cyan-400 text-white text-center cursor-pointer"
+                  onClick={handleSaveVariant}
                 >
-                  <p>Reset Varian</p>
+                  Tambah Varian
                 </div>
               </div>
-              <div
-                className="p-5 bg-cyan-400 text-white text-center cursor-pointer"
-                onClick={handleSaveVariant}
-              >
-                Tambah Varian
-              </div>
             </div>
-          </div>
+          )}
+          {errors && (
+            <div className="mt-5 bg-red-200 border-l-4 border-red-400 px-5 py-2">
+              Error: {errors}
+            </div>
+          )}
           <div className="mt-5">
             <Button type={5} onClick={handleSaveProduct}>
               Tambah Produk/Simpan
