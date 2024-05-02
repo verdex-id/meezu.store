@@ -20,7 +20,7 @@ export function makeRequestValidation(request) {
         variant_type_name: Joi.string()
           .min(3)
           .max(30)
-          .pattern(/^[a-zA-Z0-9\s_()&/\[\].,=-]+$/)
+          .pattern(/^[a-zA-Z0-9\s]+$/)
           .required(),
         variant_name: Joi.string()
           .min(1)
