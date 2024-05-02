@@ -51,6 +51,7 @@ export async function POST(request) {
         discount_code: true,
         invoice: {
           select: {
+            invoice_id: true,
             invoice_item: true,
             payment_status: true,
           },
