@@ -44,8 +44,8 @@ export async function POST(request) {
     }
 
     let createdOrder;
-    let netPrice;
     let createdInvoice;
+    let tripayTransaction;
     await prisma.$transaction(async (tx) => {
       createdOrder = await tx.order.create({
         data: {
@@ -109,7 +109,7 @@ export async function POST(request) {
 
       grossPrice = grossPrice + shipment.pricing.price;
 
-      netPrice = grossPrice - discount;
+      const netPrice = grossPrice - discount;
 
       createdInvoice = await tx.invoice.create({
         data: {
@@ -135,16 +135,20 @@ export async function POST(request) {
           },
         },
       });
+
+      tripayTransaction = await makeTransaction(
+        req,
+        createdOrder.order_code,
+        netPrice,
+        tripayItems,
+      );
+      if (tripayTransaction.error) {
+        throw new FailError(
+          "There was an error processing your payment. Please try again later or contact support for assistance.",
+          500,
+        );
+      }
     });
-    const tripayTransaction = await makeTransaction(
-      req,
-      createdOrder.order_code,
-      netPrice,
-      tripayItems,
-    );
-    if (tripayTransaction.error) {
-      throw tripayTransaction.error;
-    }
 
     await prisma.payment.create({
       data: {
@@ -161,7 +165,6 @@ export async function POST(request) {
       purchasedItems,
     );
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
