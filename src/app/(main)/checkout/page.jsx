@@ -11,9 +11,15 @@ export default function CheckoutPage() {
 
   const [selectedPayment, setSelectedPayment] = useState(null);
 
+  const [areasSearchText, setAreasSearchText] = useState("");
+  const [areas, setAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState();
+  const [addressNotes, setAddressNotes] = useState("");
+
+  const [sellerNotes, setSellerNotes] = useState("");
+
   const handleClick = (paymentId) => {
     setSelectedPayment(paymentId);
-    console.log(`Payment option ${paymentId} clicked`);
   };
 
   useEffect(() => {
@@ -26,6 +32,15 @@ export default function CheckoutPage() {
     getPaymentOptions();
   }, []);
 
+  async function handleSearchAddress() {
+    const res = await fetch(`/api/areas?input=${areasSearchText}`).then((r) =>
+      r.json()
+    );
+    if (res.status == "success") {
+      setAreas(res.data.areas);
+    }
+  }
+
   return (
     <>
       <div className="min-h-dvh w-full max-w-screen-xl mx-auto px-8 text-cyan-900">
@@ -37,8 +52,8 @@ export default function CheckoutPage() {
                   type={"text"}
                   id={"email"}
                   name={"email"}
-                  title={"email"}
-                  placeholder={"email"}
+                  title={"Email"}
+                  placeholder={"email@gmail.com"}
                 />
               </div>
               <div className="mt-8">
@@ -47,7 +62,7 @@ export default function CheckoutPage() {
                   id={"confirmEmail"}
                   name={"confirmEmail"}
                   title={"Konfirmasi Email"}
-                  placeholder={"Konfirmasi Email"}
+                  placeholder={"email@gmail.com"}
                 />
               </div>
             </div>
@@ -58,8 +73,8 @@ export default function CheckoutPage() {
                   type={"text"}
                   id={"name"}
                   name={"name"}
-                  title={"name"}
-                  placeholder={"name"}
+                  title={"Name"}
+                  placeholder={"Nama Lengkap"}
                 />
               </div>
 
@@ -67,59 +82,105 @@ export default function CheckoutPage() {
                 {/* input Nomor Telepon */}
                 <Input
                   type={"text"}
-                  id={"nomor"}
-                  name={"nomor"}
-                  title={"nomor"}
-                  placeholder={"nomor"}
+                  id={"phone"}
+                  name={"phone"}
+                  title={"Nomor HP"}
+                  placeholder={"08123456789"}
                 />
               </div>
             </div>
           </div>
 
           <div className="mt-8 border-y-4">
-            {/* select Provinsi */}
-            <div className="w-full mt-8  ">
-              <Select title={"Provinsi"}>
-                <option value="kalbar">Kalimantan Barat</option>
-                <option value="kalteng">Kalimantan Tengah</option>
-                <option value="kaltim">Kalimantan Timur</option>
-              </Select>
-            </div>
-            {/* select Kota */}
+            <Input
+              type={"textarea"}
+              title={"Catatan untuk Penjual"}
+              placeholder="Catatan untuk penjual, jika ada"
+              onChange={(e) => setSellerNotes(e.target.value)}
+            />
+          </div>
+
+          <div className="mt-8 border-y-4">
+            {/* Search Address */}
             <div className="w-full mt-8">
-              <Select title={"Kota"}>
-                <option value="kalbar">Pontianak</option>
-                <option value="kalteng">Singkawang</option>
-                <option value="kaltim">Sintang</option>
-              </Select>
+              <h1 className="font-bold font-fredoka text-2xl">Cari Alamat</h1>
+              <div className="flex gap-2 mb-2">
+                <input
+                  type={"text"}
+                  placeholder="Masukkan kata kunci untuk mencari alamat pengiriman"
+                  onChange={(e) => setAreasSearchText(e.target.value)}
+                  className="w-full px-5 py-3 outline-none"
+                />
+                <div
+                  className="px-5 py-3 bg-cyan-400 text-white cursor-pointer"
+                  onClick={() => handleSearchAddress()}
+                >
+                  Search
+                </div>
+              </div>
+
+              {areas.length > 0 && (
+                <>
+                  <Select title={"Pilih Alamat"}>
+                    {areas.map((area, i) => (
+                      <option
+                        key={i}
+                        value={area.id}
+                        onClick={() => setSelectedArea(area)}
+                      >
+                        {area.name}
+                      </option>
+                    ))}
+                  </Select>
+
+                  <div>
+                    <Input
+                      type={"textarea"}
+                      title={"Catatan Alamat"}
+                      placeholder="Contoh: RT/RW, Patokan, Warna Rumah, dll"
+                      onChange={(e) => setAddressNotes(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
             </div>
-            {/* select Kecamatan */}
-            <div className="w-full mt-8">
-              <Select title={"Kota"}>
-                <option value="kalbar">Pontianak Barat</option>
-                <option value="kalteng">Pontianak Selatan</option>
-                <option value="kaltim">Pontianak Kota</option>
-              </Select>
-            </div>
-            <div className="mt-8">
-              {/* Kode Pos */}
-              <Input
-                type={"text"}
-                id={"kodePos"}
-                name={"kodePos"}
-                title={"Kode Pos"}
-                placeholder={"kode Pos"}
-              />
-            </div>
-            <div className="mb-8 mt-8">
-              <Input
-                type={"textarea"}
-                id={"detail"}
-                name={"detail"}
-                title={"Detail"}
-                placeholder="Detail Pesanan jika diperlukan"
-              />
-            </div>
+
+            {selectedArea && (
+              <div className="p-5 bg-white mt-8">
+                <h1 className="font-bold text-xl">
+                  Konfirmasi Alamat Pengiriman
+                </h1>
+                <h1>{selectedArea.name}</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                  <div>
+                    <h1 className="font-bold first-letter:uppercase">
+                      {selectedArea.administrative_division_level_1_type}
+                    </h1>
+                    <h2>{selectedArea.administrative_division_level_1_name}</h2>
+                  </div>
+                  <div>
+                    <h1 className="font-bold first-letter:uppercase">
+                      {selectedArea.administrative_division_level_2_type}
+                    </h1>
+                    <h2>{selectedArea.administrative_division_level_2_name}</h2>
+                  </div>
+                  <div>
+                    <h1 className="font-bold first-letter:uppercase">
+                      {selectedArea.administrative_division_level_3_type}
+                    </h1>
+                    <h2>{selectedArea.administrative_division_level_3_name}</h2>
+                  </div>
+                  <div>
+                    <h1 className="font-bold first-letter:uppercase">
+                      Postal Code
+                    </h1>
+                    <h2>{selectedArea.postal_code}</h2>
+                  </div>
+                </div>
+                <h1 className="font-bold">Catatan Alamat</h1>
+                <p className="bg-slate-100 p-2">{addressNotes}</p>
+              </div>
+            )}
           </div>
           {/* Subtotal Item */}
           <div className=""></div>

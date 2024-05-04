@@ -1,6 +1,5 @@
 "use client";
 
-import { useCookies } from "next-client-cookies";
 import { useState } from "react";
 import Link from "next/link";
 import CardTextIcon from "@/icons/card_text";
@@ -8,8 +7,6 @@ import Image from "next/image";
 import ChevronDownIcon from "@/icons/chevron_down";
 
 export default function ProductDetailScreen({ product }) {
-  const cookie = useCookies();
-
   const [images, setImages] = useState([
     "/banner/banner_1.png",
     "/images/Thumbnail.svg",
@@ -25,18 +22,21 @@ export default function ProductDetailScreen({ product }) {
   function handleAddToCart(productIteration, quantity) {
     setLoading(true);
     setSuccessAddCart(null);
-    let currentCart = (cookie.get("cart") || "").split(",");
 
-    if (currentCart[0] == "") {
-      currentCart = currentCart.shift();
+    let cart = {};
+    if (localStorage.getItem("cart")) {
+      cart = JSON.parse(localStorage.getItem("cart")) || {};
     }
 
-    let newCart = [...currentCart];
-    for (let i = 0; i < quantity; i++) {
-      newCart.push(productIteration.product_iteration_id);
-    }
+    cart[productIteration.product_iteration_id] = {
+      id: productIteration.product_iteration_id,
+      qty:
+        (Number(cart[productIteration.product_iteration_id]?.qty) || 0) +
+        Number(quantity),
+    };
 
-    cookie.set("cart", newCart.join(","));
+    localStorage.setItem("cart", JSON.stringify(cart));
+
     setSuccessAddCart(productIteration);
     setLoading(false);
   }

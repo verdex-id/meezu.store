@@ -3,42 +3,96 @@
 import Button from "@/components/button";
 import MinusIcon from "@/icons/minus";
 import PlusIcon from "@/icons/plus";
-import { useCookies } from "next-client-cookies";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 export default function CheckoutPage() {
-  const cookie = useCookies();
-
+  const [loading, setLoading] = useState(false);
   const [cartItems, setCartItems] = useState([]);
+  const [subtotal, setSubtotal] = useState(0);
 
-  const cartCookies = (cookie.get("cart") || "").split(",");
-  if (cartCookies[0] == "") {
-    window.location.replace("/merch");
-    return;
-  }
+  const [cartLocal, setCartLocal] = useState({});
+
+  useEffect(() => {
+    if (localStorage.getItem("cart")) {
+      setCartLocal(JSON.parse(localStorage.getItem("cart")));
+    }
+  }, []);
+
+  useEffect(() => {
+    let temp = 0;
+    for (let product of cartItems) {
+      temp +=
+        product.product_variant_price *
+        cartLocal[product.product_iteration_id].qty;
+    }
+    setSubtotal(temp);
+  }, [cartItems, cartLocal]);
 
   useEffect(() => {
     async function getProductIterations() {
+      setLoading(true);
+
+      const cartLocalInitial = JSON.parse(localStorage.getItem("cart"));
+      const ids = [];
+      for (const id in cartLocalInitial) {
+        ids.push(id);
+      }
+
       const res = await fetch(`/api/product_iterations/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ids: cartCookies,
+          ids: ids,
         }),
       }).then((r) => r.json());
+
+      setLoading(false);
       if (res.status == "success") {
         setCartItems(res.data.products);
       }
     }
     getProductIterations();
   }, []);
+
+  function handleDecreaseCart(id) {
+    let cart = {};
+    if (localStorage.getItem("cart")) {
+      cart = JSON.parse(localStorage.getItem("cart")) || {};
+    }
+
+    cart[id] = {
+      id: id,
+      qty: (Number(cart[id]?.qty) || 0) - 1,
+    };
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    setCartLocal(cart);
+  }
+
+  function handleIncreaseCart(id) {
+    let cart = {};
+    if (localStorage.getItem("cart")) {
+      cart = JSON.parse(localStorage.getItem("cart")) || {};
+    }
+
+    cart[id] = {
+      id: id,
+      qty: (Number(cart[id]?.qty) || 0) + 1,
+    };
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+    setCartLocal(cart);
+  }
   return (
     <>
       <div className="min-h-dvh w-full max-w-screen-xl mx-auto px-8 pb-16 mt-5">
-        <h1 className="font-bold text-2xl">Keranjang</h1>
+        <h1 className="font-bold text-2xl">
+          Keranjang{" "}
+          {loading && <span className="font-normal">(Loading...)</span>}
+        </h1>
 
         <div className="mt-5 space-y-5">
           {cartItems.map((cart, i) => (
@@ -76,11 +130,19 @@ export default function CheckoutPage() {
                   <div>
                     <h1>Jumlah</h1>
                     <div className="flex gap-2">
-                      <button>
+                      <button
+                        onClick={() =>
+                          handleDecreaseCart(cart.product_iteration_id)
+                        }
+                      >
                         <MinusIcon className="w-6" />
                       </button>
-                      <p>1</p>
-                      <button>
+                      <p>{cartLocal[cart.product_iteration_id].qty}</p>
+                      <button
+                        onClick={() =>
+                          handleIncreaseCart(cart.product_iteration_id)
+                        }
+                      >
                         <PlusIcon className="w-6" />
                       </button>
                     </div>
@@ -90,7 +152,8 @@ export default function CheckoutPage() {
                     <p>
                       Rp
                       {Intl.NumberFormat("id-ID").format(
-                        cart.product_variant_price
+                        cart.product_variant_price *
+                          cartLocal[cart.product_iteration_id].qty
                       )}
                     </p>
                   </div>
@@ -103,7 +166,10 @@ export default function CheckoutPage() {
             <div className="flex text-center justify-end">
               <div>
                 <h1 className="font-semibold text-xl">Subtotal</h1>
-                <p>Rp100.000</p>
+                <p>
+                  Rp
+                  {Intl.NumberFormat("id-ID").format(subtotal)}
+                </p>
               </div>
             </div>
             <hr className="border-2 border-cyan-700 mt-2" />
