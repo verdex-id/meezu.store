@@ -23,7 +23,7 @@ module.exports = {
           600: "#3995bf",
           700: "#2e7798",
           800: "#225972",
-          900: "#1b4559"
+          900: "#1b4559",
         },
         pink: {
           50: "#ffeff4",
@@ -35,13 +35,13 @@ module.exports = {
           600: "#bf466b",
           700: "#983856",
           800: "#722a40",
-          900: "#592132"
-        }
+          900: "#592132",
+        },
       },
       fontFamily: {
         fredoka: "var(--font-fredoka)",
-        baloo: "var(--font-baloo)"
-      }
+        baloo: "var(--font-baloo)",
+      },
     },
   },
   plugins: [],
