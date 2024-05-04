@@ -3,19 +3,38 @@
 import Button from "@/components/button";
 import MinusIcon from "@/icons/minus";
 import PlusIcon from "@/icons/plus";
+import { useCookies } from "next-client-cookies";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 export default function CheckoutPage() {
-  const [cartItems, setCartItems] = useState([
-    {
-      test: 1,
-    },
-    {
-      test: 1,
-    },
-  ]);
+  const cookie = useCookies();
 
+  const [cartItems, setCartItems] = useState([]);
+
+  const cartCookies = (cookie.get("cart") || "").split(",");
+  if (cartCookies[0] == "") {
+    window.location.replace("/merch");
+    return;
+  }
+
+  useEffect(() => {
+    async function getProductIterations() {
+      const res = await fetch(`/api/product_iterations/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ids: cartCookies,
+        }),
+      }).then((r) => r.json());
+      if (res.status == "success") {
+        setCartItems(res.data.products);
+      }
+    }
+    getProductIterations();
+  }, []);
   return (
     <>
       <div className="min-h-dvh w-full max-w-screen-xl mx-auto px-8 pb-16 mt-5">
@@ -31,17 +50,28 @@ export default function CheckoutPage() {
                     <Image src={"/logo/akudav2.png"} fill />
                   </div>
                   <div>
-                    <h1>T-Shirt Ella JKT48</h1>
+                    <h1>{cart.product.product_name}</h1>
                   </div>
-                  <div className="text-sm text-cyan-700">
-                    <p>Varian: Hitam</p>
-                    <p>Ukuran: XL</p>
+                  <div className="text-sm text-cyan-700 flex gap-2">
+                    {cart.product_variant_mapping.map((pv, i) => (
+                      <div key={i}>
+                        <p className="text-xs">
+                          {pv.variant.varian_type.variant_type_name}
+                        </p>
+                        <p className="font-bold">{pv.variant.variant_name}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div className="flex gap-8 text-center">
                   <div>
                     <h1>Harga Satuan</h1>
-                    <p>Rp100.000</p>
+                    <p>
+                      Rp
+                      {Intl.NumberFormat("id-ID").format(
+                        cart.product_variant_price
+                      )}
+                    </p>
                   </div>
                   <div>
                     <h1>Jumlah</h1>
@@ -57,7 +87,12 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <h1>Total</h1>
-                    <p>Rp100.000</p>
+                    <p>
+                      Rp
+                      {Intl.NumberFormat("id-ID").format(
+                        cart.product_variant_price
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>
