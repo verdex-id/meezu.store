@@ -37,7 +37,7 @@ export default function MerchPage() {
 
   function handleSearch(event) {
     const filter = products.filter((p) =>
-      p.title.toLowerCase().includes(event.target.value.toLowerCase())
+      p.product_name.toLowerCase().includes(event.target.value.toLowerCase())
     );
     setFilteredProducts(filter);
   }
