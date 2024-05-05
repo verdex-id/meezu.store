@@ -11,6 +11,7 @@ export default function AdminDashboardPage() {
     "transaction",
     "link",
     "courier",
+    "address",
   ]);
   return (
     <>

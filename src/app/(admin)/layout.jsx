@@ -1,6 +1,7 @@
 import NavbarAdmin from "@/components/navbarAdmin";
 import Footer from "@/components/footer";
 import { CookiesProvider } from "next-client-cookies/server";
+import CheckAuth from "./check_auth";
 
 export default function RootLayout({ children }) {
   return (
@@ -8,7 +9,7 @@ export default function RootLayout({ children }) {
       <body>
         <CookiesProvider>
           <NavbarAdmin />
-          {children}
+          <CheckAuth>{children}</CheckAuth>
           <Footer />
         </CookiesProvider>
       </body>

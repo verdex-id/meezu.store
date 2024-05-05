@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { retriveCourierRates } from "@/services/biteship";
+import { FailError } from "@/utils/custom-error";
 
 export async function makeCourierRates(request, biteshipItems) {
   let activeOriginAddress;
@@ -39,7 +40,7 @@ export async function makeCourierRates(request, biteshipItems) {
     activeOriginAddress.area_id,
     request.guest_area_id,
     selectedCourier.courier_code,
-    biteshipItems,
+    biteshipItems
   );
 
   if (response.error) {
@@ -59,7 +60,7 @@ export async function makeCourierRates(request, biteshipItems) {
   }
 
   const pricing = response.pricing.find(
-    (p) => p.courier_service_code === selectedCourier.courier_service_code,
+    (p) => p.courier_service_code === selectedCourier.courier_service_code
   );
 
   if (!pricing) {
