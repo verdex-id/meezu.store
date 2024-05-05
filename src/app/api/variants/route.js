@@ -1,5 +1,4 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
-import { cetak } from "@/utils/cetak";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
@@ -38,8 +37,6 @@ export async function GET(request) {
   } else {
     response["variant_types"] = await prisma.variantType.findMany();
   }
-
-  console.log(variantType);
 
   return NextResponse.json(...successResponse(response));
 }
@@ -108,9 +105,6 @@ export async function POST(request) {
         },
       });
 
-      cetak(createdVariantType, "cvt", true);
-      cetak(createdVariant, "cv", true);
-
       newProductVariantMapping = await tx.productVariantMapping.create({
         data: {
           product_iteration_id: req.product_iteration_id,
@@ -119,7 +113,6 @@ export async function POST(request) {
       });
     });
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
