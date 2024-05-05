@@ -5,7 +5,6 @@ import { unsignedMediumInt, unsignedSmallInt } from "@/utils/mysql";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
-import { JSONPath } from "jsonpath-plus";
 import { NextResponse } from "next/server";
 
 export async function PATCH(request, { params }) {
@@ -17,6 +16,7 @@ export async function PATCH(request, { params }) {
     }
 
     const schema = Joi.object({
+      product_iteration_id: Joi.number().integer().required(),
       new_iteration_price: Joi.number()
         .min(500)
         .max(unsignedMediumInt)
@@ -29,30 +29,20 @@ export async function PATCH(request, { params }) {
         .required(),
       new_iteration_weight: Joi.number().max(500_000).integer().required(),
     });
+
     let req = await request.json();
-    req = schema.validate(req);
+    req = schema.validate({
+      product_iteration_id: params.productIterationId,
+      ...req,
+    });
     if (req.error) {
-      throw new FailError("Invalid request format.", 403, req.error.details);
+      throw new FailError("Invalid request format", 403, req.error.details);
     }
     req = req.value;
 
-    const existingProduct = await prisma.product.findUnique({
-      where: {
-        product_id: parseInt(params.productId),
-      },
-      select: {
-        product_id: true,
-      },
-    });
-
-    if (!existingProduct) {
-      throw new FailError("Product not found", 404);
-    }
-
     updatedProductIteration = await prisma.productIteration.update({
       where: {
-        product_id: existingProduct.product_id,
-        product_iteration_id: parseInt(params.iterationId),
+        product_iteration_id: req.product_iteration_id,
       },
       data: {
         product_variant_price: parseInt(req.new_iteration_price),
@@ -64,13 +54,6 @@ export async function PATCH(request, { params }) {
         product_variant_price: true,
         product_variant_stock: true,
         product_variant_weight: true,
-        product: {
-          select: {
-            product_id: true,
-            product_slug: true,
-            product_name: true,
-          },
-        },
       },
     });
   } catch (e) {
@@ -105,41 +88,57 @@ export async function DELETE(req, { params }) {
       throw new FailError(admin.error, admin.errorCode);
     }
 
-    const existingProduct = await prisma.product.findUnique({
+    const schema = Joi.object({
+      product_iteration_id: Joi.number().integer().required(),
+    });
+    let req = schema.validate({
+      product_iteration_id: params.productIterationId,
+    });
+    if (req.error) {
+      throw new FailError("Invalid request format", 403, req.error.details);
+    }
+    req = req.value;
+
+    const existingProductIteration = await prisma.productIteration.findUnique({
       where: {
-        product_id: parseInt(params.productId),
+        product_iteration_id: req.product_iteration_id,
       },
       select: {
-        product_id: true,
-        product_iterations: {
-          where: {
-            product_iteration_id: parseInt(params.iterationId),
-          },
-          take: 1,
+        product_iteration_id: true,
+        product: {
           select: {
-            product_iteration_id: true,
-            product_variant_mapping: {
-              select: {
-                product_variant_mapping_id: true,
-              },
+            product_iterations: {
+              take: 200,
             },
+          },
+        },
+        product_variant_mapping: {
+          select: {
+            product_variant_mapping_id: true,
           },
         },
       },
     });
 
-    if (!existingProduct) {
-      throw new FailError("Product not found", 404);
+    if (existingProductIteration.product.product_iterations.length < 2) {
+      throw new FailError(
+        "fails to remove variants, requiring at least one iteration",
+        400,
+      );
     }
 
-    if (existingProduct.product_iterations.length < 1) {
-      throw new FailError("Variant not found", 404);
+    if (!existingProductIteration) {
+      throw new FailError("Product iteration not found", 404);
     }
+    const relatedVariantMappingIds =
+      existingProductIteration.product_variant_mapping.reduce(
+        (list, varMap) => {
+          list.push(varMap.product_variant_mapping_id);
+          return list;
+        },
+        [],
+      );
 
-    const relatedVariantMappingIds = JSONPath({
-      path: `$.product_iterations[*].product_variant_mapping[*].product_variant_mapping_id`,
-      json: existingProduct,
-    });
     await prisma.$transaction(async (tx) => {
       await tx.productVariantMapping.deleteMany({
         where: {
@@ -149,8 +148,7 @@ export async function DELETE(req, { params }) {
 
       deletedProductVariant = await tx.productIteration.delete({
         where: {
-          product_iteration_id:
-            existingProduct.product_iterations[0].product_iteration_id,
+          product_iteration_id: existingProductIteration.product_iteration_id,
         },
       });
     });
