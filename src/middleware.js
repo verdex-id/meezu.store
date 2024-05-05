@@ -12,10 +12,9 @@ export async function middleware(request) {
     ["/api/myshop_orders", ["GET"]],
     ["/api/addresses/origin", ["GET", "DELETE"]],
     ["/api/products", ["GET", "DELETE"]],
-    ["/api/product_variants", ["DELETE"]],
-    ["/api/product_iterations", ["GET"]],
+    ["/api/product_iterations", ["GET", "DELETE"]],
     ["/api/payment/channels", ["GET"]],
-    ["/api/variants", ["GET"]],
+    ["/api/variants", ["GET", "DELETE"]],
     ["/api/couriers", ["GET"]],
     ["/api/callbacks/biteship", ["GET", "POST"]],
     ["/api/discounts", ["GET", "DELETE"]],
@@ -41,12 +40,13 @@ export async function middleware(request) {
   const authRoutes = [
     ["/api/addresses/origin"],
     ["/api/products", ["POST", "PATCH", "DELETE"]],
+    ["/api/product_iterations", ["POST", "PATCH", "DELETE"]],
+    ["/api/variants", ["POST" , "DELETE"]],
     ["/api/admins/settings"],
     ["/api/couriers", ["POST", "DELETE"]],
     ["/api/discounts/product", ["GET", "POST", "DELETE"]],
     ["/api/discounts", ["POST", "DELETE"]],
     ["/api/shipments/guest", ["POST"]],
-    ["/api/product_variants", ["POST", "PATCH", "DELETE"]],
     ["/api/myshop_orders", ["GET"]],
   ];
 

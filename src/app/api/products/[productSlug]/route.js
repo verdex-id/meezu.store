@@ -60,6 +60,7 @@ export async function GET(req, { params }) {
           product_variant_weight: true,
           product_variant_mapping: {
             select: {
+              product_variant_mapping_id: true,
               variant: {
                 select: {
                   variant_slug: true,
