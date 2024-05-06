@@ -39,7 +39,7 @@ export default function CheckoutPage() {
         ids.push(id);
       }
 
-      const res = await fetch(`/api/product_iterations/`, {
+      const res = await fetch(`/api/product_cart_iterations/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,6 +93,7 @@ export default function CheckoutPage() {
     localStorage.setItem("cart", JSON.stringify(cart));
     setCartLocal(cart);
   }
+
   return (
     <>
       <div className="min-h-dvh w-full max-w-screen-xl mx-auto px-8 pb-16 mt-5">
@@ -185,11 +186,26 @@ export default function CheckoutPage() {
             </div>
             <hr className="border-2 border-cyan-700 mt-2" />
           </div>
-          <div className="mt-8 flex justify-end">
+          <div className="mt-8 flex justify-end gap-2">
             <div>
-              <Button type={2} href={"/checkout"}>
-                Checkout
+              <Button
+                type={2}
+                onClick={() => {
+                  localStorage.removeItem("cart");
+                  window.location.reload();
+                }}
+              >
+                Reset Cart
               </Button>
+            </div>
+            <div>
+              {cartItems.length > 0 ? (
+                <Button type={2} href={"/checkout"}>
+                  Checkout
+                </Button>
+              ) : (
+                <Button type={2}>Keranjang Masih Kosong</Button>
+              )}
             </div>
           </div>
         </div>
