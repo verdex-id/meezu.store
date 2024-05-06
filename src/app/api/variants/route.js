@@ -57,7 +57,7 @@ export async function POST(request) {
         .pattern(/^[a-zA-Z0-9\s]+$/)
         .required(),
       variant_name: Joi.string()
-        .min(3)
+        .min(1)
         .max(15)
         .pattern(/^[a-zA-Z0-9\s]+$/)
         .required(),
@@ -65,7 +65,7 @@ export async function POST(request) {
 
     const { searchParams } = new URL(request.url);
     const productIterationId = parseInt(
-      searchParams.get("product_iteration_id"),
+      searchParams.get("product_iteration_id")
     );
     let req = await request.json();
 
@@ -116,11 +116,11 @@ export async function POST(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
@@ -134,6 +134,6 @@ export async function POST(request) {
   return NextResponse.json(
     ...successResponse({
       new_product_variant_mapping: newProductVariantMapping,
-    }),
+    })
   );
 }

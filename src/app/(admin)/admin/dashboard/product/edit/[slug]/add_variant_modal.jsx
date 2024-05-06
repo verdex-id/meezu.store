@@ -31,14 +31,11 @@ export default function AddVariantModal({
       }),
     }).then((r) => r.json());
 
-    console.log(res);
+    if (res.status == "success") {
+      window.location.reload();
+    }
 
     setLoading(false);
-
-    if (res.status == "success") {
-      setShowAddVariantModal(false);
-      // window.location.reload();
-    }
   }
   return (
     <div className="fixed top-0 left-0 w-full min-h-dvh bg-black/50 z-50">
@@ -49,7 +46,7 @@ export default function AddVariantModal({
             method="post"
             onSubmit={handleAddVariant}
           >
-            <h1 className="font-bold text-xl">Add Variant</h1>
+            <h1 className="font-bold text-xl">Tambah Informasi</h1>
             <div>
               <h1 className="font-bold">Judul</h1>
               <input
@@ -69,7 +66,7 @@ export default function AddVariantModal({
                 name="variant_name"
                 placeholder="Contoh: Putih"
                 className="px-5 py-2 border-2 border-cyan-200 w-full outline-none"
-                minLength={3}
+                minLength={1}
                 maxLength={30}
                 required
               />
