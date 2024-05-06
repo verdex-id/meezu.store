@@ -2,12 +2,21 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import Button from "./button";
 import { usePathname } from "next/navigation";
 import CartIcon from "@/icons/cart";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const pathname = usePathname();
+
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    setInterval(() => {
+      const cart = JSON.parse(localStorage.getItem("cart"));
+      setCartCount(Object.keys(cart).length);
+    }, 3000);
+  });
   return (
     <>
       <div className="flex justify-between items-center w-full max-w-screen-xl p-5 mx-auto border-b-4 border-white font-baloo">
@@ -35,8 +44,13 @@ export default function Navbar() {
           >
             Merchandise
           </Link>
-          <Link href={"/cart"}>
+          <Link href={"/cart"} className="relative">
             <CartIcon className="w-6" />
+            {cartCount > 0 && (
+              <div className="w-5 h-5 text-white bg-red-500 rounded-full absolute -right-2 -top-2">
+                <p className="text-center text-sm">{cartCount}</p>
+              </div>
+            )}
           </Link>
         </div>
       </div>

@@ -69,7 +69,7 @@ export async function POST(request) {
 
       const affected = await tx.$executeRawUnsafe(
         prouductIterationBulkUpdateQuery,
-        ...prouductIterationBulkUpdateValues,
+        ...prouductIterationBulkUpdateValues
       );
       if (affected !== invoiceItems.length) {
         throw new FailError("Several records not found for update", 404);
@@ -140,12 +140,12 @@ export async function POST(request) {
         req,
         createdOrder.order_code,
         netPrice,
-        tripayItems,
+        tripayItems
       );
       if (tripayTransaction.error) {
         throw new FailError(
           "There was an error processing your payment. Please try again later or contact support for assistance.",
-          500,
+          500
         );
       }
     });
@@ -162,17 +162,18 @@ export async function POST(request) {
       shipment.pricing,
       tripayTransaction.transaction,
       createdInvoice,
-      purchasedItems,
+      purchasedItems
     );
   } catch (e) {
+    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 

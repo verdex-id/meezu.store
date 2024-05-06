@@ -63,6 +63,13 @@ export default function CheckoutPage() {
       cart = JSON.parse(localStorage.getItem("cart")) || {};
     }
 
+    if (Number(cart[id].qty) <= 1) {
+      delete cart[id];
+      localStorage.setItem("cart", JSON.stringify(cart));
+      window.location.reload();
+      return;
+    }
+
     cart[id] = {
       id: id,
       qty: (Number(cart[id]?.qty) || 0) - 1,
@@ -141,6 +148,10 @@ export default function CheckoutPage() {
                       <button
                         onClick={() =>
                           handleIncreaseCart(cart.product_iteration_id)
+                        }
+                        disabled={
+                          cart.product_variant_stock <=
+                          cartLocal[cart.product_iteration_id].qty
                         }
                       >
                         <PlusIcon className="w-6" />
