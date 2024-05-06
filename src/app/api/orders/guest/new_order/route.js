@@ -4,135 +4,83 @@ import { generateOrderCode } from "@/utils/random";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
-import { makeResponse } from "./make-response";
-import { orderStatus } from "@/utils/order-status";
-import { paymentStatus } from "@/utils/payment-status";
+import { makeRequestValidation } from "./make-validation";
 import { prepareData } from "./prepare-data";
-import { makeCourierRates } from "./make-courier-rates";
+import { cetak } from "@/utils/cetak";
 
 export async function POST(request) {
   let response;
   try {
-    const req = {
-      guest_full_name: Joi.string(),
-      guest_address: Joi.string().max(200).required(),
-      guest_area_id: Joi.string().required(),
-      guest_phone_number: Joi.string()
-        .pattern(/^(?:\+?62)?[ -]?(?:\d[ -]?){9,15}\d$/)
-        .required(),
-      guest_email: Joi.string(),
-      note_for_courier: Joi.string().max(45),
-      note_for_seller: Joi.string().max(150),
-      courier_id: Joi.string(),
-      order_items: Joi.array().items(
-        Joi.object({
-          product_iteration_id: Joi.number().integer().min(0).required(),
-          quantity: Joi.number().integer().min(1).required(),
-        }),
-      ),
-    };
+    let req = makeRequestValidation(await request.json());
+    if (req.error) {
+      throw req.error;
+    }
+    req = req.request;
 
     const datas = await prepareData(req);
     if (datas.error) {
       throw datas.error;
     }
 
-    let {
-      invoiceItems,
-      tripayItems,
-      biteshipItems,
-      grossPrice,
-      totalWeight,
-      prouductIterationBulkUpdateQuery,
-      prouductIterationBulkUpdateValues,
-    } = datas.datas;
-    const purchasedItems = [...tripayItems];
+    cetak(datas, "datas", true);
+
+    let { invoiceItems, biteshipItems, grossPrice, totalWeight } = datas.datas;
 
     const shipment = await makeCourierRates(req, biteshipItems);
     if (shipment.error) {
       throw shipment.error;
     }
 
-    let createdOrder;
-    let createdInvoice;
-    let tripayTransaction;
+    throw new Error("shit");
+    grossPrice = grossPrice + shipment.pricing.price;
     await prisma.$transaction(async (tx) => {
       createdOrder = await tx.order.create({
         data: {
           order_code: generateOrderCode(),
-          order_status: orderStatus.pending,
+          //order_status: orderStatus.pending,
           note_for_seller: req.note_for_seller ? req.note_for_seller : null,
-                    shipment: {
-                        create: {
-
-                        }
-                    },
+          guest_order: {
+            create: {
+              guest_email: req.guest_email,
+              guest_note_for_courier: req.note_for_courier,
+            },
+          },
+          shipment: {
+            create: {
+              origin_address_id: shipment.origin.origin_address_id,
+              destination_area_id: req.guest_area_id,
+              courier_id: shipment.courier.courier_id,
+            },
+          },
+          invoice: {
+            create: {
+              customer_full_name: req.guest_full_name,
+              customer_phone_number: req.guest_phone_number,
+              customer_full_address: req.guest_address,
+              discount_amount: 0,
+              total_weight: totalWeight,
+              shipping_cost: shipment.pricing.price,
+              gross_price: grossPrice,
+              net_price: grossPrice,
+              invoice_item: {
+                createMany: {
+                  data: invoiceItems,
+                },
+              },
+            },
+          },
         },
         select: {
           order_id: true,
           order_code: true,
         },
       });
-      await tx.guestOrder.create({
-        data: {
-          order_id: createdOrder.order_id,
-          guest_email: req.guest_email,
-          guest_note_for_courier: req.note_for_courier,
-        },
-      });
-
-
-
-      await tx.shipment.create({
-        data: {
-          origin_address_id: shipment.origin.origin_address_id,
-          destination_area_id: req.guest_area_id,
-          courier_id: shipment.courier.courier_id,
-          order_id: createdOrder.order_id,
-        },
-      });
-
-      tripayItems.push({
-        name: "Shipping cost",
-        price: shipment.pricing.price,
-        quantity: 1,
-      });
-
-      createdInvoice = await tx.invoice.create({
-        data: {
-          payment_status: paymentStatus.unpaid,
-          customer_full_name: req.guest_full_name,
-          customer_phone_number: req.guest_phone_number,
-          customer_full_address: req.guest_address,
-          discount_amount: discount,
-          total_weight: totalWeight,
-          shipping_cost: shipment.pricing.price,
-          gross_price: grossPrice,
-          net_price: netPrice,
-          invoice_item: {
-            createMany: {
-              data: invoiceItems,
-            },
-          },
-          order_id: createdOrder.order_id,
-        },
-        include: {
-          _count: {
-            select: { invoice_item: true },
-          },
-        },
-      });
-
-      grossPrice = grossPrice + shipment.pricing.price;
-
-      const netPrice = grossPrice - discount;
     });
 
     response = makeResponse(
       shipment.pricing,
       tripayTransaction.transaction,
       createdInvoice,
-      purchasedItems,
     );
   } catch (e) {
     console.log(e);

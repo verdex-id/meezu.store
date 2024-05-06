@@ -79,15 +79,6 @@ export async function POST(request) {
 
       const netPrice = grossPrice - discount;
 
-      createdInvoice = await tx.invoice.update({
-        data: {
-        },
-        include: {
-          _count: {
-            select: { invoice_item: true },
-          },
-        },
-      });
 
       tripayTransaction = await makeTransaction(
         req,
