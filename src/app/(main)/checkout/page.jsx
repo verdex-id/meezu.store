@@ -40,7 +40,7 @@ export default function CheckoutPage() {
         ids.push(id);
       }
 
-      const res = await fetch(`/api/product_iterations/`, {
+      const res = await fetch(`/api/product_cart_iterations/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,6 +51,9 @@ export default function CheckoutPage() {
       }).then((r) => r.json());
 
       if (res.status == "success") {
+        if (res.data.length == 0) {
+          window.location.replace("/cart");
+        }
         setCartItems(res.data.products);
       }
     }
@@ -90,6 +93,7 @@ export default function CheckoutPage() {
     );
     if (res.status == "success") {
       setAreas(res.data.areas);
+      setSelectedArea(res.data.areas[0]);
     }
   }
 
@@ -102,38 +106,25 @@ export default function CheckoutPage() {
       });
     }
 
-    console.log({
+    const payload = {
       guest_full_name: name,
-      guest_address: selectedArea.name,
-      guest_area_id: selectedArea.id,
       guest_phone_number: phone,
       guest_email: confirmEmail,
+      guest_area_id: selectedArea.id,
+      guest_address: selectedArea.name,
+      courier_id: "2",
       note_for_courier: addressNotes,
       note_for_seller: sellerNotes,
-      courier_id: "3",
       payment_method: selectedPayment.code,
-      discount_code: "adsa",
       order_items: orderItems,
-    });
+    };
 
     const res = await fetch("/api/orders/guest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        guest_full_name: name,
-        guest_address: selectedArea.name,
-        guest_area_id: selectedArea.id,
-        guest_phone_number: phone,
-        guest_email: confirmEmail,
-        note_for_courier: addressNotes,
-        note_for_seller: sellerNotes,
-        courier_id: "1",
-        payment_method: selectedPayment.code,
-        discount_code: "adsa",
-        order_items: orderItems,
-      }),
+      body: JSON.stringify(payload),
     }).then((r) => r.json());
 
     console.log(res);

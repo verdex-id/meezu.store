@@ -22,8 +22,8 @@ export async function GET(request) {
       ...failResponse(
         "Invalid request format.",
         403,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
 
@@ -31,13 +31,13 @@ export async function GET(request) {
 
   if (areas.error) {
     return NextResponse.json(
-      ...failResponse("Unable to find areas", 404, areas.error),
+      ...failResponse("Unable to find areas", 404, areas.error)
     );
   }
 
   return NextResponse.json(
     ...successResponse({
       areas: areas.areas,
-    }),
+    })
   );
 }
