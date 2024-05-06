@@ -1,10 +1,10 @@
 import Review from "@/components/review";
-import ProductDetailScreen from "@/components/screen/product_detail";
+import ProductDetailScreen from "./product_detail";
 
 async function getProduct(slug) {
-  const res = await fetch(process.env.BASE_URL + `/api/products/${slug}`).then(
-    (r) => r.json()
-  );
+  const res = await fetch(process.env.BASE_URL + `/api/products/${slug}`, {
+    next: { revalidate: 10 },
+  }).then((r) => r.json());
   return res;
 }
 

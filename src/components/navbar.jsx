@@ -14,7 +14,9 @@ export default function Navbar() {
   useEffect(() => {
     setInterval(() => {
       const cart = JSON.parse(localStorage.getItem("cart"));
-      setCartCount(Object.keys(cart).length);
+      try {
+        setCartCount(Object.keys(cart).length);
+      } catch (err) {}
     }, 3000);
   });
   return (

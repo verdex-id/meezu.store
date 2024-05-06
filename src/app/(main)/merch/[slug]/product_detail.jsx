@@ -72,7 +72,7 @@ export default function ProductDetailScreen({ product }) {
           <h1 className="font-bold font-baloo text-3xl md:text-6xl">
             {product.product_name}
           </h1>
-          <p>{product.product_description}</p>
+          <p className="p-5 bg-white">{product.product_description}</p>
 
           <div>
             {product.product_iterations.map((iteration, i) => (
@@ -171,9 +171,13 @@ export default function ProductDetailScreen({ product }) {
                     >
                       {loading ? "Loading..." : "Add to cart"}
                     </button>
-                    <button className="p-3 w-full bg-cyan-400 text-white">
+                    <Link
+                      href={`/cart`}
+                      onClick={() => handleAddToCart(iteration, quantity)}
+                      className="p-3 w-full bg-cyan-400 text-white block text-center"
+                    >
                       Checkout
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
