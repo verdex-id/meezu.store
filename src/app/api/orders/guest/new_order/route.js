@@ -62,7 +62,11 @@ export async function POST(request) {
           order_code: generateOrderCode(),
           order_status: orderStatus.pending,
           note_for_seller: req.note_for_seller ? req.note_for_seller : null,
-          shipment: {},
+                    shipment: {
+                        create: {
+
+                        }
+                    },
         },
         select: {
           order_id: true,
@@ -76,16 +80,8 @@ export async function POST(request) {
           guest_note_for_courier: req.note_for_courier,
         },
       });
-      console.log(createdOrder);
 
 
-      const affected = await tx.$executeRawUnsafe(
-        prouductIterationBulkUpdateQuery,
-        ...prouductIterationBulkUpdateValues,
-      );
-      if (affected !== invoiceItems.length) {
-        throw new FailError("Several records not found for update", 404);
-      }
 
       await tx.shipment.create({
         data: {
