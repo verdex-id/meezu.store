@@ -15,6 +15,7 @@ export async function middleware(request) {
     ["/api/product_iterations", ["GET", "DELETE"]],
     ["/api/product_iterations_multiple", ["POST"]],
     ["/api/payment/channels", ["GET"]],
+    ["/api/payment", ["GET"]],
     ["/api/variants", ["GET", "DELETE"]],
     ["/api/couriers", ["GET"]],
     ["/api/callbacks/biteship", ["GET", "POST"]],

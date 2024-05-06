@@ -1,4 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
+import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
