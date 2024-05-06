@@ -8,6 +8,80 @@ import { NextResponse } from "next/server";
 import Joi from "joi";
 import { unsignedMediumInt, unsignedSmallInt } from "@/utils/mysql";
 
+export async function GET(request) {
+  let products;
+  try {
+    const schema = Joi.object({
+      page: Joi.number().min(1).integer().required(),
+      limit: Joi.number().min(1).max(30).integer().required(),
+    });
+
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get("page");
+    const limit = searchParams.get("limit");
+
+    const validationResult = schema.validate({
+      page,
+      limit,
+    });
+
+    if (validationResult.error) {
+      throw new FailError(
+        "Invalid request format.",
+        400,
+        validationResult.error.details,
+      );
+    }
+
+    products = await prisma.product.findMany({
+      skip: parseInt(limit) * (parseInt(page) - 1),
+      take: parseInt(limit),
+      select: {
+        product_id: true,
+        product_slug: true,
+        product_name: true,
+        product_discounts: {
+          select: {
+            discount: {
+              select: {
+                discount_value: true,
+                is_percent_discount: true,
+              },
+            },
+          },
+        },
+        product_iterations: {
+          orderBy: { product_variant_price: "asc" },
+          take: 1,
+          select: {
+            product_iteration_id: true,
+            product_variant_price: true,
+          },
+        },
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      if (e.code === "P2025") {
+        return NextResponse.json(
+          ...failResponse(`${e.meta.modelName} not found`, 404),
+        );
+      }
+      return NextResponse.json(
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+      );
+    }
+
+    if (e instanceof FailError) {
+      return NextResponse.json(...failResponse(e.message, e.code, e.detail));
+    }
+
+    return NextResponse.json(...errorResponse());
+  }
+
+  return NextResponse.json(...successResponse({ products }));
+}
+
 export async function POST(request) {
   let createdProduct;
   try {
