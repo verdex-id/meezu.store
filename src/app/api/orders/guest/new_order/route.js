@@ -32,7 +32,7 @@ export async function POST(request) {
       throw shipment.error;
     }
 
-    grossPrice = grossPrice + shipment.pricing.price;
+    const netPrice = grossPrice + shipment.pricing.price;
 
     let createdOrder;
     await prisma.$transaction(async (tx) => {
@@ -52,7 +52,6 @@ export async function POST(request) {
               origin_address_id: shipment.origin.origin_address_id,
               destination_area_id: req.guest_area_id,
               courier_id: shipment.courier.courier_id,
-              price: shipment.pricing.price,
             },
           },
           invoice: {
@@ -64,7 +63,7 @@ export async function POST(request) {
               total_weight: totalWeight,
               shipping_cost: shipment.pricing.price,
               gross_price: grossPrice,
-              net_price: grossPrice,
+              net_price: netPrice,
               invoice_item: {
                 createMany: {
                   data: invoiceItems,
@@ -93,7 +92,6 @@ export async function POST(request) {
         },
       });
       response = makeResponse(createdOrder, biteshipItems, shipment.pricing);
-      throw new Error("shit");
     });
 
     const cookie = cookies();
