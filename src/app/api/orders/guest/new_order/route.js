@@ -6,7 +6,10 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
 import { makeRequestValidation } from "./make-validation";
 import { prepareData } from "./prepare-data";
-import { cetak } from "@/utils/cetak";
+import { makeCourierRates } from "./make-courier-rates";
+import { orderStatus } from "@/utils/order-status";
+import { makeResponse } from "./make-response";
+import { cookies } from "next/headers";
 
 export async function POST(request) {
   let response;
@@ -22,8 +25,6 @@ export async function POST(request) {
       throw datas.error;
     }
 
-    cetak(datas, "datas", true);
-
     let { invoiceItems, biteshipItems, grossPrice, totalWeight } = datas.datas;
 
     const shipment = await makeCourierRates(req, biteshipItems);
@@ -31,13 +32,14 @@ export async function POST(request) {
       throw shipment.error;
     }
 
-    throw new Error("shit");
     grossPrice = grossPrice + shipment.pricing.price;
+
+    let createdOrder;
     await prisma.$transaction(async (tx) => {
       createdOrder = await tx.order.create({
         data: {
           order_code: generateOrderCode(),
-          //order_status: orderStatus.pending,
+          order_status: orderStatus.pending,
           note_for_seller: req.note_for_seller ? req.note_for_seller : null,
           guest_order: {
             create: {
@@ -50,6 +52,7 @@ export async function POST(request) {
               origin_address_id: shipment.origin.origin_address_id,
               destination_area_id: req.guest_area_id,
               courier_id: shipment.courier.courier_id,
+              price: shipment.pricing.price,
             },
           },
           invoice: {
@@ -73,17 +76,29 @@ export async function POST(request) {
         select: {
           order_id: true,
           order_code: true,
+          order_status: true,
+          guest_order: true,
+          invoice: {
+            include: {
+              _count: {
+                select: { invoice_item: true },
+              },
+            },
+          },
+          shipment: {
+            select: {
+              price: true,
+            },
+          },
         },
       });
+      response = makeResponse(createdOrder, biteshipItems, shipment.pricing);
+      throw new Error("shit");
     });
 
-    response = makeResponse(
-      shipment.pricing,
-      tripayTransaction.transaction,
-      createdInvoice,
-    );
+    const cookie = cookies();
+    cookie.set("active_order_code", response.guest_order_code);
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
