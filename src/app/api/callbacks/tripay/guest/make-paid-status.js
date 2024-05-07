@@ -24,48 +24,33 @@ export async function makePaidStatus(order) {
 
     const currentTime = new Date().toISOString();
 
-    await prisma.$transaction(async (tx) => {
-      const updatedOrder = await tx.order.update({
-        where: {
-          order_id: order.order_id,
-          order_status: orderStatus.awaitingPayment,
-        },
-        data: { order_status: orderStatus.awaitingFulfillment },
-        select: {
-          order_id: true,
-          order_status: true,
-          invoice: {
-            select: {
-              invoice_id: true,
-              invoice_item: true,
-            },
-          },
-        },
-      });
-
-      await tx.invoice.update({
-        where: {
-          invoice_id: updatedOrder.invoice.invoice_id,
+    await prisma.order.update({
+      where: {
+        order_id: order.order_id,
+        order_status: orderStatus.awaitingPayment,
+        invoice: {
           payment_status: paymentStatus.unpaid,
         },
-        data: {
-          payment_date: currentTime,
-          payment_status: paymentStatus.paid,
-        },
-        select: {
-          invoice_item: {
-            select: {
-              invoice_item_quantity: true,
-              product_iteration: {
-                select: {
-                  product_iteration_id: true,
-                  product_variant_stock: true,
-                },
-              },
-            },
+      },
+      data: {
+        order_status: orderStatus.awaitingFulfillment,
+        invoice: {
+          update: {
+            payment_date: currentTime,
+            payment_status: paymentStatus.paid,
           },
         },
-      });
+      },
+      select: {
+        order_id: true,
+        order_status: true,
+        invoice: {
+          select: {
+            invoice_id: true,
+            invoice_item: true,
+          },
+        },
+      },
     });
   } catch (e) {
     return {

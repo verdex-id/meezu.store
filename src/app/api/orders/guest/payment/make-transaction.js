@@ -2,18 +2,18 @@ import { requestClosedTransaction } from "@/services/tripay";
 import { FailError } from "@/utils/custom-error";
 
 export async function makeTransaction(
-  request,
-  merchanRef,
+  order,
+  paymentMethod,
   amount,
   tripayItems,
 ) {
   const response = await requestClosedTransaction(
-    merchanRef,
+    order.order_code,
     amount,
-    request.payment_method,
-    request.guest_full_name,
-    request.guest_email,
-    request.guest_phone_number,
+    paymentMethod,
+    order.invoice.customer_full_name,
+    order.guest_order.guest_email,
+    order.invoice.customer_phone_number,
     tripayItems,
     "",
   );

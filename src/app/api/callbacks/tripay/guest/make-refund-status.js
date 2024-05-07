@@ -23,8 +23,18 @@ export async function makeRefundStatus(order) {
         where: {
           order_id: order.order_id,
           order_status: orderStatus.awaitingRefund,
+          invoice: {
+            payment_status: paymentStatus.paid,
+          },
         },
-        data: { order_status: orderStatus.refunded },
+        data: {
+          order_status: orderStatus.refunded,
+          invoice: {
+            update: {
+              payment_status: paymentStatus.refund,
+            },
+          },
+        },
         select: {
           order_id: true,
           order_status: true,
@@ -32,29 +42,6 @@ export async function makeRefundStatus(order) {
           invoice: {
             select: {
               invoice_id: true,
-            },
-          },
-        },
-      });
-
-      await tx.invoice.update({
-        where: {
-          invoice_id: updatedOrder.invoice.invoice_id,
-          payment_status: paymentStatus.paid,
-        },
-        data: {
-          payment_status: paymentStatus.refund,
-        },
-        select: {
-          invoice_item: {
-            select: {
-              invoice_item_quantity: true,
-              product_iteration: {
-                select: {
-                  product_iteration_id: true,
-                  product_variant_stock: true,
-                },
-              },
             },
           },
         },
