@@ -29,33 +29,20 @@ export async function makeFailedStatus(order) {
         });
       }
 
-      const deleteBasedOnOrderId = {
-        where: {
-          order_id: order.order_id,
-        },
-      };
-      await tx.guestOrder.delete(deleteBasedOnOrderId);
-      await tx.shipment.delete(deleteBasedOnOrderId);
-      await tx.payment.delete(deleteBasedOnOrderId);
-
-      const deletedInvoiceItemsCount = await tx.invoiceItem.deleteMany({
-        where: {
-          invoice_id: order.invoice.invoice_id,
-        },
-      });
-
-      await tx.invoice.delete(deleteBasedOnOrderId);
-
       const affected = await tx.$executeRawUnsafe(
         prouductIterationBulkUpdateQuery,
         ...prouductIterationBulkUpdateValues,
       );
 
-      if (affected !== deletedInvoiceItemsCount.count) {
+      if (affected !== order.invoice.invoice_item.length) {
         throw new FailError("Several records not found for update", 404);
       }
 
-      await tx.order.delete(deleteBasedOnOrderId);
+      await tx.order.delete({
+        where: {
+          order_id: order.order_id,
+        },
+      });
     });
   } catch (e) {
     return {

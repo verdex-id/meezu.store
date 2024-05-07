@@ -39,7 +39,7 @@ export async function POST(request) {
       createdOrder = await tx.order.create({
         data: {
           order_code: generateOrderCode(),
-          order_status: orderStatus.pending,
+          order_status: orderStatus.incomplete,
           note_for_seller: req.note_for_seller ? req.note_for_seller : null,
           guest_order: {
             create: {

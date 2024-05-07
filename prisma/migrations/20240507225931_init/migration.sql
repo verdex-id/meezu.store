@@ -123,7 +123,7 @@ CREATE TABLE `Order` (
     `order_code` VARCHAR(191) NOT NULL,
     `discount_code` VARCHAR(191) NULL,
     `order_date` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `order_status` ENUM('PENDING', 'AWAITING_PAYMENT', 'AWAITING_FULFILLMENT', 'AWAITING_SHIPMENT', 'AWAITING_PICKUP', 'SHIPPED', 'ARRIVED', 'COMPLETED', 'CANCELLATION_REQUEST', 'AWAITING_REFUND', 'CANCELLED', 'REFUNDED') NOT NULL DEFAULT 'AWAITING_PAYMENT',
+    `order_status` ENUM('INCOMPLETE', 'AWAITING_PAYMENT', 'AWAITING_FULFILLMENT', 'AWAITING_SHIPMENT', 'AWAITING_PICKUP', 'SHIPPED', 'ARRIVED', 'COMPLETED', 'CANCELLATION_REQUEST', 'AWAITING_REFUND', 'CANCELLED', 'REFUNDED') NOT NULL DEFAULT 'AWAITING_PAYMENT',
     `note_for_seller` VARCHAR(150) NULL,
 
     UNIQUE INDEX `Order_order_id_key`(`order_id`),
@@ -315,16 +315,16 @@ ALTER TABLE `Variant` ADD CONSTRAINT `Variant_varian_type_id_fkey` FOREIGN KEY (
 ALTER TABLE `IterationImage` ADD CONSTRAINT `IterationImage_product_variant_id_fkey` FOREIGN KEY (`product_variant_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`invoice_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_invoice_id_fkey` FOREIGN KEY (`invoice_id`) REFERENCES `Invoice`(`invoice_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `InvoiceItem` ADD CONSTRAINT `InvoiceItem_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Payment` ADD CONSTRAINT `Payment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_courier_id_fkey` FOREIGN KEY (`courier_id`) REFERENCES `Courier`(`courier_id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -333,10 +333,10 @@ ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_courier_id_fkey` FOREIGN KEY (`c
 ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_origin_address_id_fkey` FOREIGN KEY (`origin_address_id`) REFERENCES `OriginAddress`(`origin_address_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Shipment` ADD CONSTRAINT `Shipment_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `GuestOrder` ADD CONSTRAINT `GuestOrder_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `GuestOrder` ADD CONSTRAINT `GuestOrder_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `ThresholdDiscount` ADD CONSTRAINT `ThresholdDiscount_discount_id_fkey` FOREIGN KEY (`discount_id`) REFERENCES `Discount`(`discount_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
