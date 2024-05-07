@@ -97,7 +97,7 @@ model Invoice {
   shipping_cost             Int             @db.UnsignedMediumInt
   gross_price               Int             @db.UnsignedMediumInt
   net_price                 Int             @db.UnsignedMediumInt
-  order                     Order           @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id])
+  order                     Order           @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id], onDelete: Cascade)
   order_id                  String          @unique
   invoice_item              InvoiceItem[]
 }
@@ -111,14 +111,14 @@ model InvoiceItem {
   invoice_item_price          Int       @db.UnsignedMediumInt
   invoice_item_total_price    Int       @db.UnsignedMediumInt
 
-  invoice                     Invoice           @relation(fields: [invoice_id], references: [invoice_id])
+  invoice                     Invoice           @relation(fields: [invoice_id], references: [invoice_id], onDelete: Cascade)
   invoice_id                  String
   product_iteration           ProductIteration?  @relation(fields: [product_iteration_id], references: [product_iteration_id])
   product_iteration_id        Int?
 }
 
 enum OrderStatus {
-  PENDING
+  INCOMPLETE
   AWAITING_PAYMENT
   AWAITING_FULFILLMENT
   AWAITING_SHIPMENT
@@ -153,7 +153,7 @@ model Payment {
   paygate_transaction_id    String               // tripay transaction reference code
   payment_method            String
 
-  order                     Order                @relation(fields: [order_id], references: [order_id])
+  order                     Order                @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
   order_id                  String     @unique
 }
 
@@ -176,7 +176,7 @@ model Shipment {
   origin_address          OriginAddress?    @relation(fields: [origin_address_id], references: [origin_address_id])
   origin_address_id       Int?  
               
-  order                   Order            @relation(fields: [order_id], references: [order_id])
+  order                   Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
   order_id                String  @unique
 }
 
@@ -196,7 +196,7 @@ model GuestOrder {
   guest_email                 String             @db.VarChar(75)
   guest_note_for_courier      String?            @db.VarChar(45)
   
-  order                       Order              @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id])
+  order                       Order              @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id], onDelete: Cascade)
   order_id                    String   @unique
 }
 
@@ -284,4 +284,5 @@ model Session {
   admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
   admin_id          String?
 }
+
 
