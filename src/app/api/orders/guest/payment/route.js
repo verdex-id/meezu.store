@@ -39,7 +39,7 @@ export async function POST(request) {
     const order = await prisma.order.findUnique({
       where: {
         order_code: req.order_code,
-        order_status: orderStatus.pending,
+        order_status: orderStatus.incomplete,
       },
       select: {
         order_id: true,

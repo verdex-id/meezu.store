@@ -1,10 +1,10 @@
 export const orderStatus = {
   /**
-   * Represents the order status when it is pending.
-   * This status indicates that the order has been created but has not yet been processed.
+   * Represents the order status when it is incomplete.
+   * This status indicates that some components of the order have not been completed by the buyer.
    * @type {string}
    */
-  pending: "PENDING",
+  incomplete: "INCOMPLETE",
 
   /**
    * Represents the order status when it is awaiting payment.
