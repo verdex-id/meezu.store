@@ -110,7 +110,7 @@ export async function POST(request) {
     return NextResponse.json(...errorResponse());
   }
 
-  return NextResponse.json(...successResponse({ banner_id: banner.banner_id }));
+  return NextResponse.json(...successResponse({ banner }));
 }
 
 function isMatch(pattern, str) {

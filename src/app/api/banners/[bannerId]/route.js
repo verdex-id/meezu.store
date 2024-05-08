@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 
 export async function GET(req, { params }) {
-  let banners;
+  let banner;
   try {
     const schema = Joi.object({
       banner_id: Joi.number().integer().required(),
@@ -21,7 +21,7 @@ export async function GET(req, { params }) {
     }
     req = req.value;
 
-    banners = await prisma.banner.findUnique({
+    banner = await prisma.banner.findUnique({
       where: {
         banner_id: req.banner_id,
       },
@@ -40,7 +40,7 @@ export async function GET(req, { params }) {
     return NextResponse.json(...errorResponse());
   }
 
-  return NextResponse.json(...successResponse({ banners: banners }));
+  return NextResponse.json(...successResponse({ banner: banner }));
 }
 
 export async function PATCH(request, { params }) {

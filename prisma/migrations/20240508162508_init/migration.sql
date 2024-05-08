@@ -74,7 +74,7 @@ CREATE TABLE `Variant` (
 CREATE TABLE `IterationImage` (
     `iteration_image_id` INTEGER NOT NULL AUTO_INCREMENT,
     `iteration_image_path` VARCHAR(191) NOT NULL,
-    `product_variant_id` INTEGER NOT NULL,
+    `product_iteration_id` INTEGER NOT NULL,
 
     UNIQUE INDEX `IterationImage_iteration_image_id_key`(`iteration_image_id`),
     PRIMARY KEY (`iteration_image_id`)
@@ -322,7 +322,7 @@ ALTER TABLE `ProductVariantMapping` ADD CONSTRAINT `ProductVariantMapping_varian
 ALTER TABLE `Variant` ADD CONSTRAINT `Variant_varian_type_id_fkey` FOREIGN KEY (`varian_type_id`) REFERENCES `VariantType`(`varian_type_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `IterationImage` ADD CONSTRAINT `IterationImage_product_variant_id_fkey` FOREIGN KEY (`product_variant_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `IterationImage` ADD CONSTRAINT `IterationImage_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;
