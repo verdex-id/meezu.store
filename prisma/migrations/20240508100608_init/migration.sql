@@ -296,6 +296,16 @@ CREATE TABLE `Session` (
     PRIMARY KEY (`session_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Banner` (
+    `banner_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `banner_image_path` VARCHAR(191) NOT NULL,
+    `banner_url` VARCHAR(191) NULL,
+
+    UNIQUE INDEX `Banner_banner_id_key`(`banner_id`),
+    PRIMARY KEY (`banner_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Product` ADD CONSTRAINT `Product_product_category_id_fkey` FOREIGN KEY (`product_category_id`) REFERENCES `ProductCategory`(`product_category_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 

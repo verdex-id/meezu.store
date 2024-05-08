@@ -285,4 +285,8 @@ model Session {
   admin_id          String?
 }
 
-
+model Banner {
+  banner_id     Int   @unique   @default(autoincrement())  @id
+  banner_image_path    String
+  banner_url           String?
+}

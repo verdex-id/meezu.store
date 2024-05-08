@@ -22,6 +22,7 @@ export async function middleware(request) {
     ["/api/discounts", ["GET", "DELETE"]],
     ["/api/vouchers", ["GET"]],
     ["/api/callbacks/biteship", ["GET"]],
+        ["/api/banner", ["GET","POST", "DELETE"]]
   ];
 
   if (!checkRoute(jsonRoutes, request)) {
@@ -50,6 +51,7 @@ export async function middleware(request) {
     ["/api/discounts", ["POST", "DELETE"]],
     ["/api/shipments/guest", ["POST"]],
     ["/api/myshop_orders", ["GET"]],
+    ["/api/banners", ["POST", "DELETE", "PATCH"]],
   ];
 
   if (checkRoute(authRoutes, request)) {
