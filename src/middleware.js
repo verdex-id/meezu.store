@@ -22,7 +22,8 @@ export async function middleware(request) {
     ["/api/discounts", ["GET", "DELETE"]],
     ["/api/vouchers", ["GET"]],
     ["/api/callbacks/biteship", ["GET"]],
-        ["/api/banner", ["GET","POST", "DELETE"]]
+    ["/api/banners", ["GET", "POST", "DELETE"]],
+    ["/api/iteration_images", ["GET", "POST", "DELETE"]],
   ];
 
   if (!checkRoute(jsonRoutes, request)) {
@@ -34,7 +35,7 @@ export async function middleware(request) {
           ...failResponse("Request/JSON syntax error", 400, {
             name: e.name,
             message: e.message,
-          })
+          }),
         );
       }
     }
@@ -52,13 +53,14 @@ export async function middleware(request) {
     ["/api/shipments/guest", ["POST"]],
     ["/api/myshop_orders", ["GET"]],
     ["/api/banners", ["POST", "DELETE", "PATCH"]],
+    ["/api/iteration_images", ["POST", "DELETE"]],
   ];
 
   if (checkRoute(authRoutes, request)) {
     let authorization = headers().get("authorization");
     if (authorization === null) {
       return Response.json(
-        ...failResponse("Authorization header is not provided.", 401)
+        ...failResponse("Authorization header is not provided.", 401),
       );
     }
 
@@ -66,26 +68,26 @@ export async function middleware(request) {
 
     if (authorization.length === 0) {
       return Response.json(
-        ...failResponse("Authorization header is not provided.", 401)
+        ...failResponse("Authorization header is not provided.", 401),
       );
     }
 
     if (authorization.length < 2) {
       return Response.json(
-        ...failResponse("Authorization header is not valid.", 401)
+        ...failResponse("Authorization header is not valid.", 401),
       );
     }
 
     if (authorization[0].toLowerCase() !== "bearer") {
       return Response.json(
-        ...failResponse("Unsupported authentication type.", 401)
+        ...failResponse("Unsupported authentication type.", 401),
       );
     }
 
     const verificationResult = await verifyToken(authorization[1]);
     if (!verificationResult.isValid) {
       return Response.json(
-        ...failResponse("token has expired or is invalid.", 401)
+        ...failResponse("token has expired or is invalid.", 401),
       );
     }
 
@@ -96,7 +98,7 @@ export async function middleware(request) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set(
       authPayloadAccountId,
-      verificationResult.payload.accountId
+      verificationResult.payload.accountId,
     );
 
     return NextResponse.next({
