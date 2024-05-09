@@ -148,6 +148,7 @@ CREATE TABLE `Shipment` (
     `shipment_id` VARCHAR(191) NOT NULL,
     `expedition_order_id` VARCHAR(191) NULL,
     `courier_tracking_id` VARCHAR(191) NULL,
+    `courier_waybill_id` VARCHAR(191) NULL,
     `shipment_status` VARCHAR(191) NULL,
     `shipment_date` DATETIME(3) NULL,
     `cash_on_delivery_fee` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,

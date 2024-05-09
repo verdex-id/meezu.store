@@ -161,6 +161,7 @@ model Shipment {
   shipment_id             String      @unique  @default(cuid())  @id
   expedition_order_id     String?     @unique           // biteship order id
   courier_tracking_id     String?
+  courier_waybill_id      String?
   shipment_status         String?
   shipment_date           DateTime?
 
@@ -290,4 +291,5 @@ model Banner {
   banner_image_path    String
   banner_url           String?
 }
+
 

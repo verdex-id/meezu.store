@@ -6,20 +6,17 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
 import { NextResponse } from "next/server";
 
-export async function GET(request) {
+export async function GET(request, { params }) {
   let orders;
   try {
     const schema = Joi.object({
-      order_code: Joi.string()
-        .pattern(/^[A-Z0-9-]{27,}$/)
+      order_id: Joi.string()
+        .pattern(/^[a-z0-9-]{25,}$/)
         .required(),
     });
 
-    const { searchParams } = new URL(request.url);
-    const orderCode = searchParams.get("order_code");
-
     let req = schema.validate({
-      order_code: orderCode,
+      order_id: params.orderId,
     });
     if (req.error) {
       throw new FailError("invalid request format", 400, req.error.details);
@@ -28,17 +25,18 @@ export async function GET(request) {
 
     orders = await prisma.order.findUnique({
       where: {
-        order_code: req.order_code,
+        order_id: req.order_id,
       },
       select: {
+        order_status: true,
         order_code: true,
+        order_id: true,
         guest_order: {
           select: {
             guest_email: true,
             guest_note_for_courier: true,
           },
         },
-        order_status: true,
         invoice: {
           select: {
             payment_date: true,
@@ -60,6 +58,7 @@ export async function GET(request) {
         payment: {
           select: {
             payment_method: true,
+            paygate_transaction_id: true,
           },
         },
         shipment: {
@@ -86,30 +85,29 @@ export async function GET(request) {
         ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
+
+    if (e instanceof FailError) {
+      return NextResponse.json(...failResponse(e.message, e.code, e.detail));
+    }
     return NextResponse.json(...errorResponse());
   }
 
   return NextResponse.json(...successResponse({ orders: orders }));
 }
 
-export async function PATCH(request) {
+export async function PATCH(request, { params }) {
   let updatedOrder;
   try {
     const schema = Joi.object({
-      order_code: Joi.string()
-        .pattern(/^[A-Z0-9-]{27,}$/)
+      order_id: Joi.string()
+        .pattern(/^[a-z0-9-]{25,}$/)
         .required(),
-      new_status: Joi.string()
-        .valid(orderStatus.cancellationRequest)
-        .required(),
+      new_status: Joi.string().valid(orderStatus.awaitingRefund, orderStatus.awaitingFulfillment).required(),
     });
-
-    const { searchParams } = new URL(request.url);
-    const orderCode = searchParams.get("order_code");
 
     let req = await request.json();
     req = schema.validate({
-      order_code: orderCode,
+      order_id: params.orderId,
       ...req,
     });
     if (req.error) {
@@ -119,20 +117,14 @@ export async function PATCH(request) {
 
     updatedOrder = await prisma.order.update({
       where: {
-        order_code: req.order_code,
-        OR: [
-          {
-            order_status: orderStatus.awaitingFulfillment,
-          },
-          {
-            order_status: orderStatus.awaitingShipment,
-          },
-        ],
+        order_id: req.order_id,
+        order_status: orderStatus.cancellationRequest,
       },
       data: {
         order_status: req.new_status,
       },
       select: {
+        order_id: true,
         order_code: true,
         order_status: true,
       },
