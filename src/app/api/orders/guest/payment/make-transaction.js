@@ -15,7 +15,7 @@ export async function makeTransaction(
     order.guest_order.guest_email,
     order.invoice.customer_phone_number,
     tripayItems,
-    "",
+    process.env.TRIPAY_CALLBACK_URL,
   );
 
   if (!response.success) {
