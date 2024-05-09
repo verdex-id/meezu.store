@@ -7,7 +7,6 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 
-
 export async function GET() {
   let banners;
   try {
@@ -26,14 +25,14 @@ export async function GET() {
     return NextResponse.json(...errorResponse());
   }
 
-  return NextResponse.json(...successResponse({ banners: banners}));
+  return NextResponse.json(...successResponse({ banners: banners }));
 }
 
 export async function POST(request) {
   const limit = 2;
   const sizeLimit = limit * 1024 * 1024;
   const imageType = "image";
-  const saveLocation = "public/banner/";
+  const saveLocation = "/banner/";
 
   let banner;
   try {
@@ -74,15 +73,12 @@ export async function POST(request) {
     const newFileName =
       new Date().getTime() + "." + getFileExtension(file.name);
     const buffer = Buffer.from(await file.arrayBuffer());
-    const savePath = path.join(saveLocation + newFileName);
+    const savePath = path.join("public" + saveLocation + newFileName);
     await writeFile(savePath, buffer);
 
     banner = await prisma.banner.create({
       data: {
-        banner_image_path: savePath,
-      },
-      select: {
-        banner_id: true,
+        banner_image_path: saveLocation + newFileName,
       },
     });
   } catch (e) {

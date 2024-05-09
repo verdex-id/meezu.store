@@ -56,7 +56,7 @@ export async function POST(request) {
   const limit = 2;
   const sizeLimit = limit * 1024 * 1024;
   const imageType = "image";
-  const saveLocation = "public/iteration_images/";
+  const saveLocation = "/iteration_images/";
   const imagePerIteration = 5;
 
   let iterationImage;
@@ -129,12 +129,12 @@ export async function POST(request) {
     const newFileName =
       new Date().getTime() + "." + getFileExtension(file.name);
     const buffer = Buffer.from(await file.arrayBuffer());
-    const savePath = path.join(saveLocation + newFileName);
+    const savePath = path.join("public" + saveLocation + newFileName);
     await writeFile(savePath, buffer);
 
     iterationImage = await prisma.iterationImage.create({
       data: {
-        iteration_image_path: savePath,
+        iteration_image_path: saveLocation + newFileName,
         product_iteration_id: req.product_iteration_id,
       },
     });
