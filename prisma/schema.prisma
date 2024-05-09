@@ -40,7 +40,7 @@ model ProductIteration {
   product_variant_stock     Int                       @db.UnsignedSmallInt
   product                   Product                   @relation(name: "ProductToProductIteration", fields: [product_id], references: [product_id])
   product_id                Int                
-  iteration_images          IterationImage[]          @relation(name: "ProductVariantToVariantImage")
+  iteration_images          IterationImage[]         
   product_variant_mapping   ProductVariantMapping[]
   invoice_items             InvoiceItem[]
 }
@@ -72,8 +72,8 @@ model Variant {
 model IterationImage {
   iteration_image_id      Int               @default(autoincrement())  @unique  @id
   iteration_image_path    String  
-  product_iteration       ProductIteration  @relation(name: "ProductVariantToVariantImage", fields: [product_variant_id], references: [product_iteration_id])
-  product_variant_id      Int
+  product_iteration       ProductIteration  @relation(fields: [product_iteration_id], references: [product_iteration_id])
+  product_iteration_id    Int
 }
 
 enum PaymentStatus {
@@ -285,4 +285,9 @@ model Session {
   admin_id          String?
 }
 
+model Banner {
+  banner_id     Int   @unique   @default(autoincrement())  @id
+  banner_image_path    String
+  banner_url           String?
+}
 
