@@ -11,6 +11,7 @@ import { orderStatus } from "@/utils/order-status";
 import { makeResponse } from "./make-response";
 import { sendEmail } from "@/services/email";
 import { emailHTML, emailText } from "./make-email";
+import { cookies } from "next/headers";
 
 export async function POST(request) {
   let response;
@@ -184,6 +185,9 @@ export async function POST(request) {
       emailText(order.order_code, formatedPrice, expireTime),
       emailHTML(order.order_code, formatedPrice, expireTime),
     );
+
+    const cookie = cookies();
+    cookie.delete("active_order_code");
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
