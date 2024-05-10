@@ -9,6 +9,8 @@ import { NextResponse } from "next/server";
 import { prepareData } from "./prepare-data";
 import { orderStatus } from "@/utils/order-status";
 import { makeResponse } from "./make-response";
+import { sendEmail } from "@/services/email";
+import { emailHTML, emailText } from "./make-email";
 
 export async function POST(request) {
   let response;
@@ -166,6 +168,21 @@ export async function POST(request) {
       updatedInvoice,
       tripayTransaction.transaction,
       purchasedItems,
+    );
+
+    const expireTime = new Date(
+      tripayTransaction.transaction.expired_time * 1000,
+    ).toLocaleString();
+
+    const formatedPrice = updatedInvoice.net_price
+      .toLocaleString()
+      .replace(/,/g, ".");
+
+    sendEmail(
+      order.guest_order.guest_email,
+      "Customer order",
+      emailText(order.order_code, formatedPrice, expireTime),
+      emailHTML(order.order_code, formatedPrice, expireTime),
     );
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
