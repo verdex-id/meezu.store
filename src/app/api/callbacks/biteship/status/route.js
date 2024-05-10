@@ -43,7 +43,6 @@ export async function POST(request) {
         expedition_order_id: req.order_id,
       },
       data: {
-        courier_tracking_id: req.courier_tracking_id,
         shipment_status: req.status,
       },
     });
