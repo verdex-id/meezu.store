@@ -72,6 +72,7 @@ export async function GET(request) {
       emailHTML(order.order_code, formatedPrice, expireTime),
     );
   } catch (e) {
+        console.log(e)
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
