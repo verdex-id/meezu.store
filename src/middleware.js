@@ -9,6 +9,7 @@ export async function middleware(request) {
   const jsonRoutes = [
     ["/api/areas", ["GET"]],
     ["/api/orders", ["GET"]],
+    ["/api/orders/cancel", ["DELETE"]],
     ["/api/myshop_orders", ["GET"]],
     ["/api/addresses/origin", ["GET", "DELETE"]],
     ["/api/products", ["GET", "DELETE"]],

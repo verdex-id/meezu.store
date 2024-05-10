@@ -7,7 +7,7 @@ import Joi from "joi";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  let orders;
+  let order;
   try {
     const schema = Joi.object({
       order_code: Joi.string()
@@ -26,7 +26,7 @@ export async function GET(request) {
     }
     req = req.value;
 
-    orders = await prisma.order.findUnique({
+    order = await prisma.order.findUnique({
       where: {
         order_code: req.order_code,
       },
@@ -75,6 +75,10 @@ export async function GET(request) {
         },
       },
     });
+
+    if (!order) {
+      throw new FailError(`Order not found`, 404);
+    }
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
@@ -86,10 +90,14 @@ export async function GET(request) {
         ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
+    if (e instanceof FailError) {
+      return NextResponse.json(...failResponse(e.message, e.code, e.detail));
+    }
+
     return NextResponse.json(...errorResponse());
   }
 
-  return NextResponse.json(...successResponse({ orders: orders }));
+  return NextResponse.json(...successResponse({ order: order }));
 }
 
 export async function PATCH(request) {
