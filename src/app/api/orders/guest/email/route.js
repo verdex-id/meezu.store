@@ -4,9 +4,9 @@ import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
-import { emailHTML, emailText } from "../payment/make-email";
 import Joi from "joi";
 import { sendEmail } from "@/services/email";
+import { emailHTML, emailText } from "./make-email";
 
 export async function GET(request) {
   let order;
@@ -72,7 +72,6 @@ export async function GET(request) {
       emailHTML(order.order_code, formatedPrice, expireTime),
     );
   } catch (e) {
-        console.log(e)
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
