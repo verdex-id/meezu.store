@@ -34,69 +34,66 @@ export async function POST(request) {
 
     const netPrice = grossPrice + shipment.pricing.price;
 
-    let createdOrder;
-    await prisma.$transaction(async (tx) => {
-      createdOrder = await tx.order.create({
-        data: {
-          order_code: generateOrderCode(),
-          order_status: orderStatus.incomplete,
-          note_for_seller: req.note_for_seller ? req.note_for_seller : null,
-          guest_order: {
-            create: {
-              guest_email: req.guest_email,
-              guest_note_for_courier: req.note_for_courier,
-            },
+    let createdOrder = await prisma.order.create({
+      data: {
+        order_code: generateOrderCode(),
+        order_status: orderStatus.incomplete,
+        note_for_seller: req.note_for_seller ? req.note_for_seller : null,
+        guest_order: {
+          create: {
+            guest_email: req.guest_email,
+            guest_note_for_courier: req.note_for_courier,
           },
-          shipment: {
-            create: {
-              origin_address_id: shipment.origin.origin_address_id,
-              destination_area_id: req.guest_area_id,
-              courier_id: shipment.courier.courier_id,
-            },
+        },
+        shipment: {
+          create: {
+            origin_address_id: shipment.origin.origin_address_id,
+            destination_area_id: req.guest_area_id,
+            courier_id: shipment.courier.courier_id,
           },
-          invoice: {
-            create: {
-              customer_full_name: req.guest_full_name,
-              customer_phone_number: req.guest_phone_number,
-              customer_full_address: req.guest_address,
-              discount_amount: 0,
-              total_weight: totalWeight,
-              shipping_cost: shipment.pricing.price,
-              gross_price: grossPrice,
-              net_price: netPrice,
-              invoice_item: {
-                createMany: {
-                  data: invoiceItems,
-                },
+        },
+        invoice: {
+          create: {
+            customer_full_name: req.guest_full_name,
+            customer_phone_number: req.guest_phone_number,
+            customer_full_address: req.guest_address,
+            discount_amount: 0,
+            total_weight: totalWeight,
+            shipping_cost: shipment.pricing.price,
+            gross_price: grossPrice,
+            net_price: netPrice,
+            invoice_item: {
+              createMany: {
+                data: invoiceItems,
               },
             },
           },
         },
-        select: {
-          order_id: true,
-          order_code: true,
-          order_status: true,
-          guest_order: true,
-          invoice: {
-            include: {
-              _count: {
-                select: { invoice_item: true },
-              },
-            },
-          },
-          shipment: {
-            select: {
-              price: true,
+      },
+      select: {
+        order_id: true,
+        order_code: true,
+        order_status: true,
+        guest_order: true,
+        invoice: {
+          include: {
+            _count: {
+              select: { invoice_item: true },
             },
           },
         },
-      });
-      response = makeResponse(createdOrder, biteshipItems, shipment.pricing);
+        shipment: {
+          select: {
+            price: true,
+          },
+        },
+      },
     });
-
+    response = makeResponse(createdOrder, biteshipItems, shipment.pricing);
     const cookie = cookies();
     cookie.set("active_order_code", response.guest_order_code);
   } catch (e) {
+    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(

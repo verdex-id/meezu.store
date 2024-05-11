@@ -4,9 +4,9 @@ import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
-import { emailHTML, emailText } from "../payment/make-email";
 import Joi from "joi";
 import { sendEmail } from "@/services/email";
+import { emailHTML, emailText } from "./make-email";
 
 export async function GET(request) {
   let order;
@@ -65,7 +65,7 @@ export async function GET(request) {
       .toLocaleString()
       .replace(/,/g, ".");
 
-    sendEmail(
+    await sendEmail(
       order.guest_order.guest_email,
       "Customer order",
       emailText(order.order_code, formatedPrice, expireTime),
