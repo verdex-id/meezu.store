@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const [sellerNotes, setSellerNotes] = useState("");
 
   const [orderCode, setOrderCode] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const cartLocal = JSON.parse(localStorage.getItem("cart"));
@@ -82,6 +83,7 @@ export default function CheckoutPage() {
   }
 
   async function handleCheckout() {
+    setLoading(true);
     let orderItems = [];
     for (let data of cartItems) {
       orderItems.push({
@@ -97,8 +99,8 @@ export default function CheckoutPage() {
       guest_area_id: selectedArea.id,
       guest_address: selectedArea.name,
       courier_id: "2",
-      note_for_courier: addressNotes,
-      note_for_seller: sellerNotes,
+      note_for_courier: addressNotes || "-",
+      note_for_seller: sellerNotes || "-",
       order_items: orderItems,
     };
 
@@ -110,9 +112,11 @@ export default function CheckoutPage() {
       body: JSON.stringify(payload),
     }).then((r) => r.json());
 
-    console.log(res);
-
+    setLoading(false);
     setOrderCode(res.data.purchase_details.guest_order_code);
+    window.location.replace(
+      `/checkout/${res.data.purchase_details.guest_order_code}`
+    );
   }
   return (
     <>
@@ -331,24 +335,19 @@ export default function CheckoutPage() {
             </div>
 
             <div className="flex justify-end border-y-4 mt-8 p-8">
-              {orderCode && (
-                <div>
-                  <h1 className="font-bold">
-                    Success! Anda akan diarahkan otomatis, atau{" "}
-                    <Link
-                      href={`/checkout/${orderCode}`}
-                      className="text-cyan-700"
-                    >
-                      klik disini
-                    </Link>{" "}
-                    untuk memilih metode pembayaran.
-                  </h1>
-                </div>
-              )}
               <div className="">
-                <Button type={2} onClick={() => handleCheckout()}>
-                  CHECKOUT !
-                </Button>
+                {orderCode ? (
+                  <Link
+                    href={`/checkout/${orderCode}`}
+                    className="bg-cyan-400 text-white p-5 block"
+                  >
+                    Berhasil! Klik untuk Lanjutkan
+                  </Link>
+                ) : (
+                  <Button type={2} onClick={() => handleCheckout()}>
+                    {loading ? "Loading..." : "Next"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
