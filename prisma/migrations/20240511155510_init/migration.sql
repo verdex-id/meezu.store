@@ -175,7 +175,6 @@ CREATE TABLE `Courier` (
     `courier_service_code` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Courier_courier_id_key`(`courier_id`),
-    UNIQUE INDEX `Courier_courier_code_key`(`courier_code`),
     UNIQUE INDEX `Courier_courier_code_courier_service_code_key`(`courier_code`, `courier_service_code`),
     PRIMARY KEY (`courier_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
