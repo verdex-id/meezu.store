@@ -13,9 +13,10 @@ export default function AdminDashboardCourierNewPage() {
 
   useEffect(() => {
     async function getBiteshipCouriers() {
-      const res = await fetch("/api/couriers/biteship").then((r) => r.json());
-      console.log(res);
-      setCouriers(res.data.couriers.couriers);
+      const res = await fetch("/api/couriers?available=false").then((r) =>
+        r.json()
+      );
+      setCouriers(res.data.courier_companies);
     }
     getBiteshipCouriers();
   }, []);
@@ -75,7 +76,7 @@ export default function AdminDashboardCourierNewPage() {
               <option
                 key={i}
                 value={`${courier.courier_code}::${courier.courier_service_code}`}
-              >{`${courier.courier_code} - ${courier.courier_service_code}`}</option>
+              >{`${courier.courier_name} - ${courier.courier_service_name}`}</option>
             ))}
           </select>
           <button

@@ -1,18 +1,50 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
-export default function PaymentScreen({ payment, instruction }) {
+export default function PaymentScreen({ order, payment, instruction }) {
   const [copied, setCopied] = useState(false);
   const [showTutorial, setTutorial] = useState();
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const [emailCooldown, setEmailCooldown] = useState(0);
+
   const expiredDateTime = new Date(payment.expired_at * 1000);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (emailCooldown >= 1) {
+        setEmailCooldown(emailCooldown - 1);
+      }
+    }, 1000);
+  }, [success, error, emailCooldown]);
 
   function handleCopy() {
     setCopied(false);
     navigator.clipboard.writeText(payment.pay_code);
     setCopied(true);
+  }
+
+  async function handleSendEmail() {
+    setLoading(true);
+
+    const res = await fetch(
+      "/api/orders/guest/email?order_code=" + order.order_code
+    ).then((r) => r.json());
+
+    setEmailCooldown(10);
+    setLoading(false);
+
+    if (res.status == "success") {
+      setSuccess(true);
+    } else if (res.status == "fail") {
+      setSuccess(false);
+      setError(res.message);
+    }
   }
   return (
     <>
@@ -53,7 +85,7 @@ export default function PaymentScreen({ payment, instruction }) {
               <h1 className="font-bold">{payment.payment_name}</h1>
               <div className="cursor-pointer" onClick={handleCopy}>
                 <p
-                  className={`p-5 text-2xl font-bold tracking-widest font-mono ${
+                  className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
                     copied ? "bg-green-50" : "bg-white"
                   }`}
                 >
@@ -76,31 +108,61 @@ export default function PaymentScreen({ payment, instruction }) {
         <div className="p-5 bg-white mt-5">
           <h1 className="font-bold">Items</h1>
           <div className="font-mono text-sm">
-            <div className="grid grid-cols-3 px-2 bg-cyan-200 font-bold">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-8 bg-cyan-200 font-bold px-2">
               <p>Name</p>
-              <p>Price</p>
               <p>Subtotal</p>
             </div>
             {payment.order_items.map((item, i) => (
-              <div key={i} className="grid grid-cols-3 px-2 bg-cyan-100">
-                <p>
+              <div
+                key={i}
+                className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-8 px-2"
+              >
+                <h1>
                   {item.quantity}x {item.name}
-                </p>
-                <p>Rp{item.price}</p>
-                <p>Rp{item.subtotal}</p>
+                </h1>
+                <h2>
+                  Rp
+                  {Intl.NumberFormat("id-ID").format(item.subtotal)}
+                </h2>
               </div>
             ))}
-            <div className="grid grid-cols-3 px-2 bg-cyan-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-8 px-2">
               <p>Payment Fee</p>
-              <p></p>
               <p>Rp{payment.fee_customer}</p>
             </div>
-            <div className="grid grid-cols-3 px-2 bg-cyan-200 font-bold">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-8 px-2 bg-slate-100 font-bold">
               <p>Total</p>
-              <p></p>
               <p>Rp{payment.amount}</p>
             </div>
           </div>
+        </div>
+
+        {success && (
+          <div className="p-5 border-l-4 border-green-400 bg-white mt-5">
+            Success! Berhasil mengirim email ke {order.guest_order.guest_email}
+          </div>
+        )}
+
+        {error && (
+          <div className="p-5 border-l-4 border-red-400 bg-white mt-5">
+            Error! {error}
+          </div>
+        )}
+
+        <div className="p-5 bg-white mt-5">
+          <button
+            className="bg-cyan-400 text-white px-5 py-2 w-full"
+            onClick={handleSendEmail}
+            disabled={emailCooldown > 0}
+          >
+            {emailCooldown > 0
+              ? loading
+                ? "Loading..."
+                : `Send Invoice to ${order.guest_order.guest_email} (${emailCooldown}s)`
+              : loading
+              ? "Loading..."
+              : `Send Invoice to ${order.guest_order.guest_email}`}
+          </button>
         </div>
 
         <div className="p-5 bg-white space-y-2 mt-5">

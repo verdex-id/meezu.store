@@ -1,35 +1,70 @@
 "use client";
 
+import { useCookies } from "next-client-cookies";
 import { useState } from "react";
 
 export default function AdminDashboardVoucherPage() {
+  const cookie = useCookies();
+
   const [isPercentDiscount, setIsPercentDiscount] = useState(false);
   const [isLimitedDiscount, setIsLimitedDiscount] = useState(false);
   const [isThresholdDiscount, setIsThresholdDiscount] = useState(false);
   const [isLimitedTimeDiscount, setIsLimitedTimeDiscount] = useState(false);
   const [isDailyDiscount, setIsDailyDiscount] = useState(false);
 
-  async function handleAddVoucher() {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleAddVoucher(e) {
+    e.preventDefault();
+    setLoading(true);
+    setSuccess(false);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+
     const payload = {
-      discount_code: "kojo",
-      is_percent_discount: false,
-      discount_value: 50000,
-      maximum_discount_amount: 100000,
+      discount_code: formData.get("discount_code"),
+      is_percent_discount: isPercentDiscount,
+      discount_value: Number(formData.get("discount_value")),
+      maximum_discount_amount:
+        Number(formData.get("maximum_discount_amount")) || undefined,
 
-      is_limited_discount: true,
-      discount_usage_limits: 5,
+      is_limited_discount: isLimitedDiscount,
+      discount_usage_limits:
+        Number(formData.get("discount_usage_limits")) || undefined,
 
-      is_threshold_discount: true,
-      discount_minimum_amount: 50000,
+      is_threshold_discount: isThresholdDiscount,
+      discount_minimum_amount:
+        Number(formData.get("discount_minimum_amount")) || undefined,
 
-      is_limited_time_discount: true,
-      from_date: new Date(),
-      to_date: new Date(),
+      is_limited_time_discount: isLimitedTimeDiscount,
+      from_date: new Date(formData.get("from_date")).toISOString() || undefined,
+      to_date: new Date(formData.get("to_date")).toISOString() || undefined,
 
-      is_daily_discount: true,
-      from_hour: 0,
-      to_hour: 23,
+      is_daily_discount: isDailyDiscount,
+      from_hour: Number(formData.get("from_hour")) || undefined,
+      to_hour: Number(formData.get("to_hour")) || undefined,
     };
+
+    const res = await fetch("/api/discounts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + cookie.get("access_token"),
+      },
+      body: JSON.stringify(payload),
+    }).then((r) => r.json());
+
+    setLoading(false);
+
+    if (res.status == "success") {
+      setSuccess(true);
+    } else if (res.status == "fail") {
+      setSuccess(false);
+      setError(res.message);
+    }
   }
   return (
     <>
@@ -37,6 +72,7 @@ export default function AdminDashboardVoucherPage() {
         <form
           method="post"
           className="p-5 mt-5 bg-white w-full max-w-screen-sm mx-auto"
+          onSubmit={handleAddVoucher}
         >
           <h1 className="font-bold text-xl text-center">Add New Voucher</h1>
 
@@ -199,7 +235,7 @@ export default function AdminDashboardVoucherPage() {
                 <div>
                   <h1>From Date</h1>
                   <input
-                    type="date"
+                    type="datetime-local"
                     name="from_date"
                     className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
                     required
@@ -208,7 +244,7 @@ export default function AdminDashboardVoucherPage() {
                 <div>
                   <h1>To Date</h1>
                   <input
-                    type="date"
+                    type="datetime-local"
                     name="to_date"
                     className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
                     required
@@ -261,9 +297,21 @@ export default function AdminDashboardVoucherPage() {
             </div>
           )}
 
+          {success && (
+            <div className="mt-8 border-l-4 border-green-400 bg-white p-5">
+              Success! Voucher discount berhasil dibuat
+            </div>
+          )}
+
+          {error && (
+            <div className="mt-8 border-l-4 border-red-400 bg-white p-5">
+              Error! {error}
+            </div>
+          )}
+
           <div className="mt-8">
             <button className="px-5 py-2 bg-cyan-400 text-white w-full">
-              Save
+              {loading ? "Loading..." : "Save"}
             </button>
           </div>
         </form>
