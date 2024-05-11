@@ -6,7 +6,12 @@ export default function Footer() {
       <footer className="text-white gap-8 justify-between p-16 pt-48 pb-48 bg-pink-300">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-screen-xl mx-auto">
           <div className="max-w-sm">
-            <Image src={"/logo/akudav_21.png"} width={1440} height={540} />
+            <Image
+              src={"/logo/akudav_21.png"}
+              width={1440}
+              height={540}
+              alt="Logo"
+            />
             <p className="mt-16">Support by PT. AKUDAV DUASATU WIJAYA</p>
           </div>
 

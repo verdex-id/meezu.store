@@ -34,7 +34,7 @@ export async function GET() {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.target),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.target)
       );
     }
     return NextResponse.json(...errorResponse());
@@ -59,8 +59,8 @@ export async function POST(request) {
       ...failResponse(
         "Invalid request format.",
         403,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
 
@@ -138,9 +138,10 @@ export async function POST(request) {
       throw new ErrorWithCode("Failed to create discount", 400);
     }
   } catch (e) {
+    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.target),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.target)
       );
     }
     if (e instanceof ErrorWithCode) {
@@ -178,7 +179,7 @@ function validateDiscountPost(request) {
         is: true,
         then: Joi.number().min(500).max(unsignedMediumInt).integer().required(),
         otherwise: Joi.number().min(500).max(unsignedMediumInt).integer(),
-      },
+      }
     ),
 
     is_limited_discount: Joi.boolean().required(),
@@ -188,7 +189,7 @@ function validateDiscountPost(request) {
         is: true,
         then: Joi.number().min(1).max(unsignedSmallInt).integer().required(),
         otherwise: Joi.number().min(1).max(unsignedSmallInt).integer(),
-      },
+      }
     ),
 
     is_threshold_discount: Joi.boolean().required(),
@@ -198,7 +199,7 @@ function validateDiscountPost(request) {
         is: true,
         then: Joi.number().min(500).max(unsignedMediumInt).integer().required(),
         otherwise: Joi.number().min(500).max(unsignedMediumInt).integer(),
-      },
+      }
     ),
 
     is_limited_time_discount: Joi.boolean().required(),

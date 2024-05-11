@@ -90,6 +90,7 @@ export async function POST(request) {
       },
     });
     response = makeResponse(createdOrder, biteshipItems, shipment.pricing);
+
     const cookie = cookies();
     cookie.set("active_order_code", response.guest_order_code);
   } catch (e) {
@@ -97,11 +98,11 @@ export async function POST(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
