@@ -179,7 +179,7 @@ export async function POST(request) {
       .toLocaleString()
       .replace(/,/g, ".");
 
-    sendEmail(
+    await sendEmail(
       order.guest_order.guest_email,
       "Customer order",
       emailText(order.order_code, formatedPrice, expireTime),
