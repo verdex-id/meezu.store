@@ -184,7 +184,7 @@ model Shipment {
 model Courier {
   courier_id              Int  @unique  @default(autoincrement())  @id
   courier_name            String
-  courier_code            String    @unique
+  courier_code            String
   courier_service_name    String
   courier_service_code    String
 
@@ -291,5 +291,6 @@ model Banner {
   banner_image_path    String
   banner_url           String?
 }
+
 
 
