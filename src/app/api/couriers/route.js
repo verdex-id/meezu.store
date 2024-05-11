@@ -21,7 +21,7 @@ export async function GET(request) {
 
   if (invalidReq.error) {
     return NextResponse.json(
-      ...failResponse("Invalid request format.", 400, invalidReq.error.details),
+      ...failResponse("Invalid request format.", 400, invalidReq.error.details)
     );
   }
 
@@ -35,11 +35,11 @@ export async function GET(request) {
     },
   });
   const existingCourierCodes = existingCouriers.map(
-    (courier) => courier.courier_code,
+    (courier) => courier.courier_code
   );
 
   const existingCourierServiceCodes = existingCouriers.map(
-    (courier) => courier.courier_service_code,
+    (courier) => courier.courier_service_code
   );
 
   if (available === "true") {
@@ -50,7 +50,7 @@ export async function GET(request) {
       ) {
         courier["courier_id"] = existingCouriers.find(
           (ecourier) =>
-            ecourier.courier_service_code === courier.courier_service_code,
+            ecourier.courier_service_code === courier.courier_service_code
         ).courier_id;
 
         return courier;
@@ -68,7 +68,7 @@ export async function GET(request) {
   }
 
   return NextResponse.json(
-    ...successResponse({ courier_companies: biteshipCouriers }),
+    ...successResponse({ courier_companies: biteshipCouriers })
   );
 }
 
@@ -83,8 +83,8 @@ export async function POST(request) {
     return NextResponse.json(
       ...failResponse(
         "Unauthorized account: You do not have permission to perform this action.",
-        401,
-      ),
+        401
+      )
     );
   }
 
@@ -103,7 +103,7 @@ export async function POST(request) {
   const invalidReq = schema.validate(req);
   if (invalidReq.error) {
     return NextResponse.json(
-      ...failResponse("invalid request format.", 403, invalidReq.error.details),
+      ...failResponse("invalid request format.", 403, invalidReq.error.details)
     );
   }
   const biteshipCouriers = await retrieveCouriers();
@@ -111,15 +111,15 @@ export async function POST(request) {
   const isSupported = biteshipCouriers.couriers.find(
     (courier) =>
       req.courier_service_code === courier.courier_service_code &&
-      req.courier_code === courier.courier_code,
+      req.courier_code === courier.courier_code
   );
 
   if (!isSupported) {
     return NextResponse.json(
       ...failResponse(
         "Unable to add this specific company, please add a supported company",
-        422,
-      ),
+        422
+      )
     );
   }
 
@@ -144,7 +144,7 @@ export async function POST(request) {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
-        ...failResponse("Invalid request", 409, e.message),
+        ...failResponse("Invalid request", 409, e.message)
       );
     }
 
@@ -152,7 +152,7 @@ export async function POST(request) {
   }
 
   return NextResponse.json(
-    ...successResponse({ courier_company: createdCourierCompany }),
+    ...successResponse({ courier_company: createdCourierCompany })
   );
 }
 
@@ -167,8 +167,8 @@ export async function DELETE(request) {
     return NextResponse.json(
       ...failResponse(
         "Unauthorized account: You do not have permission to perform this action.",
-        401,
-      ),
+        401
+      )
     );
   }
 
@@ -187,7 +187,7 @@ export async function DELETE(request) {
   const invalidReq = schema.validate(req);
   if (invalidReq.error) {
     return NextResponse.json(
-      ...failResponse("invalid request format.", 403, invalidReq.error.details),
+      ...failResponse("invalid request format.", 403, invalidReq.error.details)
     );
   }
 
@@ -205,13 +205,13 @@ export async function DELETE(request) {
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
-        ...failResponse("Invalid request", 409, e.message),
+        ...failResponse("Invalid request", 409, e.message)
       );
     }
     return NextResponse.json(...errorResponse());
   }
 
   return NextResponse.json(
-    ...successResponse({ deleted_courier_company: deletedCourierCompany }),
+    ...successResponse({ deleted_courier_company: deletedCourierCompany })
   );
 }

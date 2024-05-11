@@ -24,7 +24,12 @@ export default function Navbar() {
       <div className="flex justify-between items-center w-full max-w-screen-xl p-5 mx-auto border-b-4 border-white font-baloo">
         <div>
           <Link href={"/"}>
-            <Image src={"/logo/logo_meezu.png"} width={64} height={64} />
+            <Image
+              src={"/logo/logo_meezu.png"}
+              width={64}
+              height={64}
+              alt="Logo"
+            />
           </Link>
         </div>
         <div className="flex items-center justify-between text-cyan-900 gap-8">

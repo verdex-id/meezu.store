@@ -17,51 +17,29 @@ export default function NavbarAdmin() {
                 : "text-cyan-900/70"
             }`}
           >
-            Home
+            Main Menu
           </Link>
 
           <Link
-            href={"/admin/dashboard/product"}
+            href={"/admin/dashboard/order"}
             className={`${
-              pathname == "/admin/dashboard/product"
+              pathname == "/admin/dashboard/order"
                 ? "text-cyan-900 font-bold"
                 : "text-cyan-900/70"
             }`}
           >
-            Products
+            Orders
           </Link>
 
           <Link
-            href={"/admin/dashboard/banner"}
+            href={"/admin/dashboard/logout"}
             className={`${
-              pathname == "/admin/dashboard/banner"
+              pathname == "/admin/dashboard/logout"
                 ? "text-cyan-900 font-bold"
                 : "text-cyan-900/70"
             }`}
           >
-            Banner
-          </Link>
-
-          <Link
-            href={"/admin/dashboard/listPesanan"}
-            className={`${
-              pathname == "/admin/dashboard/banner"
-                ? "text-cyan-900 font-bold"
-                : "text-cyan-900/70"
-            }`}
-          >
-            List Pesanan
-          </Link>
-
-          <Link
-            href={"/admin/dashboard/links"}
-            className={`${
-              pathname == "/admin/dashboard/banner"
-                ? "text-cyan-900 font-bold"
-                : "text-cyan-900/70"
-            }`}
-          >
-            Links
+            Logout
           </Link>
         </div>
       </div>

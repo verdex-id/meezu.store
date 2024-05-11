@@ -4,14 +4,9 @@ import Input from "@/components/input";
 import Select from "@/components/select";
 import React, { useEffect, useState } from "react";
 import Button from "@/components/button";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function CheckoutPage() {
-  const [paymentOptions, setPaymentOptions] = useState([]);
-
-  const [selectedPayment, setSelectedPayment] = useState();
-
   const [areasSearchText, setAreasSearchText] = useState("");
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState();
@@ -29,6 +24,23 @@ export default function CheckoutPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [sellerNotes, setSellerNotes] = useState("");
+
+  const [orderCode, setOrderCode] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const [couriers, setCouriers] = useState([]);
+  const [selectedCourier, setSelectedCourier] = useState();
+
+  useEffect(() => {
+    async function getCouriers() {
+      const res = await fetch("/api/couriers?available=true").then((r) =>
+        r.json()
+      );
+      setCouriers(res.data.courier_companies);
+      setSelectedCourier(res.data.courier_companies[0]);
+    }
+    getCouriers();
+  }, []);
 
   useEffect(() => {
     const cartLocal = JSON.parse(localStorage.getItem("cart"));
@@ -70,22 +82,8 @@ export default function CheckoutPage() {
   }, [cart, cartItems]);
 
   useEffect(() => {
-    setSubtotal((selectedPayment?.fee_customer.flat || 0) + cartSubtotal);
-  }, [cartSubtotal, shippingFee, selectedPayment]);
-
-  const handleClick = (payment) => {
-    setSelectedPayment(payment);
-  };
-
-  useEffect(() => {
-    async function getPaymentOptions() {
-      const res = await fetch("/api/payment/channels");
-      const response = await res.json();
-      setPaymentOptions(response.data);
-      setSelectedPayment(response.data[0]);
-    }
-    getPaymentOptions();
-  }, []);
+    setSubtotal(cartSubtotal);
+  }, [cartSubtotal, shippingFee]);
 
   async function handleSearchAddress() {
     const res = await fetch(`/api/areas?input=${areasSearchText}`).then((r) =>
@@ -98,6 +96,7 @@ export default function CheckoutPage() {
   }
 
   async function handleCheckout() {
+    setLoading(true);
     let orderItems = [];
     for (let data of cartItems) {
       orderItems.push({
@@ -112,10 +111,9 @@ export default function CheckoutPage() {
       guest_email: confirmEmail,
       guest_area_id: selectedArea.id,
       guest_address: selectedArea.name,
-      courier_id: "2",
-      note_for_courier: addressNotes,
-      note_for_seller: sellerNotes,
-      payment_method: selectedPayment.code,
+      courier_id: selectedCourier.courier_id,
+      note_for_courier: addressNotes || "-",
+      note_for_seller: sellerNotes || "-",
       order_items: orderItems,
     };
 
@@ -127,7 +125,11 @@ export default function CheckoutPage() {
       body: JSON.stringify(payload),
     }).then((r) => r.json());
 
-    console.log(res);
+    setLoading(false);
+    setOrderCode(res.data.purchase_details.guest_order_code);
+    window.location.replace(
+      `/checkout/${res.data.purchase_details.guest_order_code}`
+    );
   }
   return (
     <>
@@ -294,31 +296,34 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {/* Kurir */}
+          <div className="mt-8">
+            <h1 className="font-bold text-3xl text-cyan-900">
+              Jasa Pengiriman
+            </h1>
+            <Select>
+              {couriers.map((courier, i) => (
+                <option
+                  value=""
+                  key={i}
+                  onClick={() => setSelectedCourier(courier)}
+                >
+                  {courier.courier_name} - {courier.courier_service_name} (
+                  {courier.shipment_duration_range}{" "}
+                  {courier.shipment_duration_unit})
+                </option>
+              ))}
+            </Select>
+          </div>
+
           {/* Opsi Pembayaran */}
           <div className="mt-8 mb-8 ">
             <h1 className="font-bold text-3xl text-cyan-900 mt-8">
               Metode Pembayaran
             </h1>
-            <div className="flex flex-wrap gap-4 mt-4  ">
-              {paymentOptions.map((payment) => (
-                <button
-                  key={payment.code}
-                  className={`p-5 bg-white text-cyan-900 ${
-                    selectedPayment?.code == payment.code &&
-                    "border-b-8 border-cyan-400"
-                  }`}
-                  onClick={() => handleClick(payment)}
-                >
-                  <Image
-                    src={payment.icon_url}
-                    width={1080}
-                    height={1080}
-                    className="w-[120px] aspect-[3/1] object-contain mx-auto"
-                  />
-                  {payment.name}
-                </button>
-              ))}
-            </div>
+            <p>
+              Metode Pembayaran dapat dipilih dihalaman selanjutnya setelah ini
+            </p>
 
             {/* Subtotal Item */}
             <div className="mt-5 p-5 bg-white">
@@ -347,19 +352,11 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Shipping Fee</h1>
-                  <p>Rp0 (Implement Me)</p>
+                  <p>Rp (Implement Me)</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Payment Fee</h1>
-                  <div>
-                    Rp
-                    {Intl.NumberFormat("id-ID").format(
-                      selectedPayment?.fee_customer.flat || 0
-                    )}
-                    <p className="text-sm text-cyan-500">
-                      {selectedPayment?.code}
-                    </p>
-                  </div>
+                  <div>Next Page</div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1 className="font-bold">Subtotal</h1>
@@ -372,9 +369,18 @@ export default function CheckoutPage() {
 
             <div className="flex justify-end border-y-4 mt-8 p-8">
               <div className="">
-                <Button type={2} onClick={() => handleCheckout()}>
-                  CHECKOUT !
-                </Button>
+                {orderCode ? (
+                  <Link
+                    href={`/checkout/${orderCode}`}
+                    className="bg-cyan-400 text-white p-5 block"
+                  >
+                    Berhasil! Klik untuk Lanjutkan
+                  </Link>
+                ) : (
+                  <Button type={2} onClick={() => handleCheckout()}>
+                    {loading ? "Loading..." : "Next"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

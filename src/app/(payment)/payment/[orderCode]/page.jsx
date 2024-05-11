@@ -5,7 +5,7 @@ async function getOrder(orderCode) {
     process.env.BASE_URL + `/api/orders?order_code=${orderCode}`,
     { next: { revalidate: 0 } }
   ).then((r) => r.json());
-  return res.data.orders;
+  return res.data.order;
 }
 
 async function getPayment(reference) {
@@ -18,9 +18,9 @@ async function getPayment(reference) {
 export default async function PaymentPage({ params }) {
   const order = await getOrder(params.orderCode);
   const payment = await getPayment(order.payment.paygate_transaction_id);
-
   return (
     <PaymentScreen
+      order={order}
       payment={payment.payment}
       instruction={payment.instruction}
     />
