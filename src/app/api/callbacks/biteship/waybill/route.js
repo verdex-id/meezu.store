@@ -1,6 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { FailError } from "@/utils/custom-error";
-import { unsignedMediumInt } from "@/utils/mysql";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
@@ -9,29 +8,13 @@ import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
     const schema = Joi.object({
-      event: Joi.string().valid("order.price").required(),
+      event: Joi.string().valid("order.waybill_id").required(),
       order_id: Joi.string()
         .pattern(/^[a-z0-9]{16,}$/)
         .required(),
       status: Joi.string().required(),
       courier_tracking_id: Joi.string().required(),
       courier_waybill_id: Joi.string().required(),
-      price: Joi.number().min(0).max(unsignedMediumInt).integer().required(),
-      cash_on_delivery_fee: Joi.number()
-        .min(0)
-        .max(unsignedMediumInt)
-        .integer()
-        .required(),
-      proof_of_delivery_fee: Joi.number()
-        .min(0)
-        .max(unsignedMediumInt)
-        .integer()
-        .required(),
-      shippment_fee: Joi.number()
-        .min(0)
-        .max(unsignedMediumInt)
-        .integer()
-        .required(),
     });
     let req = await request.json();
     req = schema.validate(req);
@@ -45,10 +28,7 @@ export async function POST(request) {
         expedition_order_id: req.order_id,
       },
       data: {
-        cash_on_delivery_fee: req.cash_on_delivery_fee,
-        proof_of_delivery_fee: req.proof_of_delivery_fee,
-        shippment_fee: req.shippment_fee,
-        price: req.price,
+        courier_waybill_id: req.courier_waybill_id,
       },
     });
   } catch (e) {
