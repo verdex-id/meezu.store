@@ -5,7 +5,6 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse } from "next/server";
 import { prepareData } from "./prepare-data";
 import { makeCourierRates } from "./make-courier-rates";
-import { cetak } from "@/utils/cetak";
 import Joi from "joi";
 
 export async function POST(request) {
@@ -41,9 +40,7 @@ export async function POST(request) {
       throw pricing.error;
     }
     pricing = pricing.pricing;
-    cetak(pricing);
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
