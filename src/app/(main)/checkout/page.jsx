@@ -8,10 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function CheckoutPage() {
-  const [paymentOptions, setPaymentOptions] = useState([]);
-
-  const [selectedPayment, setSelectedPayment] = useState();
-
   const [areasSearchText, setAreasSearchText] = useState("");
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState();
@@ -29,6 +25,8 @@ export default function CheckoutPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [sellerNotes, setSellerNotes] = useState("");
+
+  const [orderCode, setOrderCode] = useState("");
 
   useEffect(() => {
     const cartLocal = JSON.parse(localStorage.getItem("cart"));
@@ -70,22 +68,8 @@ export default function CheckoutPage() {
   }, [cart, cartItems]);
 
   useEffect(() => {
-    setSubtotal((selectedPayment?.fee_customer.flat || 0) + cartSubtotal);
-  }, [cartSubtotal, shippingFee, selectedPayment]);
-
-  const handleClick = (payment) => {
-    setSelectedPayment(payment);
-  };
-
-  useEffect(() => {
-    async function getPaymentOptions() {
-      const res = await fetch("/api/payment/channels");
-      const response = await res.json();
-      setPaymentOptions(response.data);
-      setSelectedPayment(response.data[0]);
-    }
-    getPaymentOptions();
-  }, []);
+    setSubtotal(cartSubtotal);
+  }, [cartSubtotal, shippingFee]);
 
   async function handleSearchAddress() {
     const res = await fetch(`/api/areas?input=${areasSearchText}`).then((r) =>
@@ -115,7 +99,6 @@ export default function CheckoutPage() {
       courier_id: "2",
       note_for_courier: addressNotes,
       note_for_seller: sellerNotes,
-      payment_method: selectedPayment.code,
       order_items: orderItems,
     };
 
@@ -128,6 +111,8 @@ export default function CheckoutPage() {
     }).then((r) => r.json());
 
     console.log(res);
+
+    setOrderCode(res.data.purchase_details.guest_order_code);
   }
   return (
     <>
@@ -299,26 +284,9 @@ export default function CheckoutPage() {
             <h1 className="font-bold text-3xl text-cyan-900 mt-8">
               Metode Pembayaran
             </h1>
-            <div className="flex flex-wrap gap-4 mt-4  ">
-              {paymentOptions.map((payment) => (
-                <button
-                  key={payment.code}
-                  className={`p-5 bg-white text-cyan-900 ${
-                    selectedPayment?.code == payment.code &&
-                    "border-b-8 border-cyan-400"
-                  }`}
-                  onClick={() => handleClick(payment)}
-                >
-                  <Image
-                    src={payment.icon_url}
-                    width={1080}
-                    height={1080}
-                    className="w-[120px] aspect-[3/1] object-contain mx-auto"
-                  />
-                  {payment.name}
-                </button>
-              ))}
-            </div>
+            <p>
+              Metode Pembayaran dapat dipilih dihalaman selanjutnya setelah ini
+            </p>
 
             {/* Subtotal Item */}
             <div className="mt-5 p-5 bg-white">
@@ -351,15 +319,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Payment Fee</h1>
-                  <div>
-                    Rp
-                    {Intl.NumberFormat("id-ID").format(
-                      selectedPayment?.fee_customer.flat || 0
-                    )}
-                    <p className="text-sm text-cyan-500">
-                      {selectedPayment?.code}
-                    </p>
-                  </div>
+                  <div>Next Page</div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1 className="font-bold">Subtotal</h1>
@@ -371,6 +331,20 @@ export default function CheckoutPage() {
             </div>
 
             <div className="flex justify-end border-y-4 mt-8 p-8">
+              {orderCode && (
+                <div>
+                  <h1 className="font-bold">
+                    Success! Anda akan diarahkan otomatis, atau{" "}
+                    <Link
+                      href={`/checkout/${orderCode}`}
+                      className="text-cyan-700"
+                    >
+                      klik disini
+                    </Link>{" "}
+                    untuk memilih metode pembayaran.
+                  </h1>
+                </div>
+              )}
               <div className="">
                 <Button type={2} onClick={() => handleCheckout()}>
                   CHECKOUT !
