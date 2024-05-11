@@ -4,7 +4,6 @@ import Input from "@/components/input";
 import Select from "@/components/select";
 import React, { useEffect, useState } from "react";
 import Button from "@/components/button";
-import Image from "next/image";
 import Link from "next/link";
 
 export default function CheckoutPage() {
@@ -28,6 +27,20 @@ export default function CheckoutPage() {
 
   const [orderCode, setOrderCode] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [couriers, setCouriers] = useState([]);
+  const [selectedCourier, setSelectedCourier] = useState();
+
+  useEffect(() => {
+    async function getCouriers() {
+      const res = await fetch("/api/couriers?available=true").then((r) =>
+        r.json()
+      );
+      setCouriers(res.data.courier_companies);
+      setSelectedCourier(res.data.courier_companies[0]);
+    }
+    getCouriers();
+  }, []);
 
   useEffect(() => {
     const cartLocal = JSON.parse(localStorage.getItem("cart"));
@@ -98,7 +111,7 @@ export default function CheckoutPage() {
       guest_email: confirmEmail,
       guest_area_id: selectedArea.id,
       guest_address: selectedArea.name,
-      courier_id: "2",
+      courier_id: selectedCourier.courier_id,
       note_for_courier: addressNotes || "-",
       note_for_seller: sellerNotes || "-",
       order_items: orderItems,
@@ -283,6 +296,26 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {/* Kurir */}
+          <div className="mt-8">
+            <h1 className="font-bold text-3xl text-cyan-900">
+              Jasa Pengiriman
+            </h1>
+            <Select>
+              {couriers.map((courier, i) => (
+                <option
+                  value=""
+                  key={i}
+                  onClick={() => setSelectedCourier(courier)}
+                >
+                  {courier.courier_name} - {courier.courier_service_name} (
+                  {courier.shipment_duration_range}{" "}
+                  {courier.shipment_duration_unit})
+                </option>
+              ))}
+            </Select>
+          </div>
+
           {/* Opsi Pembayaran */}
           <div className="mt-8 mb-8 ">
             <h1 className="font-bold text-3xl text-cyan-900 mt-8">
@@ -319,7 +352,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Shipping Fee</h1>
-                  <p>Rp0 (Implement Me)</p>
+                  <p>Rp (Implement Me)</p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Payment Fee</h1>

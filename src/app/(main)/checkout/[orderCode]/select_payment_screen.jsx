@@ -3,10 +3,14 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Button from "@/components/button";
+import Link from "next/link";
 
 export default function SelectPaymentScreen({ order }) {
   const [paymentOptions, setPaymentOptions] = useState([]);
   const [selectedPayment, setSelectedPayment] = useState();
+
+  const [success, setSuccess] = useState();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function getPaymentOptions() {
@@ -19,15 +23,33 @@ export default function SelectPaymentScreen({ order }) {
   }, []);
 
   async function handleSetPayment() {
+    setLoading(true);
+    setSuccess();
+
+    const payload = {
+      payment_method: selectedPayment.code,
+      discount_code: undefined,
+    };
+
     const res = await fetch(
-      `/api/orders/guest/payment?order_code=${params.orderCode}`,
+      `/api/orders/guest/payment?order_code=${order.order_code}`,
       {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(),
+        body: JSON.stringify(payload),
       }
     ).then((r) => r.json());
+
+    setLoading(false);
+
+    if (res.status == "success") {
+      setSuccess(true);
+      window.location.replace("/payment/" + order.order_code);
+    } else if (res.status == "fail") {
+      setSuccess(false);
+    }
   }
   return (
     <>
@@ -42,6 +64,10 @@ export default function SelectPaymentScreen({ order }) {
             pembayaran.
           </p>
           <div className="mt-5 p-5 bg-slate-100">
+            <p className="text-sm">
+              {order.shipment.courier.courier_name} -{" "}
+              {order.shipment.courier.courier_service_name}
+            </p>
             <p className="font-medium">{order.guest_order.guest_email}</p>
             <p>{order.invoice.customer_full_address}</p>
             <p>{order.guest_order.guest_note_for_courier}</p>
@@ -147,8 +173,33 @@ export default function SelectPaymentScreen({ order }) {
           </div>
         </div>
 
+        {success == true && (
+          <div className="mt-5 border-l-4 border-green-400 bg-white p-5">
+            Success! Anda akan diarahkan otomatis ke halaman pembayaran. Jika
+            tidak,{" "}
+            <Link
+              href={`/payment/${order.order_code}`}
+              className="text-green-500"
+            >
+              klik disini.
+            </Link>
+          </div>
+        )}
+
+        {success == false && (
+          <div className="mt-5 border-l-4 border-red-400 bg-white p-5">
+            Error! Order sudah pernah dibuat atau kesalahan lainnya.{" "}
+            <Link
+              href={`/payment/${order.order_code}`}
+              className="text-green-500"
+            >
+              cek pembayaran disini.
+            </Link>
+          </div>
+        )}
+
         <div className="mt-5">
-          <Button type={2}>
+          <Button type={2} onClick={handleSetPayment}>
             Bayar Rp
             {Intl.NumberFormat("id-ID").format(
               order.invoice.gross_price +

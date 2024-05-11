@@ -18,15 +18,34 @@ export default function PaymentScreen({ payment, instruction }) {
     <>
       <div className="w-full max-w-screen-sm mx-auto px-8 min-h-dvh mt-8 pb-96">
         <div className="p-5 bg-white relative h-24">
-          <Image src={"/logo/logo_meezu.png"} fill className="object-contain" />
+          <Image
+            src={"/logo/logo_meezu.png"}
+            fill
+            className="object-contain"
+            alt="Logo"
+          />
         </div>
         <div className="p-5 bg-white mt-5">
           <div className="text-center">
             <h1 className="font-bold text-3xl">Pembayaran</h1>
-            <h2>
-              Terimakasih atas pesanan anda, silahkan lakukan pembayaran dibawah
-              ini.
-            </h2>
+            {payment.status == "UNPAID" && (
+              <>
+                <h2 className="font-bold text-2xl text-red-400">UNPAID</h2>
+                <h2>
+                  Terimakasih atas pesanan anda, silahkan lakukan pembayaran
+                  dibawah ini.
+                </h2>
+              </>
+            )}
+            {payment.status == "PAID" && (
+              <>
+                <h2 className="font-bold text-2xl text-green-400">PAID</h2>
+                <h2>
+                  Terimakasih atas pesanan anda, pembayaran sudah diterima.
+                  Pesanan akan segera di proses
+                </h2>
+              </>
+            )}
           </div>
           <hr className="border-2 border-cyan-200 mt-5" />
           <div className="mt-5">
