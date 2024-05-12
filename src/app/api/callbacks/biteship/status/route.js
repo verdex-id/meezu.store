@@ -22,6 +22,7 @@ export async function POST(request) {
       courier_driver_photo_url: Joi.string(),
       courier_driver_plate_number: Joi.string(),
       courier_link: Joi.string().allow(null),
+      updated_at: Joi.string().allow(null),
       status: Joi.string(),
       order_price: Joi.number(),
       order_id: Joi.string(),
