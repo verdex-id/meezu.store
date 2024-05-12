@@ -1,4 +1,16 @@
 const biteshipBaseURL = "https://api.biteship.com";
+import crypto from "crypto";
+
+export function biteshipCallbackSignature(content) {
+  const biteshipCallbackKey = process.env.BITESHIP_CALLBACK_SIGNATURE_KEY;
+
+  const signature = crypto
+    .createHmac("sha256", biteshipCallbackKey)
+    .update(JSON.stringify(content))
+    .digest("hex");
+
+  return signature;
+}
 
 export async function createExpeditionOrder(
   originContactName,
@@ -69,7 +81,6 @@ export async function createExpeditionOrder(
   return response;
 }
 
-
 export async function courierTracking(courierTrackingId) {
   const options = {
     method: "GET",
@@ -78,7 +89,10 @@ export async function courierTracking(courierTrackingId) {
     },
   };
 
-  let response = await fetch(`https://api.biteship.com/v1/trackings/${courierTrackingId}`, options)
+  let response = await fetch(
+    `https://api.biteship.com/v1/trackings/${courierTrackingId}`,
+    options,
+  )
     .then((response) => response.json())
     .then((response) => response);
 
