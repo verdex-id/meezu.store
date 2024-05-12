@@ -14,8 +14,10 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    const cs = headers().get("X-Biteship-Status-Callback");
+
     console.log(request);
-    console.log(callbackSignature);
+    console.log(cs);
 
     return NextResponse.json(...successResponse());
 
