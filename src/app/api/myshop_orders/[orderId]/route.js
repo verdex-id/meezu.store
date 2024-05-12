@@ -1,4 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
+import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import { FailError } from "@/utils/custom-error";
 import { orderStatus } from "@/utils/order-status";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
@@ -9,6 +10,11 @@ import { NextResponse } from "next/server";
 export async function GET(request, { params }) {
   let orders;
   try {
+    const admin = await fetchAdminIfAuthorized();
+    if (admin.error) {
+      throw new FailError(admin.error, admin.errorCode);
+    }
+
     const schema = Joi.object({
       order_id: Joi.string()
         .pattern(/^[a-z0-9-]{25,}$/)
