@@ -135,6 +135,19 @@ export default function AdminDashboardProductEditScreen({ product }) {
       setError(res.message);
     }
   }
+
+  async function handleDeleteIterationImage(imageIterationId) {
+    const res = await fetch("/api/iteration_images/" + imageIterationId, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + cookie.get("access_token"),
+      },
+    }).then((r) => r.json());
+
+    if (res.status == "success") {
+      window.location.reload();
+    }
+  }
   return (
     <>
       {showAddVariantModal && (
@@ -264,17 +277,30 @@ export default function AdminDashboardProductEditScreen({ product }) {
                   {showIterationImages == pi.product_iteration_id && (
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                       {iterationImages.map((image, i) => (
-                        <div key={i} className="relative aspect-square">
+                        <div
+                          key={i}
+                          className="relative aspect-square border-2 border-cyan-400"
+                        >
                           <Image
                             src={image.iteration_image_path}
                             fill
                             alt="Image"
                             className="object-cover"
                           />
+                          <div
+                            onClick={() =>
+                              handleDeleteIterationImage(
+                                image.iteration_image_id
+                              )
+                            }
+                            className="text-red-400 absolute top-1 left-3 text-xs cursor-pointer"
+                          >
+                            Delete
+                          </div>
                         </div>
                       ))}
                       <div
-                        className="bg-cyan-400 text-white flex items-center justify-center"
+                        className="bg-cyan-400 text-white flex items-center justify-center cursor-pointer"
                         onClick={() => {
                           setSelectedIterationId(pi.product_iteration_id);
                           setShowAddImageModal(true);

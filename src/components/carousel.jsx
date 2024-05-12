@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Carousel({ data, ...props }) {
   return (
@@ -8,12 +9,18 @@ export default function Carousel({ data, ...props }) {
         {...props}
       >
         {data.map((d, i) => (
-          <div
+          <Link
             key={i}
+            href={d.banner_url || "/"}
             className={`min-w-[90%] aspect-[4/1] bg-white relative flex-grow overflow-hidden`}
           >
-            <Image src={d.image} fill quality={100} className="object-cover" />
-          </div>
+            <Image
+              src={d.banner_image_path}
+              fill
+              quality={100}
+              className="object-cover"
+            />
+          </Link>
         ))}
       </div>
     </>

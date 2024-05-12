@@ -58,7 +58,7 @@ export default function AddIterationImageModal({
             <h1 className="font-bold text-center">Add New Banner</h1>
 
             {image && (
-              <div className="relative w-full aspect-[4/1] border-2 border-cyan-400 mt-5">
+              <div className="relative w-full aspect-square border-2 border-cyan-400 mt-5">
                 <Image
                   src={URL.createObjectURL(image)}
                   alt="Banner"
