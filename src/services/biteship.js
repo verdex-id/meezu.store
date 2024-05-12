@@ -69,6 +69,22 @@ export async function createExpeditionOrder(
   return response;
 }
 
+
+export async function courierTracking(courierTrackingId) {
+  const options = {
+    method: "GET",
+    headers: {
+      Authorization: process.env.BITESHIP_API_KEY,
+    },
+  };
+
+  let response = await fetch(`https://api.biteship.com/v1/trackings/${courierTrackingId}`, options)
+    .then((response) => response.json())
+    .then((response) => response);
+
+  return response;
+}
+
 export async function retrieveCouriers() {
   const options = {
     method: "GET",
