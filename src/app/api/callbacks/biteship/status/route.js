@@ -8,6 +8,10 @@ import Joi from "joi";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
+export async function GET() {
+  return NextResponse.json(...successResponse());
+}
+
 export async function POST(request) {
   try {
     const schema = Joi.object({
