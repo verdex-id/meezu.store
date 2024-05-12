@@ -31,7 +31,7 @@ export async function POST(request) {
         .max(unsignedMediumInt)
         .integer()
         .required(),
-      shippment_fee: Joi.number()
+      shipment_fee: Joi.number()
         .min(0)
         .max(unsignedMediumInt)
         .integer()
