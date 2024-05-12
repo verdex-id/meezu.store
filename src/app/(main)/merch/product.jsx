@@ -8,25 +8,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function ProductScreen({ products }) {
-  const [carousel, setCarousel] = useState([
-    {
-      title: "Promo 1",
-      image:
-        "https://yt3.googleusercontent.com/VcIVBcyUF5yBA_D7H4eEImf_iIy-V3QZjyvHBPGl1j98UXQuqQJ7_DOKXmmtEe27_mUh4L8nVg=w1707-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-rj",
-    },
-    {
-      title: "Promo 2",
-      image: "/banner/banner_1.png",
-    },
-    {
-      title: "Promo 3",
-      image: "/banner/banner_1.png",
-    },
-  ]);
+  const [banners, setBanners] = useState([]);
 
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const [filteredProducts, setFilteredProducts] = useState(products);
+
+  useEffect(() => {
+    async function getBanners() {
+      const res = await fetch("/api/banners").then((r) => r.json());
+      setBanners(res.data.banners);
+    }
+    getBanners();
+  }, []);
 
   function handleSearch(event) {
     const filter = products.filter((p) =>
@@ -38,7 +32,7 @@ export default function ProductScreen({ products }) {
   return (
     <div className="w-full max-w-screen-xl mx-auto px-8 mt-5 space-y-8 pb-96">
       <div>
-        <Carousel data={carousel} />
+        <Carousel data={banners} />
       </div>
       <div>
         <div className="mx-auto">

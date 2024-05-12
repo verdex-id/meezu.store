@@ -28,11 +28,11 @@ export async function GET(req, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -42,7 +42,7 @@ export async function GET(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ iteration_image: iterationImage }),
+    ...successResponse({ iteration_image: iterationImage })
   );
 }
 
@@ -73,11 +73,11 @@ export async function DELETE(req, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -87,6 +87,6 @@ export async function DELETE(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ deleted_iteration_image: iterationImage }),
+    ...successResponse({ deleted_iteration_image: iterationImage })
   );
 }

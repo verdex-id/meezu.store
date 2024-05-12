@@ -29,16 +29,15 @@ export async function GET(request) {
         product_iteration_id: req.product_iteration_id,
       },
     });
-
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -48,7 +47,7 @@ export async function GET(request) {
   }
 
   return NextResponse.json(
-    ...successResponse({ iteration_images: iterationImages}),
+    ...successResponse({ iteration_images: iterationImages })
   );
 }
 
@@ -90,21 +89,21 @@ export async function POST(request) {
       throw new FailError(
         "Invalid file name",
         400,
-        "Only one dot in file name is allowed",
+        "Only one dot in file name is allowed"
       );
     }
 
     if (!isMatch(imageType, file.type)) {
       throw new FailError(
         "Invalid file type. Please upload an image file",
-        415,
+        415
       );
     }
 
     if (file.size > sizeLimit) {
       throw new FailError(
         `File size exceeds the maximum limit of ${limit}MB`,
-        413,
+        413
       );
     }
 
@@ -122,7 +121,7 @@ export async function POST(request) {
     if (productIteration._count.iteration_images >= imagePerIteration) {
       throw new FailError(
         `Image limit exceeded. You cannot upload more than ${imagePerIteration} images`,
-        403,
+        403
       );
     }
 
@@ -144,17 +143,17 @@ export async function POST(request) {
       e.message.includes("Could not parse content as FormData")
     ) {
       return NextResponse.json(
-        ...failResponse("Invalid image file", 400, e.message),
+        ...failResponse("Invalid image file", 400, e.message)
       );
     }
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -164,7 +163,7 @@ export async function POST(request) {
   }
 
   return NextResponse.json(
-    ...successResponse({ iteration_image: iterationImage }),
+    ...successResponse({ iteration_image: iterationImage })
   );
 }
 

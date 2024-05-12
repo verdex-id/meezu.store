@@ -8,11 +8,13 @@ export default function CheckAuth({ children }) {
   const accessToken = cookie.get("access_token");
   const refreshToken = cookie.get("refresh_token");
 
-  if (!refreshToken) {
-    if (!window.location.pathname.includes("login")) {
-      window.location.replace("/admin/login");
+  useEffect(() => {
+    if (!refreshToken) {
+      if (!window.location.pathname.includes("login")) {
+        window.location.replace("/admin/login");
+      }
     }
-  }
+  }, []);
 
   useEffect(() => {
     async function getAccessToken() {

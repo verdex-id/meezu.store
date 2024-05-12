@@ -16,7 +16,6 @@ export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState([]);
 
   const [cartSubtotal, setCartSubtotal] = useState(0);
-  const [shippingFee, setShippingFee] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
 
   const [email, setEmail] = useState("");
@@ -30,6 +29,48 @@ export default function CheckoutPage() {
 
   const [couriers, setCouriers] = useState([]);
   const [selectedCourier, setSelectedCourier] = useState();
+  const [courierPricingLoading, setCourierPricingLoading] = useState(false);
+  const [courierPricing, setCourierPricing] = useState();
+
+  useEffect(() => {
+    async function getCourierRates() {
+      if (selectedArea && selectedCourier) {
+        setCourierPricingLoading(true);
+        setCourierPricing();
+
+        let orderItems = [];
+        for (let data of cartItems) {
+          orderItems.push({
+            product_iteration_id: data.product_iteration_id,
+            quantity: cart[data.product_iteration_id].qty,
+          });
+        }
+
+        const payload = {
+          guest_area_id: selectedArea.id,
+          courier_id: String(selectedCourier.courier_id),
+          order_items: orderItems,
+        };
+
+        const res = await fetch("/api/couriers/rates", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }).then((r) => r.json());
+
+        setCourierPricingLoading(false);
+
+        if (res.status == "success") {
+          setCourierPricing(res.data.pricing);
+        } else {
+          setCourierPricing(-1);
+        }
+      }
+    }
+    getCourierRates();
+  }, [selectedArea, selectedCourier]);
 
   useEffect(() => {
     async function getCouriers() {
@@ -82,8 +123,8 @@ export default function CheckoutPage() {
   }, [cart, cartItems]);
 
   useEffect(() => {
-    setSubtotal(cartSubtotal);
-  }, [cartSubtotal, shippingFee]);
+    setSubtotal(cartSubtotal + (courierPricing?.price || 0));
+  }, [cartSubtotal, courierPricing]);
 
   async function handleSearchAddress() {
     const res = await fetch(`/api/areas?input=${areasSearchText}`).then((r) =>
@@ -111,7 +152,7 @@ export default function CheckoutPage() {
       guest_email: confirmEmail,
       guest_area_id: selectedArea.id,
       guest_address: selectedArea.name,
-      courier_id: selectedCourier.courier_id,
+      courier_id: String(selectedCourier.courier_id),
       note_for_courier: addressNotes || "-",
       note_for_seller: sellerNotes || "-",
       order_items: orderItems,
@@ -124,6 +165,8 @@ export default function CheckoutPage() {
       },
       body: JSON.stringify(payload),
     }).then((r) => r.json());
+
+    localStorage.removeItem("cart");
 
     setLoading(false);
     setOrderCode(res.data.purchase_details.guest_order_code);
@@ -314,8 +357,30 @@ export default function CheckoutPage() {
                 </option>
               ))}
             </Select>
-          </div>
 
+            {courierPricingLoading && (
+              <div className="mt-5 p-5 bg-white">
+                Menghitung Biaya Pengiriman...
+              </div>
+            )}
+
+            {courierPricing && (
+              <div className="mt-5 p-5 bg-white">
+                <h1 className="font-bold">Biaya Pengiriman</h1>
+                {courierPricing == -1 ? (
+                  <p className="text-red-400">
+                    Error: Jasa kirim {selectedCourier.courier_name} -{" "}
+                    {selectedCourier.courier_service_name} tidak didukung.
+                    Silahkan pilih kurir lain.
+                  </p>
+                ) : (
+                  <p>
+                    Rp{Intl.NumberFormat("id-ID").format(courierPricing.price)}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
           {/* Opsi Pembayaran */}
           <div className="mt-8 mb-8 ">
             <h1 className="font-bold text-3xl text-cyan-900 mt-8">
@@ -352,7 +417,12 @@ export default function CheckoutPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Shipping Fee</h1>
-                  <p>Rp (Implement Me)</p>
+                  <p>
+                    Rp
+                    {Intl.NumberFormat("id-ID").format(
+                      courierPricing?.price || 0
+                    )}
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <h1>Payment Fee</h1>

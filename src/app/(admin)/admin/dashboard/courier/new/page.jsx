@@ -32,7 +32,7 @@ export default function AdminDashboardCourierNewPage() {
     const courier_code = data[0];
     const courier_service_code = data[1];
 
-    const res = await fetch("/api/couriers", {
+    const res = await fetch("/api/couriers/create", {
       method: "POST",
       headers: {
         Authorization: "Bearer " + cookie.get("access_token"),
