@@ -42,7 +42,7 @@ export async function GET(request) {
     const tracking = await courierTracking(order.shipment.courier_tracking_id);
 
     if (!tracking.success) {
-      throw new FailError(expedition.error, 400);
+      throw new FailError(tracking.error, 400);
     }
 
     response = {
