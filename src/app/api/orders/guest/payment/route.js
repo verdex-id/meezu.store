@@ -19,7 +19,7 @@ export async function POST(request) {
         .pattern(/^[A-Z0-9-]{27,}$/)
         .required(),
       payment_method: Joi.string()
-        .pattern(/^[A-Z_]+$/)
+        .pattern(/^[A-Z0-9-_]+$/)
         .required(),
       discount_code: Joi.string(),
     });

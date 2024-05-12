@@ -1,23 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import CardTextIcon from "@/icons/card_text";
 import Image from "next/image";
 import ChevronDownIcon from "@/icons/chevron_down";
 
 export default function ProductDetailScreen({ product }) {
-  const [images, setImages] = useState([
-    "/banner/banner_1.png",
-    "/images/Thumbnail.svg",
-    "/logo/akudav.png",
-  ]);
+  const [images, setImages] = useState([]);
+
   const [selectedImage, setSelectedImage] = useState(images[0]);
 
   const [loading, setLoading] = useState(false);
   const [successAddCart, setSuccessAddCart] = useState();
 
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    async function getImages() {
+      for (const iteration of product.product_iterations) {
+        const res = await fetch(
+          "/api/iteration_images?product_iteration_id=" +
+            iteration.product_iteration_id
+        ).then((r) => r.json());
+        if (res.status == "success") {
+          setImages([...images, ...res.data.iteration_images]);
+        }
+      }
+    }
+    getImages();
+  }, []);
+
+  useEffect(() => {
+    setSelectedImage(images[0]);
+  }, [images]);
 
   function handleAddToCart(productIteration, quantity) {
     setLoading(true);
@@ -54,7 +70,7 @@ export default function ProductDetailScreen({ product }) {
       if (images[index - 1]) {
         setSelectedImage(images[index - 1]);
       } else {
-        setSelectedImage(images.length - 1);
+        setSelectedImage(images[images.length - 1]);
       }
     }
   }
@@ -81,40 +97,55 @@ export default function ProductDetailScreen({ product }) {
                 className="grid grid-cols-1 lg:grid-cols-2 gap-8 bg-white p-5"
               >
                 <div className="relative">
-                  <div className="relative h-full max-w-[400px] lg:max-w-full aspect-square mx-auto">
-                    <Image src={selectedImage} fill className="object-cover" />
-                  </div>
-                  <div className="absolute bottom-5 left-0 w-full">
-                    <div className="flex gap-2 mx-auto w-max">
-                      {images.map((img, i) => (
-                        <button
-                          key={i}
-                          className="p-1"
-                          onClick={() => setSelectedImage(img)}
-                        >
-                          <div
-                            className={`w-2 h-2 rounded-full bg-slate-500 ${
-                              selectedImage == img &&
-                              "bg-slate-900 border-2 border-black"
-                            }`}
-                          ></div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  {selectedImage && (
+                    <>
+                      <div className="relative h-full max-w-[400px] lg:max-w-full aspect-square mx-auto">
+                        <Image
+                          src={selectedImage.iteration_image_path}
+                          fill
+                          className="object-cover"
+                          alt="Image"
+                        />
+                      </div>
+                      <div className="absolute bottom-5 left-0 w-full">
+                        <div className="flex gap-2 mx-auto w-max">
+                          {images
+                            .filter(
+                              (image) =>
+                                image.product_iteration_id ==
+                                iteration.product_iteration_id
+                            )
+                            .map((img, i) => (
+                              <button
+                                key={i}
+                                className="p-1"
+                                onClick={() => setSelectedImage(img)}
+                              >
+                                <div
+                                  className={`w-2 h-2 rounded-full bg-slate-500 ${
+                                    selectedImage == img &&
+                                    "bg-slate-900 border-2 border-black"
+                                  }`}
+                                ></div>
+                              </button>
+                            ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
                   <div className="absolute top-0 left-0 w-full h-full">
                     <div className="h-full w-full flex items-center justify-between">
                       <button
                         className="p-5 h-full"
                         onClick={() => handleChangeImage("back")}
                       >
-                        <ChevronDownIcon className="w-10 rotate-90 text-white" />
+                        <ChevronDownIcon className="w-10 rotate-90 text-white bg-black/5 rounded-xl" />
                       </button>
                       <button
                         className="p-5 h-full"
                         onClick={() => handleChangeImage("next")}
                       >
-                        <ChevronDownIcon className="w-10 -rotate-90 text-white" />
+                        <ChevronDownIcon className="w-10 -rotate-90 text-white bg-black/5 rounded-xl" />
                       </button>
                     </div>
                   </div>
