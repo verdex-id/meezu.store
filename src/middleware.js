@@ -53,7 +53,7 @@ export async function middleware(request) {
     ["/api/discounts/product", ["GET", "POST", "DELETE"]],
     ["/api/discounts", ["POST", "DELETE"]],
     ["/api/shipments/guest", ["POST"]],
-    ["/api/myshop_orders", ["GET"]],
+    ["/api/myshop_orders", ["GET", "PATCH"]],
     ["/api/banners", ["POST", "DELETE", "PATCH"]],
     ["/api/iteration_images", ["POST", "DELETE"]],
   ];
