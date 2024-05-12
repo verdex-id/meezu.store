@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function PaymentScreen({ order, payment, instruction }) {
   const [copied, setCopied] = useState(false);
@@ -13,7 +14,7 @@ export default function PaymentScreen({ order, payment, instruction }) {
 
   const [emailCooldown, setEmailCooldown] = useState(0);
 
-  const expiredDateTime = new Date(payment.expired_at * 1000);
+  const expiredDateTime = new Date(payment.expired_time * 1000);
 
   useEffect(() => {
     setTimeout(() => {
@@ -59,6 +60,7 @@ export default function PaymentScreen({ order, payment, instruction }) {
         </div>
         <div className="p-5 bg-white mt-5">
           <div className="text-center">
+            <p className="text-xs text-slate-700">{order.order_code}</p>
             <h1 className="font-bold text-3xl">Pembayaran</h1>
             {payment.status == "UNPAID" && (
               <>
@@ -76,6 +78,12 @@ export default function PaymentScreen({ order, payment, instruction }) {
                   Terimakasih atas pesanan anda, pembayaran sudah diterima.
                   Pesanan akan segera di proses
                 </h2>
+                <Link
+                  href={"/track/" + order.order_code}
+                  className="text-cyan-700 border-2 border-cyan-400 px-5 py-2 block w-max mx-auto mt-5"
+                >
+                  Track Pengiriman
+                </Link>
               </>
             )}
           </div>
@@ -83,22 +91,37 @@ export default function PaymentScreen({ order, payment, instruction }) {
           <div className="mt-5">
             <div className="p-5 bg-cyan-200 text-center">
               <h1 className="font-bold">{payment.payment_name}</h1>
-              <div className="cursor-pointer" onClick={handleCopy}>
-                <p
-                  className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
-                    copied ? "bg-green-50" : "bg-white"
-                  }`}
-                >
-                  {payment.pay_code}
-                </p>
-                <p className="text-xs">{copied ? "Copied" : "Click to Copy"}</p>
-              </div>
+              {payment.payment_method.includes("QRIS") ? (
+                <div className="p-5 bg-white">
+                  <div className="relative h-72 w-full">
+                    <Image
+                      src={payment.qr_url}
+                      alt="QRIS"
+                      className="object-contain"
+                      fill
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="cursor-pointer" onClick={handleCopy}>
+                  <p
+                    className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
+                      copied ? "bg-green-50" : "bg-white"
+                    }`}
+                  >
+                    {payment.pay_code}
+                  </p>
+                  <p className="text-xs">
+                    {copied ? "Copied" : "Click to Copy"}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
           <div className="mt-5 text-center">
             <p>
               Lakukan pembayaran sebelum{" "}
-              <span className="font-bold">
+              <span className="font-medium">
                 {expiredDateTime.toLocaleString("id-ID")}
               </span>
             </p>

@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import { useCookies } from "next-client-cookies";
 import AddVariantModal from "./add_variant_modal";
 import AddIterationModal from "./add_iteration_modal";
+import AddIterationImageModal from "./add_image_modal";
+import Image from "next/image";
 
 export default function AdminDashboardProductEditScreen({ product }) {
   const cookie = useCookies();
-
-  console.log(product);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -16,8 +16,21 @@ export default function AdminDashboardProductEditScreen({ product }) {
 
   const [showAddVariantModal, setShowAddVariantModal] = useState(false);
   const [showAddIterationModal, setShowAddIterationModal] = useState(false);
+  const [showAddImageModal, setShowAddImageModal] = useState(false);
+
   const [selectedIterationId, setSelectedIterationId] = useState();
-  const [focusIteration, setFocusIteration] = useState();
+  const [showIterationImages, setShowIterationImages] = useState();
+  const [iterationImages, setIterationImages] = useState([]);
+
+  async function handleShowIterationImages(productIterationId) {
+    setShowIterationImages(productIterationId);
+    const res = await fetch(
+      "/api/iteration_images?product_iteration_id=" + productIterationId
+    ).then((r) => r.json());
+    if (res.status == "success") {
+      setIterationImages(res.data.iteration_images);
+    }
+  }
 
   async function handleEditBasicProduct(e) {
     e.preventDefault();
@@ -136,6 +149,13 @@ export default function AdminDashboardProductEditScreen({ product }) {
           productId={product.product_id}
         />
       )}
+      {showAddImageModal && (
+        <AddIterationImageModal
+          productIterationId={selectedIterationId}
+          setShowAddImageModal={setShowAddImageModal}
+        />
+      )}
+
       <div className="w-full max-w-screen-sm mx-auto px-8 min-h-dvh">
         <h1 className="font-bold text-xl">
           Edit Product {product.product_name}
@@ -228,6 +248,42 @@ export default function AdminDashboardProductEditScreen({ product }) {
                   <div className="bg-red-500 text-white w-6 h-6 rounded-full">
                     <p className="text-center">{i + 1}</p>
                   </div>
+                </div>
+                <div>
+                  <h1 className="font-bold">
+                    Gambar (1:1){" "}
+                    <span
+                      onClick={() =>
+                        handleShowIterationImages(pi.product_iteration_id)
+                      }
+                      className="text-cyan-700 font-normal cursor-pointer"
+                    >
+                      Show Images
+                    </span>
+                  </h1>
+                  {showIterationImages == pi.product_iteration_id && (
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                      {iterationImages.map((image, i) => (
+                        <div key={i} className="relative aspect-square">
+                          <Image
+                            src={image.iteration_image_path}
+                            fill
+                            alt="Image"
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                      <div
+                        className="bg-cyan-400 text-white flex items-center justify-center"
+                        onClick={() => {
+                          setSelectedIterationId(pi.product_iteration_id);
+                          setShowAddImageModal(true);
+                        }}
+                      >
+                        <p className="text-xl">Tambah</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <h1 className="font-bold">Informasi Tambahan</h1>
                 <div className="flex gap-2">

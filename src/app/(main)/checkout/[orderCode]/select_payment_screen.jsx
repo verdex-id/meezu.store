@@ -12,6 +12,8 @@ export default function SelectPaymentScreen({ order }) {
   const [success, setSuccess] = useState();
   const [loading, setLoading] = useState(false);
 
+  const [discountCode, setDiscountCode] = useState();
+
   useEffect(() => {
     async function getPaymentOptions() {
       const res = await fetch("/api/payment/channels");
@@ -28,7 +30,7 @@ export default function SelectPaymentScreen({ order }) {
 
     const payload = {
       payment_method: selectedPayment.code,
-      discount_code: undefined,
+      discount_code: discountCode ? discountCode : undefined,
     };
 
     const res = await fetch(
@@ -48,7 +50,23 @@ export default function SelectPaymentScreen({ order }) {
       setSuccess(true);
       window.location.replace("/payment/" + order.order_code);
     } else if (res.status == "fail") {
+      console.log(res);
       setSuccess(false);
+    }
+  }
+
+  async function handleCancel() {
+    setLoading(true);
+    const res = await fetch(
+      "/api/orders/cancel?order_code=" + order.order_code,
+      {
+        method: "DELETE",
+      }
+    ).then((r) => r.json());
+
+    setLoading(false);
+    if (res.status == "success") {
+      window.location.replace("/");
     }
   }
   return (
@@ -140,6 +158,16 @@ export default function SelectPaymentScreen({ order }) {
               </div>
             </div>
           </div>
+
+          <div className="mt-5 bg-slate-100 p-5">
+            <h1 className="font-bold">Punya Voucher Discount?</h1>
+            <input
+              type="text"
+              placeholder="MERCH7"
+              className="px-5 py-2 bg-white outline-none"
+              onChange={(e) => setDiscountCode(e.target.value)}
+            />
+          </div>
         </div>
         <div className="mt-5">
           <h1 className="font-bold text-xl">Select Payment Method</h1>
@@ -198,16 +226,25 @@ export default function SelectPaymentScreen({ order }) {
           </div>
         )}
 
-        <div className="mt-5">
+        <div className="mt-5 flex gap-4">
           <Button type={2} onClick={handleSetPayment}>
-            Bayar Rp
-            {Intl.NumberFormat("id-ID").format(
-              order.invoice.gross_price +
-                order.invoice.shipping_cost +
-                selectedPayment?.fee_customer.flat -
-                order.invoice.discount_amount
+            {loading ? (
+              "Loading..."
+            ) : (
+              <>
+                Bayar Rp
+                {Intl.NumberFormat("id-ID").format(
+                  order.invoice.gross_price +
+                    order.invoice.shipping_cost +
+                    selectedPayment?.fee_customer.flat -
+                    order.invoice.discount_amount
+                )}
+              </>
             )}
           </Button>
+          <button onClick={handleCancel} className="text-red-500 px-5">
+            Cancel
+          </button>
         </div>
       </div>
     </>
