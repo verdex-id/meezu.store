@@ -7,7 +7,6 @@ import Joi from "joi";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  console.log("tisdfjsflk");
   let response;
   try {
     const schema = Joi.object({
