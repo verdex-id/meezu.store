@@ -36,13 +36,14 @@ export async function POST(request) {
     });
 
     let req = await request.json();
+
+    console.log(req)
+    console.log(callbackSignature)
     req = schema.validate(req);
     if (req.error) {
       throw new FailError("Invalid request format.", 403, req.error.details);
     }
     req = req.value;
-    console.log(req)
-    console.log(callbackSignature)
 
     const content = {
       event: req.event,
