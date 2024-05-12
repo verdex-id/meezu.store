@@ -4,6 +4,7 @@ import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
