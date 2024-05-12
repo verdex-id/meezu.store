@@ -9,6 +9,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
+  const callbackSignature = headers().get("X-Biteship-Price-Callback");
   try {
     const schema = Joi.object({
       event: Joi.string().valid("order.price").required(),
@@ -19,6 +20,7 @@ export async function POST(request) {
       courier_tracking_id: Joi.string().required(),
       courier_waybill_id: Joi.string().required(),
       price: Joi.number().min(0).max(unsignedMediumInt).integer().required(),
+      updated_at: Joi.string().allow(null),
       cash_on_delivery_fee: Joi.number()
         .min(0)
         .max(unsignedMediumInt)
@@ -36,8 +38,12 @@ export async function POST(request) {
         .required(),
     });
     let req = await request.json();
+
+    console.log(req);
+    console.log(callbackSignature);
     req = schema.validate(req);
     if (req.error) {
+      console.log(req.error.details);
       throw new FailError("Invalid request format.", 403, req.error.details);
     }
     req = req.value;
@@ -46,7 +52,6 @@ export async function POST(request) {
       event: req.event,
     };
     const signature = biteshipCallbackSignature(content);
-    const callbackSignature = headers().get("X-Biteship-Price-Callback");
     if (signature !== callbackSignature) {
       throw new FailError("Invalid signature", 400);
     }
@@ -63,6 +68,20 @@ export async function POST(request) {
       },
     });
   } catch (e) {
+    if (e instanceof SyntaxError) {
+      // callback registration check
+      const content = {
+        event: "order.price",
+      };
+      const signature = biteshipCallbackSignature(content);
+
+      if (signature !== callbackSignature) {
+        return NextResponse.json(...failResponse("Invalid signature", 400));
+      }
+
+      return NextResponse.json(...successResponse());
+    }
+
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
