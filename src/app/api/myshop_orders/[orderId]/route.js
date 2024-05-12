@@ -64,6 +64,8 @@ export async function GET(request, { params }) {
         shipment: {
           select: {
             courier_tracking_id: true,
+            courier_waybill_id: true,
+            shipment_status: true,
             courier: {
               select: {
                 courier_name: true,
@@ -102,7 +104,9 @@ export async function PATCH(request, { params }) {
       order_id: Joi.string()
         .pattern(/^[a-z0-9-]{25,}$/)
         .required(),
-      new_status: Joi.string().valid(orderStatus.awaitingRefund, orderStatus.awaitingFulfillment).required(),
+      new_status: Joi.string()
+        .valid(orderStatus.awaitingRefund, orderStatus.awaitingFulfillment)
+        .required(),
     });
 
     let req = await request.json();

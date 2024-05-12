@@ -100,6 +100,7 @@ export async function GET(request) {
         },
         shipment: {
           select: {
+            shipment_status: true,
             courier: {
               select: {
                 courier_name: true,

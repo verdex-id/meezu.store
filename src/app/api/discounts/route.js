@@ -138,7 +138,6 @@ export async function POST(request) {
       throw new ErrorWithCode("Failed to create discount", 400);
     }
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(
         ...failResponse(prismaErrorCode[e.code], 409, e.meta.target)

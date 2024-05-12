@@ -65,7 +65,7 @@ export async function GET(request) {
         },
         shipment: {
           select: {
-            courier_tracking_id: true,
+            courier_waybill_id: true,
             courier: {
               select: {
                 courier_name: true,
@@ -84,11 +84,11 @@ export async function GET(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404)
+          ...failResponse(`${e.meta.modelName} not found`, 404),
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
     if (e instanceof FailError) {
@@ -150,11 +150,11 @@ export async function PATCH(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404)
+          ...failResponse(`${e.meta.modelName} not found`, 404),
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
 
