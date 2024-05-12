@@ -1,4 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
+import { biteshipCallbackSignature } from "@/services/biteship";
 import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -22,6 +23,15 @@ export async function POST(request) {
       throw new FailError("Invalid request format.", 403, req.error.details);
     }
     req = req.value;
+
+    const content = {
+      event: req.event,
+    };
+    const signature = biteshipCallbackSignature(content);
+    const callbackSignature = headers().get("X-Biteship-Waybill-Callback");
+    if (signature !== callbackSignature) {
+      throw new FailError("Invalid signature", 400);
+    }
 
     await prisma.shipment.update({
       where: {
