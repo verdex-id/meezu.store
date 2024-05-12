@@ -1,7 +1,7 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { biteshipCallbackSignature } from "@/services/biteship";
 import { FailError } from "@/utils/custom-error";
-import { unsignedMediumInt } from "@/utils/mysql";
+import { orderStatus } from "@/utils/order-status";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
@@ -47,30 +47,81 @@ export async function POST(request) {
       throw new FailError("Invalid signature", 400);
     }
 
-    //switch (req.status.toUpperCase()) {
-    //  case "ALLOCATED":
-    //    error = await makePaidStatus(order);
-    //    break;
-    //  case "EXPIRED":
-    //    error = await makeFailedStatus(order);
-    //    break;
-    //  case "FAILED":
-    //    error = await makeFailedStatus(order);
-    //    break;
-    //  case "REFUND":
-    //    error = await makeRefundStatus(order);
-    //    break;
-    //  default:
-    //    throw new FailError("Unrecognized payment status", 400);
-    //}
+    let updatedData;
+    switch (req.status.toUpperCase()) {
+      case "SCHEDULED":
+      case "CONFIRMED":
+        updatedData = {
+          shipment_status: req.status,
+          order: {
+            update: {
+              order_status: orderStatus.awaitingShipment,
+            },
+          },
+        };
+        break;
+      case "COURIER_NOT_FOUND":
+      case "CANCELLED":
+      case "REJECTED":
+      case "DISPOSED":
+      case "RETURNED":
+        updatedData = {
+          shipment_status: req.status,
+          order: {
+            update: {
+              order_status: orderStatus.awaitingFulfillment,
+            },
+          },
+        };
+
+        break;
+      case "ALLOCATED":
+      case "PICKING_UP":
+        updatedData = {
+          shipment_status: req.status,
+          order: {
+            update: {
+              order_status: orderStatus.awaitingPickup,
+            },
+          },
+        };
+
+        break;
+      case "PICKED":
+      case "DROPPING_OFF":
+      case "RETURN_IN_TRANSIT":
+        updatedData = {
+          shipment_status: req.status,
+          order: {
+            update: {
+              order_status: orderStatus.shipped,
+            },
+          },
+        };
+        break;
+      case "DELIVERED":
+        updatedData = {
+          shipment_status: req.status,
+          order: {
+            update: {
+              order_status: orderStatus.arrived,
+            },
+          },
+        };
+        break;
+      default:
+        updatedData = {
+          shipment_status: req.status,
+        };
+
+        break;
+    }
 
     await prisma.shipment.update({
       where: {
         expedition_order_id: req.order_id,
       },
-      data: {
-        shipment_status: req.status,
-      },
+      data: updatedData,
     });
   } catch (e) {
     if (e instanceof SyntaxError) {
