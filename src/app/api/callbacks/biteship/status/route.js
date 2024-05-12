@@ -54,6 +54,11 @@ export async function POST(request) {
       throw new FailError("Invalid signature", 400);
     }
 
+    console.log(request);
+    console.log(callbackSignature);
+
+    return NextResponse.json(...successResponse());
+
     await prisma.shipment.update({
       where: {
         expedition_order_id: req.order_id,
