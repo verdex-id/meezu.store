@@ -14,6 +14,11 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    console.log(request);
+    console.log(callbackSignature);
+
+    return NextResponse.json(...successResponse());
+
     const schema = Joi.object({
       event: Joi.string().valid("order.status").required(),
       courier_tracking_id: Joi.string().required(),
@@ -54,11 +59,6 @@ export async function POST(request) {
       throw new FailError("Invalid signature", 400);
     }
 
-    console.log(request);
-    console.log(callbackSignature);
-
-    return NextResponse.json(...successResponse());
-
     await prisma.shipment.update({
       where: {
         expedition_order_id: req.order_id,
@@ -68,7 +68,7 @@ export async function POST(request) {
       },
     });
   } catch (e) {
-        console.log(e)
+    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
