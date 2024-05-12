@@ -1,6 +1,5 @@
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { courierTracking } from "@/services/biteship";
-import { cetak } from "@/utils/cetak";
 import { FailError } from "@/utils/custom-error";
 import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
