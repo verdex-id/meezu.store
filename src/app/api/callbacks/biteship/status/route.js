@@ -13,34 +13,27 @@ export async function POST(request) {
   try {
     const schema = Joi.object({
       event: Joi.string().valid("order.status").required(),
-      courier_tracking_id: Joi.string().required(),
-      courier_waybill_id: Joi.string().required(),
-      courier_company: Joi.string().required(),
-      courier_type: Joi.string().required(),
-      courier_driver_name: Joi.string().required(),
-      courier_driver_phone: Joi.string()
-        .pattern(/^(?:\+?62)?[ -]?(?:\d[ -]?){9,15}\d$/)
-        .required(),
-      courier_driver_photo_url: Joi.string().uri().required(),
-      courier_driver_plate_number: Joi.string().required(),
-      courier_link: Joi.string().uri().required(),
-      status: Joi.string().required(),
-      order_price: Joi.number()
-        .min(0)
-        .max(unsignedMediumInt)
-        .integer()
-        .required(),
-      order_id: Joi.string()
-        .pattern(/^[a-z0-9]{16,}$/)
-        .required(),
+      courier_tracking_id: Joi.string(),
+      courier_waybill_id: Joi.string(),
+      courier_company: Joi.string(),
+      courier_type: Joi.string(),
+      courier_driver_name: Joi.string(),
+      courier_driver_phone: Joi.string(),
+      courier_driver_photo_url: Joi.string(),
+      courier_driver_plate_number: Joi.string(),
+      courier_link: Joi.string(),
+      status: Joi.string(),
+      order_price: Joi.number(),
+      order_id: Joi.string(),
     });
 
     let req = await request.json();
 
-    console.log(req)
-    console.log(callbackSignature)
+    console.log(req);
+    console.log(callbackSignature);
     req = schema.validate(req);
     if (req.error) {
+      console.log(req.error.details);
       throw new FailError("Invalid request format.", 403, req.error.details);
     }
     req = req.value;
@@ -52,6 +45,23 @@ export async function POST(request) {
     if (signature !== callbackSignature) {
       throw new FailError("Invalid signature", 400);
     }
+
+    //switch (req.status.toUpperCase()) {
+    //  case "ALLOCATED":
+    //    error = await makePaidStatus(order);
+    //    break;
+    //  case "EXPIRED":
+    //    error = await makeFailedStatus(order);
+    //    break;
+    //  case "FAILED":
+    //    error = await makeFailedStatus(order);
+    //    break;
+    //  case "REFUND":
+    //    error = await makeRefundStatus(order);
+    //    break;
+    //  default:
+    //    throw new FailError("Unrecognized payment status", 400);
+    //}
 
     await prisma.shipment.update({
       where: {
