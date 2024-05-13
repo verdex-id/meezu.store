@@ -13,18 +13,22 @@ export default function AdminDashboardAddressPage() {
   const [phone, setPhone] = useState("");
   const [currentAddress, setCurrentAddress] = useState();
 
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     async function getCurrentAddress() {
       const res = await fetch("/api/addresses/origin/1", {
         headers: {
           "Content-Type": "application/json",
-          Authorization: cookie.get("access_token"),
+          Authorization: "Bearer " + cookie.get("access_token"),
         },
       }).then((r) => r.json());
 
       if (res.status == "success") {
         setCurrentAddress(res.data.address);
-        setAreasSearchText(res.data.address.name);
+        setAreasSearchText(res.data.address.address);
       }
     }
     getCurrentAddress();
@@ -38,12 +42,22 @@ export default function AdminDashboardAddressPage() {
     const res = await fetch(`/api/areas?input=${areasSearchText}`).then((r) =>
       r.json()
     );
+
+    console.log(res);
     if (res.status == "success") {
       setAreas(res.data.areas);
     }
   }
 
   async function handleSaveAddress() {
+    setLoading(true);
+    setSuccess(false);
+
+    if (!selectedArea) {
+      setError("Area belum dipilih");
+      return;
+    }
+
     const res = await fetch("/api/addresses/origin", {
       method: "POST",
       headers: {
@@ -57,7 +71,11 @@ export default function AdminDashboardAddressPage() {
       }),
     }).then((r) => r.json());
 
-    console.log(res);
+    setLoading(false);
+
+    if (res.status == "success") {
+      setSuccess(true);
+    }
   }
   return (
     <>
@@ -72,6 +90,7 @@ export default function AdminDashboardAddressPage() {
             className="p-5 bg-white outline-none w-full"
             placeholder="Nomor HP untuk pengiriman"
             onChange={(e) => setPhone(e.target.value)}
+            defaultValue={currentAddress?.phone_number}
           />
         </div>
 
@@ -83,12 +102,14 @@ export default function AdminDashboardAddressPage() {
               placeholder="Masukkan kata kunci untuk mencari alamat"
               className="p-5 w-full outline-none bg-white"
               onChange={(e) => setAreasSearchText(e.target.value)}
+              defaultValue={currentAddress?.address}
             />
+
             <button
               className="p-5 bg-cyan-400 text-white"
-              onClick={(e) => handleSearchAddress(e.target.value)}
+              onClick={handleSearchAddress}
             >
-              Search
+              Cari
             </button>
           </div>
         </div>
@@ -146,11 +167,21 @@ export default function AdminDashboardAddressPage() {
         )}
 
         <div className="mt-5">
+          {success && (
+            <div className="border-l-4 border-green-400 bg-white px-5 py-2 my-2">
+              Berhasil!
+            </div>
+          )}
+          {error && (
+            <div className="border-l-4 border-red-400 bg-white px-5 py-2 my-2">
+              Error! {error}
+            </div>
+          )}
           <button
             className="p-5 bg-cyan-400 text-white"
             onClick={() => handleSaveAddress()}
           >
-            Simpan Alamat
+            {loading ? "Loading..." : "Simpan Alamat"}
           </button>
         </div>
       </div>

@@ -1,6 +1,34 @@
+"use client";
+
+import { useCookies } from "next-client-cookies";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function AdminVoucherScreen({ vouchers }) {
+  const cookie = useCookies();
+
+  console.log(vouchers);
+
+  const [loading, setLoading] = useState(false);
+
+  async function handleDelete(voucherId) {
+    setLoading(true);
+    const res = await fetch("/api/discounts/" + voucherId, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + cookie.get("access_token"),
+      },
+    });
+
+    console.log(res);
+
+    setLoading(false);
+
+    if (res.status == "success") {
+      window.location.reload();
+    }
+  }
   return (
     <>
       <div className="w-full max-w-screen-xl mx-auto px-8 min-h-dvh">
@@ -35,6 +63,12 @@ export default function AdminVoucherScreen({ vouchers }) {
                     <p>LIMITED</p>
                   </div>
                 )}
+                <button
+                  onClick={() => handleDelete(voucher.discount_id)}
+                  className="bg-red-400 text-white px-5 py-1 mt-5"
+                >
+                  {loading ? "Loading..." : "Delete"}
+                </button>
               </div>
             </>
           ))}

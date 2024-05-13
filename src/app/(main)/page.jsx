@@ -5,10 +5,7 @@ export default function Home() {
   return (
     <>
       <div className="w-full max-w-screen-xl mx-auto px-8 text-cyan-900 space-y-32 pb-32 ">
-        <div
-          id="hero"
-          className="text-center mt-32 space-y-8  h-[250px] w-[1240px]"
-        >
+        <div id="hero" className="text-center mt-32 space-y-8 ">
           <h1 className="font-bold font-baloo text-4xl md:text-[128px] leading-none">
             Consistency is A Key
           </h1>

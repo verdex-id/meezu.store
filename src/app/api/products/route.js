@@ -29,7 +29,7 @@ export async function GET(request) {
       throw new FailError(
         "Invalid request format.",
         400,
-        validationResult.error.details,
+        validationResult.error.details
       );
     }
 
@@ -64,11 +64,11 @@ export async function GET(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
@@ -167,6 +167,7 @@ export async function POST(request) {
               product_variant_price: true,
               product_variant_stock: true,
               product_variant_weight: true,
+              iteration_images: true,
             },
           },
         },
@@ -176,11 +177,11 @@ export async function POST(request) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
@@ -192,6 +193,6 @@ export async function POST(request) {
   }
 
   return NextResponse.json(
-    ...successResponse({ created_product: createdProduct }),
+    ...successResponse({ created_product: createdProduct })
   );
 }

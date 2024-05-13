@@ -8,12 +8,13 @@ async function getProducts(page) {
   return res;
 }
 
-export default async function MerchPage() {
-  const res = await getProducts(1);
+export default async function MerchPage(req) {
+  const page = req.searchParams.page;
+  const res = await getProducts(page || 1);
 
   return (
     <>
-      <ProductScreen products={res.data.products} />
+      <ProductScreen products={res.data.products} page={Number(page) || 1} />
     </>
   );
 }
