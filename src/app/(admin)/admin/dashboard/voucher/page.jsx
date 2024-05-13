@@ -1,9 +1,9 @@
 import AdminVoucherScreen from "./voucher_screen";
 
 async function getVouchers() {
-  const res = await fetch(process.env.BASE_URL + "/api/vouchers").then((r) =>
-    r.json()
-  );
+  const res = await fetch(process.env.BASE_URL + "/api/vouchers", {
+    next: { revalidate: 0 },
+  }).then((r) => r.json());
   return res.data.vouchers;
 }
 

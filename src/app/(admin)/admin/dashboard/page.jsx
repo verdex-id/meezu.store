@@ -6,9 +6,9 @@ import { useState } from "react";
 export default function AdminDashboardPage() {
   const [menus, setMenus] = useState([
     "product",
+    "order",
     "banner",
     "voucher",
-    "transaction",
     "link",
     "courier",
     "address",

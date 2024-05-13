@@ -6,13 +6,16 @@ import Select from "@/components/select";
 import SearchIcon from "@/icons/search";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ChevronDownIcon from "@/icons/chevron_down";
 
-export default function ProductScreen({ products }) {
+export default function ProductScreen({ products, page }) {
   const [banners, setBanners] = useState([]);
 
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const [filteredProducts, setFilteredProducts] = useState(products);
+
+  console.log(products);
 
   useEffect(() => {
     async function getBanners() {
@@ -67,6 +70,17 @@ export default function ProductScreen({ products }) {
             ? `Product Category: ${selectedCategory.product_category_name}`
             : `All Products (${filteredProducts.length} products)`}
         </h1>
+        <div className="flex items-center gap-4 my-5">
+          {page > 1 && (
+            <Link href={`/merch?page=${page - 1}`} className="p-2 bg-white">
+              <ChevronDownIcon className="w-6 rotate-90" />
+            </Link>
+          )}
+          Page {page}
+          <Link href={`/merch?page=${page + 1}`} className="p-2 bg-white">
+            <ChevronDownIcon className="w-6 -rotate-90" />
+          </Link>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {filteredProducts?.map((product, i) => (
             <Link key={i} href={`/merch/${product.product_slug}`}>
