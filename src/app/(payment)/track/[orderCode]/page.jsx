@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 async function getTracking(orderCode) {
   const res = await fetch(
@@ -13,14 +14,14 @@ export default async function TrackOrderPage({ params }) {
   const tracking = await getTracking(params.orderCode);
   return (
     <div className="w-full max-w-screen-sm mx-auto px-8 min-h-dvh pb-96 mt-8">
-      <div className="p-5 bg-white relative h-24">
+      <Link href={"/"} className="p-5 bg-white relative h-24 block">
         <Image
           src={"/logo/logo_meezu.png"}
           fill
           className="object-contain"
           alt="Logo"
         />
-      </div>
+      </Link>
       <div className="p-5 bg-white mt-5">
         {tracking ? (
           <>

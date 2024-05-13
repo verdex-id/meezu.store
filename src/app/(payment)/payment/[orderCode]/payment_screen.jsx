@@ -64,14 +64,14 @@ export default function PaymentScreen({ order, payment, instruction }) {
   return (
     <>
       <div className="w-full max-w-screen-sm mx-auto px-8 min-h-dvh mt-8 pb-96">
-        <div className="p-5 bg-white relative h-24">
+        <Link href={"/"} className="p-5 bg-white relative h-24 block">
           <Image
             src={"/logo/logo_meezu.png"}
             fill
             className="object-contain"
             alt="Logo"
           />
-        </div>
+        </Link>
         <div className="p-5 bg-white mt-5">
           <div className="text-center">
             <p className="text-xs text-slate-700">{order.order_code}</p>
