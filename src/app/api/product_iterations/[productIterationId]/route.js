@@ -109,16 +109,11 @@ export async function DELETE(req, { params }) {
         product: {
           select: {
             product_iterations: {
-              take: 200,
+              take: 2,
             },
           },
         },
         iteration_images: true,
-        product_variant_mapping: {
-          select: {
-            product_variant_mapping_id: true,
-          },
-        },
       },
     });
 
@@ -132,27 +127,11 @@ export async function DELETE(req, { params }) {
     if (!existingProductIteration) {
       throw new FailError("Product iteration not found", 404);
     }
-    const relatedVariantMappingIds =
-      existingProductIteration.product_variant_mapping.reduce(
-        (list, varMap) => {
-          list.push(varMap.product_variant_mapping_id);
-          return list;
-        },
-        [],
-      );
 
-    await prisma.$transaction(async (tx) => {
-      await tx.productVariantMapping.deleteMany({
-        where: {
-          product_variant_mapping_id: { in: relatedVariantMappingIds },
-        },
-      });
-
-      deletedProductVariant = await tx.productIteration.delete({
-        where: {
-          product_iteration_id: existingProductIteration.product_iteration_id,
-        },
-      });
+    deletedProductVariant = await prisma.productIteration.delete({
+      where: {
+        product_iteration_id: existingProductIteration.product_iteration_id,
+      },
     });
 
     existingProductIteration.iteration_images.forEach((image) => {

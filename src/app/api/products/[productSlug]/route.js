@@ -205,11 +205,6 @@ export async function DELETE(req, { params }) {
         select: {
           product_iteration_id: true,
           iteration_images: true,
-          product_variant_mapping: {
-            select: {
-              product_variant_mapping_id: true,
-            },
-          },
         },
       },
     },
@@ -219,17 +214,6 @@ export async function DELETE(req, { params }) {
     return NextResponse.json(...failResponse("Product not found", 404));
   }
 
-  const productIterationIds = JSONPath({
-    path: "$.product_iterations[*].product_iteration_id",
-    json: targetedProduct,
-  });
-
-  const productVariantMappingIds = JSONPath({
-    path: "$.product_iterations[*].product_variant_mapping[*].product_variant_mapping_id",
-    json: targetedProduct,
-  });
-
-
   const iterationImagePaths = JSONPath({
     path: "$.product_iterations[*].iteration_images[*].iteration_image_path",
     json: targetedProduct,
@@ -237,30 +221,16 @@ export async function DELETE(req, { params }) {
 
   let deletedProduct;
   try {
-    await prisma.$transaction(async (tx) => {
-      await tx.productVariantMapping.deleteMany({
-        where: {
-          product_variant_mapping_id: { in: productVariantMappingIds },
-        },
-      });
-
-      await tx.productIteration.deleteMany({
-        where: {
-          product_iteration_id: { in: productIterationIds },
-        },
-      });
-
-      deletedProduct = await tx.product.delete({
-        where: {
-          product_slug: slug,
-        },
-        select: {
-          product_id: true,
-          product_slug: true,
-          product_name: true,
-          product_description: true,
-        },
-      });
+    deletedProduct = await prisma.product.delete({
+      where: {
+        product_slug: slug,
+      },
+      select: {
+        product_id: true,
+        product_slug: true,
+        product_name: true,
+        product_description: true,
+      },
     });
 
     iterationImagePaths.forEach((image) => {
