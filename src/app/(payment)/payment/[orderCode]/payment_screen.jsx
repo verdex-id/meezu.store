@@ -48,6 +48,19 @@ export default function PaymentScreen({ order, payment, instruction }) {
       setError(res.message);
     }
   }
+
+  async function handleCancelOrder() {
+    const res = await fetch(
+      "/api/orders/cancel?order_code=" + order.order_code,
+      {
+        method: "DELETE",
+      }
+    ).then((r) => r.json());
+
+    if (res.status == "success") {
+      window.location.replace("/merch");
+    }
+  }
   return (
     <>
       <div className="w-full max-w-screen-sm mx-auto px-8 min-h-dvh mt-8 pb-96">
@@ -226,6 +239,18 @@ export default function PaymentScreen({ order, payment, instruction }) {
               </div>
             ))}
         </div>
+
+        {payment.status == "UNPAID" && (
+          <div className="mt-5 text-center">
+            <button onClick={handleCancelOrder} className="text-red-500">
+              Cancel Order
+            </button>
+            <p className="text-xs">
+              *Warning: Dengan 1x klik anda akan mengajukan pembatalan pesanan
+              ini. Pengajuan dapat diterima atau ditolak oleh Admin.
+            </p>
+          </div>
+        )}
       </div>
     </>
   );

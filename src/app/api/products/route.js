@@ -56,7 +56,7 @@ export async function GET(request) {
           select: {
             product_iteration_id: true,
             product_variant_price: true,
-            iteration_images:true,
+            iteration_images: true,
           },
         },
       },

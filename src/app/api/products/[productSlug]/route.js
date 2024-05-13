@@ -23,8 +23,8 @@ export async function GET(req, { params }) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
   const product = await prisma.product.findUnique({
@@ -58,6 +58,7 @@ export async function GET(req, { params }) {
           product_variant_price: true,
           product_variant_stock: true,
           product_variant_weight: true,
+          iteration_images: true,
           product_variant_mapping: {
             select: {
               product_variant_mapping_id: true,
@@ -110,8 +111,8 @@ export async function PATCH(request, { params }) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
 
@@ -128,8 +129,8 @@ export async function PATCH(request, { params }) {
       ...failResponse(
         "Invalid request format.",
         403,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
 
@@ -160,7 +161,7 @@ export async function PATCH(request, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ updated_product: updatedProduct }),
+    ...successResponse({ updated_product: updatedProduct })
   );
 }
 
@@ -188,8 +189,8 @@ export async function DELETE(req, { params }) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details,
-      ),
+        validationResult.error.details
+      )
     );
   }
 
@@ -262,6 +263,6 @@ export async function DELETE(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ deleted_product: deletedProduct }),
+    ...successResponse({ deleted_product: deletedProduct })
   );
 }

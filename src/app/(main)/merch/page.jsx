@@ -3,7 +3,7 @@ import ProductScreen from "./product";
 async function getProducts(page) {
   const res = await fetch(
     process.env.BASE_URL + `/api/products?page=${page}&limit=30`,
-    { next: { revalidate: 10 } }
+    { next: { revalidate: 0 } }
   ).then((r) => r.json());
   return res;
 }
