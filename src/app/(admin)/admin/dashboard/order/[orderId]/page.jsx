@@ -37,7 +37,9 @@ export default async function AdminDashboardOrderDetail({ params }) {
               </p>
               <p className="font-medium">
                 <span className="font-normal">Shipment Status</span>{" "}
-                {order.shipment.shipment_status.toUpperCase()}{" "}
+                <span className="uppercase">
+                  {order.shipment.shipment_status}
+                </span>{" "}
                 <Link
                   href={"/track/" + order.order_code}
                   className="text-cyan-700 font-normal text-sm"

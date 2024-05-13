@@ -21,8 +21,6 @@ export default function AdminVoucherScreen({ vouchers }) {
       },
     });
 
-    console.log(res);
-
     setLoading(false);
 
     if (res.status == "success") {
@@ -58,14 +56,55 @@ export default function AdminVoucherScreen({ vouchers }) {
                     voucher.maximum_discount_amount
                   )}
                 </p>
+                <p className="text-xs">
+                  Minimun Amount: Rp
+                  {Intl.NumberFormat("id-ID").format(
+                    voucher.threshold_discount?.minimum_amount || 0
+                  )}
+                </p>
                 {voucher.is_limited && (
                   <div className="px-2 bg-cyan-500 text-white font-bold w-max mx-auto mt-2">
-                    <p>LIMITED</p>
+                    <p>
+                      LIMITED{" "}
+                      <span className="font-normal text-sm">
+                        {voucher.usage_limits} uses
+                      </span>
+                    </p>
                   </div>
                 )}
+                <p className="text-sm">{voucher.number_of_uses}x Usage</p>
+
+                {voucher.limited_time_discount && (
+                  <div className="px-2 text-white mt-5">
+                    <p className="text-xs">
+                      Valid from{" "}
+                      {new Date(
+                        voucher.limited_time_discount.from_date
+                      ).toLocaleString("id-ID")}
+                    </p>
+                    <p className="text-xs">
+                      Valid until{" "}
+                      {new Date(
+                        voucher.limited_time_discount.to_date
+                      ).toLocaleString("id-ID")}
+                    </p>
+                  </div>
+                )}
+
+                {voucher.daily_discount && (
+                  <div className="px-2 text-white mt-5">
+                    <p className="text-xs">
+                      Active on{" "}
+                      <span>{voucher.daily_discount.from_hour}:00 WIB</span>
+                      <span> to </span>
+                      <span>{voucher.daily_discount.to_hour}:00 WIB</span>
+                    </p>
+                  </div>
+                )}
+
                 <button
                   onClick={() => handleDelete(voucher.discount_id)}
-                  className="bg-red-400 text-white px-5 py-1 mt-5"
+                  className="bg-red-400 text-white px-5 mt-5"
                 >
                   {loading ? "Loading..." : "Delete"}
                 </button>

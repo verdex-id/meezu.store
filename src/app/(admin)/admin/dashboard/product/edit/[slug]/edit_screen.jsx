@@ -362,7 +362,7 @@ export default function AdminDashboardProductEditScreen({ product }) {
                     />
                   </div>
                   <div>
-                    <h1 className="font-bold">Berat (kg)</h1>
+                    <h1 className="font-bold">Berat (gram)</h1>
                     <input
                       type="number"
                       name="product_variant_weight"

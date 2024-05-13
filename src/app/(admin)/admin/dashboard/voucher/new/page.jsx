@@ -26,24 +26,28 @@ export default function AdminDashboardVoucherPage() {
 
     const payload = {
       discount_code: formData.get("discount_code"),
-      is_percent_discount: isPercentDiscount,
+      is_percent_discount: isPercentDiscount || false,
       discount_value: Number(formData.get("discount_value")),
       maximum_discount_amount:
         Number(formData.get("maximum_discount_amount")) || undefined,
 
-      is_limited_discount: isLimitedDiscount,
+      is_limited_discount: isLimitedDiscount || false,
       discount_usage_limits:
         Number(formData.get("discount_usage_limits")) || undefined,
 
-      is_threshold_discount: isThresholdDiscount,
+      is_threshold_discount: isThresholdDiscount || false,
       discount_minimum_amount:
         Number(formData.get("discount_minimum_amount")) || undefined,
 
-      is_limited_time_discount: isLimitedTimeDiscount,
-      from_date: new Date(formData.get("from_date")).toISOString() || undefined,
-      to_date: new Date(formData.get("to_date")).toISOString() || undefined,
+      is_limited_time_discount: isLimitedTimeDiscount || false,
+      from_date: formData.get("from_date")
+        ? new Date(formData.get("from_date")).toISOString() || undefined
+        : undefined,
+      to_date: formData.get("to_date")
+        ? new Date(formData.get("to_date")).toISOString() || undefined
+        : undefined,
 
-      is_daily_discount: isDailyDiscount,
+      is_daily_discount: isDailyDiscount || false,
       from_hour: Number(formData.get("from_hour")) || undefined,
       to_hour: Number(formData.get("to_hour")) || undefined,
     };

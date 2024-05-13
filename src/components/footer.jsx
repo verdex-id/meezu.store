@@ -15,7 +15,7 @@ export default function Footer() {
             <p className="mt-16">Support by PT. AKUDAV DUASATU WIJAYA</p>
           </div>
 
-          <div className="grid grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-2 xl:grid-cols-2">
             <div>
               <h1 className="font-bold text-3xl mb-16">Links</h1>
               <div className="flex flex-col gap-2">
@@ -52,14 +52,11 @@ export default function Footer() {
                 >
                   Instagram
                 </Link>
-                <Link href={"/"} className="pb-6">
-                  Twitter
-                </Link>
               </div>
             </div>
 
-            <div>
-              <h1 className="font-bold text-3xl mb-16">Business</h1>
+            {/* <div>
+              <h1 className="font-bold text-3xl mb-16">Contact</h1>
               <div className="flex flex-col gap-2">
                 <Link href={"/"} className="pb-6">
                   Email
@@ -68,7 +65,7 @@ export default function Footer() {
                   Phone(+62)
                 </Link>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </footer>

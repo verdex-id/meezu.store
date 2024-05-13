@@ -61,7 +61,7 @@ export default async function TrackOrderPage({ params }) {
             </div>
           </>
         ) : (
-          <p>Error: Order Not Found</p>
+          <p>Error: Pesanan belum dikirim atau Pesanan tidak ditemukan</p>
         )}
       </div>
     </div>

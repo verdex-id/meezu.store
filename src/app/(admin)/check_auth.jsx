@@ -14,7 +14,7 @@ export default function CheckAuth({ children }) {
         window.location.replace("/admin/login");
       }
     }
-  }, []);
+  }, [children]);
 
   useEffect(() => {
     async function getAccessToken() {

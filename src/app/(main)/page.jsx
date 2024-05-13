@@ -81,18 +81,22 @@ export default function Home() {
             sekarang!
           </p>
           <div className="flex flex-row justify-center">
-            <Button type={2}>Merchandise</Button>
+            <Button href={"/merch"} type={2}>
+              Merchandise
+            </Button>
           </div>
         </div>
         <div id="buy-guide" className="">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* left grid */}
             <div>
-              <h1 className="font-baloo text-[64px] mt-16">
+              <h1 className="font-baloo text-3xl sm:text-4xl lg:text-6xl mt-16">
                 Bagaimana Cara Memesan?
               </h1>
               <div className="flex ">
-                <Button type={2}>Merchandise</Button>
+                <Button href={"/merch"} type={2}>
+                  Merchandise
+                </Button>
               </div>
             </div>
             <div>
