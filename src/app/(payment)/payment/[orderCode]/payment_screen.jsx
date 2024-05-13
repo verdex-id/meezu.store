@@ -256,17 +256,15 @@ export default function PaymentScreen({ order, payment, instruction }) {
             ))}
         </div>
 
-        {payment.status == "UNPAID" && (
-          <div className="mt-5 text-center">
-            <button onClick={handleCancelOrder} className="text-red-500">
-              Cancel Order
-            </button>
-            <p className="text-xs">
-              *Warning: Dengan 1x klik anda akan mengajukan pembatalan pesanan
-              ini. Pengajuan dapat diterima atau ditolak oleh Admin.
-            </p>
-          </div>
-        )}
+        <div className="mt-5 text-center">
+          <button onClick={handleCancelOrder} className="text-red-500">
+            Cancel Order
+          </button>
+          <p className="text-xs">
+            *Warning: Dengan 1x klik anda akan mengajukan pembatalan pesanan
+            ini. Pengajuan dapat diterima atau ditolak oleh Admin.
+          </p>
+        </div>
       </div>
     </>
   );
