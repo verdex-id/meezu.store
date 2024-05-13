@@ -50,12 +50,31 @@ export default function PaymentScreen({ order, payment, instruction }) {
   }
 
   async function handleCancelOrder() {
+    setLoading(true);
     const res = await fetch(
       "/api/orders/cancel?order_code=" + order.order_code,
       {
         method: "DELETE",
       }
     ).then((r) => r.json());
+
+    setLoading(false);
+
+    if (res.status == "success") {
+      window.location.replace("/merch");
+    }
+  }
+
+  async function handleCancelOrderPaid() {
+    setLoading(true);
+    const res = await fetch("/api/orders?order_code=" + order.order_code, {
+      method: "PATCH",
+      body: JSON.stringify({
+        new_status: "CANCELLATION_REQUEST",
+      }),
+    }).then((r) => r.json());
+
+    setLoading(false);
 
     if (res.status == "success") {
       window.location.replace("/merch");
@@ -256,15 +275,29 @@ export default function PaymentScreen({ order, payment, instruction }) {
             ))}
         </div>
 
-        <div className="mt-5 text-center">
-          <button onClick={handleCancelOrder} className="text-red-500">
-            Cancel Order
-          </button>
-          <p className="text-xs">
-            *Warning: Dengan 1x klik anda akan mengajukan pembatalan pesanan
-            ini. Pengajuan dapat diterima atau ditolak oleh Admin.
-          </p>
-        </div>
+        {payment.status == "UNPAID" && (
+          <div className="mt-5 text-center">
+            <button onClick={handleCancelOrder} className="text-red-500">
+              {loading ? "Loading..." : "Cancel Order"}
+            </button>
+            <p className="text-xs">
+              *Warning: Dengan 1x klik anda akan mengajukan pembatalan pesanan
+              ini.
+            </p>
+          </div>
+        )}
+
+        {payment.status == "PAID" && (
+          <div className="mt-5 text-center">
+            <button onClick={handleCancelOrderPaid} className="text-red-500">
+              {loading ? "Loading..." : "Cancel Order"}
+            </button>
+            <p className="text-xs">
+              *Warning: Dengan 1x klik anda akan mengajukan pembatalan pesanan
+              ini. Pengajuan dapat diterima atau ditolak oleh Admin.
+            </p>
+          </div>
+        )}
       </div>
     </>
   );

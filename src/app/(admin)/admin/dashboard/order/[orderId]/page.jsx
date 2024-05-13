@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import MarkAsDoneScreen from "./mark_as_done_screen";
 import ShipScreen from "./ship_screen";
+import AcceptCancelScreen from "./response_cancel_screen";
 
 async function getOrderByCode(id) {
   const cookie = cookies();
@@ -127,6 +128,10 @@ export default async function AdminDashboardOrderDetail({ params }) {
               order.shipment.shipment_status == "delivered" && (
                 <MarkAsDoneScreen orderId={params.orderId} />
               )}
+
+            {order.order_status == "CANCELLATION_REQUEST" && (
+              <AcceptCancelScreen order={order} />
+            )}
           </>
         ) : (
           <p>Error: Order Not Found</p>
