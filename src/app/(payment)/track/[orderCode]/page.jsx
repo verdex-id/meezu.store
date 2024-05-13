@@ -3,7 +3,12 @@ import Link from "next/link";
 
 async function getTracking(orderCode) {
   const res = await fetch(
-    process.env.BASE_URL + "/api/couriers/tracking?order_code=" + orderCode
+    process.env.BASE_URL + "/api/couriers/tracking?order_code=" + orderCode,
+    {
+      next: {
+        revalidate: 0,
+      },
+    }
   ).then((r) => r.json());
   if (res.status == "success") {
     return res.data.tracking;
