@@ -79,7 +79,6 @@ export default function AdminDashboardVoucherPage() {
           onSubmit={handleAddVoucher}
         >
           <h1 className="font-bold text-xl text-center">Add New Voucher</h1>
-
           <div className="mt-5">
             <h1>Discount Code</h1>
             <input
@@ -97,6 +96,7 @@ export default function AdminDashboardVoucherPage() {
             <select
               name="is_percent_discount"
               className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
+              onChange={(e) => setIsPercentDiscount(Boolean(e.target.value))}
             >
               <option value="false" onClick={() => setIsPercentDiscount(false)}>
                 Nominal (Cth: Potongan Rp10.000)
@@ -106,7 +106,6 @@ export default function AdminDashboardVoucherPage() {
               </option>
             </select>
           </div>
-
           <div className="mt-5">
             <h1>Discount Value</h1>
             {isPercentDiscount ? (
@@ -131,7 +130,6 @@ export default function AdminDashboardVoucherPage() {
               />
             )}
           </div>
-
           <div className="mt-5">
             <h1>Max Discount Amount</h1>
             <input
@@ -144,12 +142,12 @@ export default function AdminDashboardVoucherPage() {
               max={16500000}
             />
           </div>
-
           <div className="mt-5">
             <h1>Limited Discount?</h1>
             <select
               name="is_limited_discount"
               className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
+              onChange={(e) => setIsLimitedDiscount(Boolean(e.target.value))}
             >
               <option value="false" onClick={() => setIsLimitedDiscount(false)}>
                 Unlimited
@@ -159,7 +157,6 @@ export default function AdminDashboardVoucherPage() {
               </option>
             </select>
           </div>
-
           {isLimitedDiscount && (
             <div className="mt-5">
               <h1>Max Discount Usage Limit</h1>
@@ -174,12 +171,12 @@ export default function AdminDashboardVoucherPage() {
               />
             </div>
           )}
-
           <div className="mt-5">
             <h1>Ada Minimal Biaya Pembelian?</h1>
             <select
               name="is_threshold_discount"
               className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
+              onChange={(e) => setIsThresholdDiscount(Boolean(e.target.value))}
             >
               <option
                 value="false"
@@ -192,7 +189,6 @@ export default function AdminDashboardVoucherPage() {
               </option>
             </select>
           </div>
-
           {isThresholdDiscount && (
             <div className="mt-5">
               <h1>Minimal Pembelian</h1>
@@ -211,12 +207,14 @@ export default function AdminDashboardVoucherPage() {
               />
             </div>
           )}
-
           <div className="mt-5">
             <h1>Ada Batas Tanggal?</h1>
             <select
               name="is_limited_time_discount"
               className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
+              onChange={(e) =>
+                setIsLimitedTimeDiscount(Boolean(e.target.value))
+              }
             >
               <option
                 value="false"
@@ -257,12 +255,12 @@ export default function AdminDashboardVoucherPage() {
               </div>
             </div>
           )}
-
           <div className="mt-5">
             <h1>Ada Batas Jam?</h1>
             <select
               name="is_limited_time_discount"
               className="px-5 py-2 bg-white outline-none border-2 border-cyan-200 w-full"
+              onChange={(e) => setIsDailyDiscount(Boolean(e.target.value))}
             >
               <option value="false" onClick={() => setIsDailyDiscount(false)}>
                 No
@@ -300,19 +298,16 @@ export default function AdminDashboardVoucherPage() {
               </div>
             </div>
           )}
-
           {success && (
             <div className="mt-8 border-l-4 border-green-400 bg-white p-5">
               Success! Voucher discount berhasil dibuat
             </div>
           )}
-
           {error && (
             <div className="mt-8 border-l-4 border-red-400 bg-white p-5">
               Error! {error}
             </div>
           )}
-
           <div className="mt-8">
             <button className="px-5 py-2 bg-cyan-400 text-white w-full">
               {loading ? "Loading..." : "Save"}
