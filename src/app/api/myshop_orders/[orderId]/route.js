@@ -37,6 +37,7 @@ export async function GET(request, { params }) {
         order_status: true,
         order_code: true,
         order_id: true,
+        note_for_seller: true,
         guest_order: {
           select: {
             guest_email: true,
@@ -46,6 +47,7 @@ export async function GET(request, { params }) {
         invoice: {
           select: {
             payment_date: true,
+            payment_status: true,
             customer_full_address: true,
             gross_price: true,
             shipping_cost: true,
