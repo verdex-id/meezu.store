@@ -15,6 +15,7 @@ export default function PaymentScreen({ order, payment, instruction }) {
   const [emailCooldown, setEmailCooldown] = useState(0);
 
   const expiredDateTime = new Date(payment.expired_time * 1000);
+  const paidDateTime = new Date(payment.paid_at * 1000);
 
   useEffect(() => {
     setTimeout(() => {
@@ -89,42 +90,53 @@ export default function PaymentScreen({ order, payment, instruction }) {
           </div>
           <hr className="border-2 border-cyan-200 mt-5" />
           <div className="mt-5">
-            <div className="p-5 bg-cyan-200 text-center">
-              <h1 className="font-bold">{payment.payment_name}</h1>
-              {payment.payment_method.includes("QRIS") ? (
-                <div className="p-5 bg-white">
-                  <div className="relative h-72 w-full">
-                    <Image
-                      src={payment.qr_url}
-                      alt="QRIS"
-                      className="object-contain"
-                      fill
-                    />
+            {payment.status != "PAID" && (
+              <div className="p-5 bg-cyan-200 text-center">
+                <h1 className="font-bold">{payment.payment_name}</h1>
+                {payment.payment_method.includes("QRIS") ? (
+                  <div className="p-5 bg-white">
+                    <div className="relative h-72 w-full">
+                      <Image
+                        src={payment.qr_url}
+                        alt="QRIS"
+                        className="object-contain"
+                        fill
+                      />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="cursor-pointer" onClick={handleCopy}>
-                  <p
-                    className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
-                      copied ? "bg-green-50" : "bg-white"
-                    }`}
-                  >
-                    {payment.pay_code}
-                  </p>
-                  <p className="text-xs">
-                    {copied ? "Copied" : "Click to Copy"}
-                  </p>
-                </div>
-              )}
-            </div>
+                ) : (
+                  <div className="cursor-pointer" onClick={handleCopy}>
+                    <p
+                      className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
+                        copied ? "bg-green-50" : "bg-white"
+                      }`}
+                    >
+                      {payment.pay_code}
+                    </p>
+                    <p className="text-xs">
+                      {copied ? "Copied" : "Click to Copy"}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="mt-5 text-center">
-            <p>
-              Lakukan pembayaran sebelum{" "}
-              <span className="font-medium">
-                {expiredDateTime.toLocaleString("id-ID")}
-              </span>
-            </p>
+            {payment.status == "PAID" ? (
+              <p>
+                Telah dibayar pada{" "}
+                <span className="font-medium">
+                  {paidDateTime.toLocaleString("id-ID")}
+                </span>
+              </p>
+            ) : (
+              <p>
+                Lakukan pembayaran sebelum{" "}
+                <span className="font-medium">
+                  {expiredDateTime.toLocaleString("id-ID")}
+                </span>
+              </p>
+            )}
           </div>
         </div>
 
