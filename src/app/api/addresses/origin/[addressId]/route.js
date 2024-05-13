@@ -103,7 +103,6 @@ export async function PUT(request, { params }) {
                 district: area.area.administrative_division_level_3_name,
                 postal_code: area.area.postal_code.toString(),
                 area_id: area.area.id,
-                admin_id: admin.admin_id,
             },
         });
 
