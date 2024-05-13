@@ -86,11 +86,11 @@ export async function GET(request, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
@@ -143,11 +143,11 @@ export async function PATCH(request, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
 
