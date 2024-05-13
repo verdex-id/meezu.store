@@ -5,6 +5,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import Joi from "joi";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
+import fs from "fs";
 
 export async function GET(req, { params }) {
   let iterationImage;
@@ -28,11 +29,11 @@ export async function GET(req, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404)
+          ...failResponse(`${e.meta.modelName} not found`, 404),
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
     if (e instanceof FailError) {
@@ -42,7 +43,7 @@ export async function GET(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ iteration_image: iterationImage })
+    ...successResponse({ iteration_image: iterationImage }),
   );
 }
 
@@ -69,15 +70,17 @@ export async function DELETE(req, { params }) {
         iteration_image_id: req.iteration_image_id,
       },
     });
+
+    fs.unlinkSync("./public" + iterationImage.iteration_image_path);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404)
+          ...failResponse(`${e.meta.modelName} not found`, 404),
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
       );
     }
     if (e instanceof FailError) {
@@ -87,6 +90,6 @@ export async function DELETE(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ deleted_iteration_image: iterationImage })
+    ...successResponse({ deleted_iteration_image: iterationImage }),
   );
 }
