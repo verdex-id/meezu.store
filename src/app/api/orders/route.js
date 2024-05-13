@@ -41,6 +41,7 @@ export async function GET(request) {
         order_status: true,
         invoice: {
           select: {
+            payment_status: true,
             payment_date: true,
             customer_full_address: true,
             gross_price: true,
