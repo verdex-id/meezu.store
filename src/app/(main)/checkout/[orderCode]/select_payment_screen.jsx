@@ -10,6 +10,9 @@ export default function SelectPaymentScreen({ order }) {
   const [selectedPayment, setSelectedPayment] = useState();
 
   const [success, setSuccess] = useState();
+  const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [emailSuccess, setEmailSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -50,7 +53,21 @@ export default function SelectPaymentScreen({ order }) {
 
     if (res.status == "success") {
       setSuccess(true);
-      window.location.replace("/payment/" + order.order_code);
+      setEmailLoading(true);
+      setEmailSuccess(false);
+
+      const res = await fetch(
+        "/api/orders/guest/email?order_code=" + order.order_code
+      ).then((r) => r.json());
+
+      if (res.status == "success") {
+        setEmailSuccess(true);
+        setEmailLoading(false);
+        window.location.replace("/payment/" + order.order_code);
+      } else {
+        setEmailError(res.message);
+        setEmailLoading(false);
+      }
     } else if (res.status == "fail") {
       setSuccess(false);
       setError(res.message);
@@ -204,6 +221,25 @@ export default function SelectPaymentScreen({ order }) {
         </div>
 
         {success == true && (
+          <div className="mt-5 border-l-4 border-green-400 bg-white p-5">
+            Success! Loading... Mencoba mengirim invoice ke email
+          </div>
+        )}
+
+        {emailError == true && (
+          <div className="mt-5 border-l-4 border-red-400 bg-white p-5">
+            Gagal mengirim email! Silahkan ke invoice dan coba kirim email
+            ulang. Simpan link berikut untuk berjaga jaga.
+            <Link
+              href={`/payment/${order.order_code}`}
+              className="text-green-500"
+            >
+              klik disini untuk ke invoice.
+            </Link>
+          </div>
+        )}
+
+        {emailSuccess == true && (
           <div className="mt-5 border-l-4 border-green-400 bg-white p-5">
             Success! Anda akan diarahkan otomatis ke halaman pembayaran. Jika
             tidak,{" "}

@@ -118,18 +118,34 @@ export default function PaymentScreen({ order, payment, instruction }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="cursor-pointer" onClick={handleCopy}>
-                    <p
-                      className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
-                        copied ? "bg-green-50" : "bg-white"
-                      }`}
-                    >
-                      {payment.pay_code}
-                    </p>
-                    <p className="text-xs">
-                      {copied ? "Copied" : "Click to Copy"}
-                    </p>
-                  </div>
+                  <>
+                    {payment.pay_code && (
+                      <div className="cursor-pointer" onClick={handleCopy}>
+                        <p
+                          className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
+                            copied ? "bg-green-50" : "bg-white"
+                          }`}
+                        >
+                          {payment.pay_code}
+                        </p>
+                        <p className="text-xs">
+                          {copied ? "Copied" : "Click to Copy"}
+                        </p>
+                      </div>
+                    )}
+
+                    {payment.pay_url && (
+                      <Link href={payment.pay_url} target="_blank">
+                        <p
+                          className={`p-5 text-sm md:text-2xl font-bold tracking-widest font-mono ${
+                            copied ? "bg-green-50" : "bg-white"
+                          }`}
+                        >
+                          Click to Pay
+                        </p>
+                      </Link>
+                    )}
+                  </>
                 )}
               </div>
             )}
