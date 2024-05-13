@@ -6,6 +6,7 @@ import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
 import { NextResponse } from "next/server";
+import fs from "fs";
 
 export async function PATCH(request, { params }) {
   let updatedProductIteration;
@@ -112,6 +113,7 @@ export async function DELETE(req, { params }) {
             },
           },
         },
+        iteration_images: true,
         product_variant_mapping: {
           select: {
             product_variant_mapping_id: true,
@@ -151,6 +153,10 @@ export async function DELETE(req, { params }) {
           product_iteration_id: existingProductIteration.product_iteration_id,
         },
       });
+    });
+
+    existingProductIteration.iteration_images.forEach((image) => {
+      fs.unlinkSync("./public" + image.iteration_image_path);
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {

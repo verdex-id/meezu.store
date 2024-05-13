@@ -6,6 +6,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
 import { JSONPath } from "jsonpath-plus";
 import { NextResponse } from "next/server";
+import fs from "fs";
 
 export async function GET(req, { params }) {
   const schema = Joi.object({
@@ -23,8 +24,8 @@ export async function GET(req, { params }) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details
-      )
+        validationResult.error.details,
+      ),
     );
   }
   const product = await prisma.product.findUnique({
@@ -111,8 +112,8 @@ export async function PATCH(request, { params }) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details
-      )
+        validationResult.error.details,
+      ),
     );
   }
 
@@ -129,8 +130,8 @@ export async function PATCH(request, { params }) {
       ...failResponse(
         "Invalid request format.",
         403,
-        validationResult.error.details
-      )
+        validationResult.error.details,
+      ),
     );
   }
 
@@ -161,7 +162,7 @@ export async function PATCH(request, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ updated_product: updatedProduct })
+    ...successResponse({ updated_product: updatedProduct }),
   );
 }
 
@@ -189,8 +190,8 @@ export async function DELETE(req, { params }) {
       ...failResponse(
         "Invalid request format.",
         400,
-        validationResult.error.details
-      )
+        validationResult.error.details,
+      ),
     );
   }
 
@@ -203,6 +204,7 @@ export async function DELETE(req, { params }) {
       product_iterations: {
         select: {
           product_iteration_id: true,
+          iteration_images: true,
           product_variant_mapping: {
             select: {
               product_variant_mapping_id: true,
@@ -224,6 +226,12 @@ export async function DELETE(req, { params }) {
 
   const productVariantMappingIds = JSONPath({
     path: "$.product_iterations[*].product_variant_mapping[*].product_variant_mapping_id",
+    json: targetedProduct,
+  });
+
+
+  const iterationImagePaths = JSONPath({
+    path: "$.product_iterations[*].iteration_images[*].iteration_image_path",
     json: targetedProduct,
   });
 
@@ -254,6 +262,10 @@ export async function DELETE(req, { params }) {
         },
       });
     });
+
+    iterationImagePaths.forEach((image) => {
+      fs.unlinkSync("./public" + image);
+    });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
@@ -263,6 +275,6 @@ export async function DELETE(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ deleted_product: deletedProduct })
+    ...successResponse({ deleted_product: deletedProduct }),
   );
 }

@@ -38,7 +38,7 @@ model ProductIteration {
   product_variant_weight    Int                       // max 500.000 gram / 500 kg
   product_variant_price     Int                       @db.UnsignedMediumInt
   product_variant_stock     Int                       @db.UnsignedSmallInt
-  product                   Product                   @relation(name: "ProductToProductIteration", fields: [product_id], references: [product_id])
+  product                   Product                   @relation(name: "ProductToProductIteration", fields: [product_id], references: [product_id], onDelete: Cascade)
   product_id                Int                
   iteration_images          IterationImage[]         
   product_variant_mapping   ProductVariantMapping[]
@@ -47,9 +47,9 @@ model ProductIteration {
 
 model ProductVariantMapping {
   product_variant_mapping_id    Int              @unique  @default(autoincrement())  @id
-  product_iteration             ProductIteration @relation(fields: [product_iteration_id], references: [product_iteration_id])
+  product_iteration             ProductIteration @relation(fields: [product_iteration_id], references: [product_iteration_id], onDelete: Cascade)
   product_iteration_id          Int
-  variant                       Variant          @relation(fields: [variant_id], references: [variant_id])
+  variant                       Variant          @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
   variant_id                    Int
   @@unique([product_iteration_id, variant_id])
 }
@@ -64,7 +64,7 @@ model Variant {
   variant_id                  Int           @unique  @default(autoincrement())  @id
   variant_slug                String        @unique  @db.VarChar(15) 
   variant_name                String        @unique  @db.VarChar(15) 
-  varian_type                 VariantType   @relation(fields: [varian_type_id], references: [varian_type_id])
+  varian_type                 VariantType   @relation(fields: [varian_type_id], references: [varian_type_id], onDelete: Cascade)
   varian_type_id              Int
   product_variant_mapping       ProductVariantMapping[]
 }
@@ -72,7 +72,7 @@ model Variant {
 model IterationImage {
   iteration_image_id      Int               @default(autoincrement())  @unique  @id
   iteration_image_path    String  
-  product_iteration       ProductIteration  @relation(fields: [product_iteration_id], references: [product_iteration_id])
+  product_iteration       ProductIteration  @relation(fields: [product_iteration_id], references: [product_iteration_id], onDelete: Cascade)
   product_iteration_id    Int
 }
 
@@ -291,6 +291,3 @@ model Banner {
   banner_image_path    String
   banner_url           String?
 }
-
-
-

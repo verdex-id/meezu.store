@@ -118,7 +118,7 @@ export async function DELETE(request, { params }) {
       },
     });
 
-    fs.unlinkSync(banner.banner_image_path);
+    fs.unlinkSync("./public" + banner.banner_image_path);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
