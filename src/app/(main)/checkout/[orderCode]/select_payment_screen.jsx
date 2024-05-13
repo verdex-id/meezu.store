@@ -11,6 +11,7 @@ export default function SelectPaymentScreen({ order }) {
 
   const [success, setSuccess] = useState();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [discountCode, setDiscountCode] = useState();
 
@@ -26,7 +27,8 @@ export default function SelectPaymentScreen({ order }) {
 
   async function handleSetPayment() {
     setLoading(true);
-    setSuccess();
+    setSuccess(false);
+    setError("");
 
     const payload = {
       payment_method: selectedPayment.code,
@@ -50,8 +52,8 @@ export default function SelectPaymentScreen({ order }) {
       setSuccess(true);
       window.location.replace("/payment/" + order.order_code);
     } else if (res.status == "fail") {
-      console.log(res);
       setSuccess(false);
+      setError(res.message);
     }
   }
 
@@ -214,15 +216,9 @@ export default function SelectPaymentScreen({ order }) {
           </div>
         )}
 
-        {success == false && (
+        {error && (
           <div className="mt-5 border-l-4 border-red-400 bg-white p-5">
-            Error! Order sudah pernah dibuat atau kesalahan lainnya.{" "}
-            <Link
-              href={`/payment/${order.order_code}`}
-              className="text-green-500"
-            >
-              cek pembayaran disini.
-            </Link>
+            Error! {error}
           </div>
         )}
 

@@ -10,12 +10,11 @@ import ChevronDownIcon from "@/icons/chevron_down";
 
 export default function ProductScreen({ products, page }) {
   const [banners, setBanners] = useState([]);
+  console.log(products);
 
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();
   const [filteredProducts, setFilteredProducts] = useState(products);
-
-  console.log(products);
 
   useEffect(() => {
     async function getBanners() {
@@ -85,13 +84,18 @@ export default function ProductScreen({ products, page }) {
           {filteredProducts?.map((product, i) => (
             <Link key={i} href={`/merch/${product.product_slug}`}>
               <div className="w-full max-w-sm mx-auto p-5 bg-white">
-                <div className="relative w-full aspect-video object-cover">
-                  <Image
-                    src={"/banner/banner_1.png"}
-                    layout="fill"
-                    className="rounded-xl"
-                  />
-                </div>
+                {product.product_iterations[0].iteration_images[0] && (
+                  <div className="relative w-full aspect-square object-cover">
+                    <Image
+                      src={
+                        product.product_iterations[0].iteration_images[0]
+                          .iteration_image_path
+                      }
+                      layout="fill"
+                      className="rounded-xl object-cover"
+                    />
+                  </div>
+                )}
                 <div>
                   <h1 className="font-bold text-xl">{product.product_name}</h1>
                   <p>
