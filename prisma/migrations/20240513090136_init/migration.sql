@@ -310,19 +310,19 @@ CREATE TABLE `Banner` (
 ALTER TABLE `Product` ADD CONSTRAINT `Product_product_category_id_fkey` FOREIGN KEY (`product_category_id`) REFERENCES `ProductCategory`(`product_category_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductIteration` ADD CONSTRAINT `ProductIteration_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `Product`(`product_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductIteration` ADD CONSTRAINT `ProductIteration_product_id_fkey` FOREIGN KEY (`product_id`) REFERENCES `Product`(`product_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductVariantMapping` ADD CONSTRAINT `ProductVariantMapping_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductVariantMapping` ADD CONSTRAINT `ProductVariantMapping_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `ProductVariantMapping` ADD CONSTRAINT `ProductVariantMapping_variant_id_fkey` FOREIGN KEY (`variant_id`) REFERENCES `Variant`(`variant_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `ProductVariantMapping` ADD CONSTRAINT `ProductVariantMapping_variant_id_fkey` FOREIGN KEY (`variant_id`) REFERENCES `Variant`(`variant_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Variant` ADD CONSTRAINT `Variant_varian_type_id_fkey` FOREIGN KEY (`varian_type_id`) REFERENCES `VariantType`(`varian_type_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Variant` ADD CONSTRAINT `Variant_varian_type_id_fkey` FOREIGN KEY (`varian_type_id`) REFERENCES `VariantType`(`varian_type_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `IterationImage` ADD CONSTRAINT `IterationImage_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `IterationImage` ADD CONSTRAINT `IterationImage_product_iteration_id_fkey` FOREIGN KEY (`product_iteration_id`) REFERENCES `ProductIteration`(`product_iteration_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Invoice` ADD CONSTRAINT `Invoice_order_id_fkey` FOREIGN KEY (`order_id`) REFERENCES `Order`(`order_id`) ON DELETE CASCADE ON UPDATE CASCADE;

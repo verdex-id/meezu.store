@@ -114,8 +114,38 @@ export async function PUT(request, { params }) {
       return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
     }
 
-    if (e instanceof ErrorWithCode) {
-      return NextResponse.json(...failResponse(e.message, e.code));
+
+    let newAddress;
+    try {
+        newAddress = await prisma.originAddress.update({
+            where: {
+                origin_address_id: parseInt(params.addressId),
+            },
+            data: {
+                phone_number: req.new_phone_number,
+                address: req.new_address,
+                province: area.area.administrative_division_level_1_name,
+                city: area.area.administrative_division_level_2_name,
+                district: area.area.administrative_division_level_3_name,
+                postal_code: area.area.postal_code.toString(),
+                area_id: area.area.id,
+            },
+        });
+
+        if (!newAddress) {
+            throw new ErrorWithCode("Address not found", 404);
+        }
+    } catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
+        }
+
+        if (e instanceof ErrorWithCode) {
+            return NextResponse.json(...failResponse(e.message, e.code));
+        }
+
+        return NextResponse.json(...errorResponse());
+
     }
 
     return NextResponse.json(...errorResponse());

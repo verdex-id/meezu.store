@@ -6,6 +6,7 @@ import { errorResponse, failResponse, successResponse } from "@/utils/response";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
 import { NextResponse } from "next/server";
+import fs from "fs";
 
 export async function PATCH(request, { params }) {
   let updatedProductIteration;
@@ -108,15 +109,11 @@ export async function DELETE(req, { params }) {
         product: {
           select: {
             product_iterations: {
-              take: 200,
+              take: 2,
             },
           },
         },
-        product_variant_mapping: {
-          select: {
-            product_variant_mapping_id: true,
-          },
-        },
+        iteration_images: true,
       },
     });
 
@@ -130,27 +127,15 @@ export async function DELETE(req, { params }) {
     if (!existingProductIteration) {
       throw new FailError("Product iteration not found", 404);
     }
-    const relatedVariantMappingIds =
-      existingProductIteration.product_variant_mapping.reduce(
-        (list, varMap) => {
-          list.push(varMap.product_variant_mapping_id);
-          return list;
-        },
-        [],
-      );
 
-    await prisma.$transaction(async (tx) => {
-      await tx.productVariantMapping.deleteMany({
-        where: {
-          product_variant_mapping_id: { in: relatedVariantMappingIds },
-        },
-      });
+    deletedProductVariant = await prisma.productIteration.delete({
+      where: {
+        product_iteration_id: existingProductIteration.product_iteration_id,
+      },
+    });
 
-      deletedProductVariant = await tx.productIteration.delete({
-        where: {
-          product_iteration_id: existingProductIteration.product_iteration_id,
-        },
-      });
+    existingProductIteration.iteration_images.forEach((image) => {
+      fs.unlinkSync("./public" + image.iteration_image_path);
     });
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
