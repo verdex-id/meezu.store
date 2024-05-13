@@ -58,23 +58,45 @@ export default function AdminDashboardAddressPage() {
       return;
     }
 
-    const res = await fetch("/api/addresses/origin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + cookie.get("access_token"),
-      },
-      body: JSON.stringify({
-        area_id: selectedArea.id,
-        address: selectedArea.name,
-        phone_number: phone,
-      }),
-    }).then((r) => r.json());
+    if (!currentAddress) {
+      const res = await fetch("/api/addresses/origin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + cookie.get("access_token"),
+        },
+        body: JSON.stringify({
+          area_id: selectedArea.id,
+          address: selectedArea.name,
+          phone_number: phone,
+        }),
+      }).then((r) => r.json());
 
-    setLoading(false);
+      setLoading(false);
 
-    if (res.status == "success") {
-      setSuccess(true);
+      if (res.status == "success") {
+        setSuccess(true);
+      }
+    } else {
+      console.log(selectedArea);
+      const res = await fetch("/api/addresses/origin/1", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + cookie.get("access_token"),
+        },
+        body: JSON.stringify({
+          new_area_id: selectedArea.id,
+          new_address: selectedArea.name,
+          new_phone_number: phone,
+        }),
+      }).then((r) => r.json());
+
+      setLoading(false);
+
+      if (res.status == "success") {
+        setSuccess(true);
+      }
     }
   }
   return (

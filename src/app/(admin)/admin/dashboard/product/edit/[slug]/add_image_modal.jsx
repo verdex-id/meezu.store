@@ -80,9 +80,16 @@ export default function AddIterationImageModal({
               />
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 flex gap-2">
               <button className="px-5 py-2 bg-cyan-400 text-white">
                 {loading ? "Loading..." : "Save"}
+              </button>
+              <button
+                onClick={() => setShowAddImageModal(false)}
+                type="reset"
+                className="px-5 py-2 bg-red-400 text-white"
+              >
+                Exit
               </button>
             </div>
           </form>

@@ -26,6 +26,7 @@ export default function CheckoutPage() {
 
   const [orderCode, setOrderCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [couriers, setCouriers] = useState([]);
   const [selectedCourier, setSelectedCourier] = useState();
@@ -137,7 +138,18 @@ export default function CheckoutPage() {
   }
 
   async function handleCheckout() {
+    if (cartItems.length == 0) {
+      setError("Anda belum memiliki item apapun didalam cart");
+      return;
+    }
+
+    if (!(selectedArea && email && phone && name)) {
+      setError("Mohon lengkapi data diatas");
+      return;
+    }
+
     setLoading(true);
+    setError(false);
     let orderItems = [];
     for (let data of cartItems) {
       orderItems.push({
@@ -166,13 +178,18 @@ export default function CheckoutPage() {
       body: JSON.stringify(payload),
     }).then((r) => r.json());
 
-    localStorage.removeItem("cart");
-
     setLoading(false);
-    setOrderCode(res.data.purchase_details.guest_order_code);
-    window.location.replace(
-      `/checkout/${res.data.purchase_details.guest_order_code}`
-    );
+
+    if (res.status == "success") {
+      localStorage.removeItem("cart");
+
+      setOrderCode(res.data.purchase_details.guest_order_code);
+      window.location.replace(
+        `/checkout/${res.data.purchase_details.guest_order_code}`
+      );
+    } else {
+      setError(res.message);
+    }
   }
   return (
     <>
@@ -255,7 +272,7 @@ export default function CheckoutPage() {
                   <div className="flex gap-2 mb-2">
                     <input
                       type={"text"}
-                      placeholder="Masukkan kata kunci untuk mencari alamat pengiriman"
+                      placeholder="Masukkan kata kunci atau kode pos alamat"
                       onChange={(e) => setAreasSearchText(e.target.value)}
                       className="w-full p-5 outline-none mt-1"
                     />
@@ -436,6 +453,12 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
+
+            {error && (
+              <div className="p-5 border-l-4 border-red-400 bg-white mt-5">
+                Error: {error}
+              </div>
+            )}
 
             <div className="flex justify-end border-y-4 mt-8 p-8">
               <div className="">

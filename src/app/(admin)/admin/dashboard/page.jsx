@@ -9,7 +9,6 @@ export default function AdminDashboardPage() {
     "order",
     "banner",
     "voucher",
-    "link",
     "courier",
     "address",
   ]);

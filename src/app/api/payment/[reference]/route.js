@@ -11,6 +11,9 @@ export async function GET(req, { params }) {
       headers: {
         Authorization: "Bearer " + process.env.TRIPAY_API_KEY,
       },
+      next: {
+        revalidate: 0,
+      },
     }
   );
   const response = await res.json();
