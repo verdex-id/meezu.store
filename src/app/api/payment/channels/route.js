@@ -9,10 +9,16 @@ export async function GET() {
       Authorization: "Bearer " + process.env.TRIPAY_API_KEY,
     },
   });
-  let response = [];
-  response = await res.json();
-  return NextResponse.json({
-    status: 200,
-    data: response?.data.filter((p) => p.active == true),
-  });
+  let response = await res.json();
+  if (response.data.success) {
+    return NextResponse.json({
+      status: 200,
+      data: response?.data.filter((p) => p.active == true),
+    });
+  } else {
+    return NextResponse.json({
+      status: 500,
+      data: [],
+    });
+  }
 }
