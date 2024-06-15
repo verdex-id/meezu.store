@@ -13,6 +13,6 @@ export async function GET() {
   response = await res.json();
   return NextResponse.json({
     status: 200,
-    data: response.data.filter((p) => p.active == true),
+    data: response?.data.filter((p) => p.active == true),
   });
 }
