@@ -10,10 +10,10 @@ export async function GET() {
     },
   });
   let response = await res.json();
-  if (response.data.success) {
+  if (response.success) {
     return NextResponse.json({
       status: 200,
-      data: response?.data.filter((p) => p.active == true),
+      data: response.data.filter((p) => p.active == true),
     });
   } else {
     return NextResponse.json({
