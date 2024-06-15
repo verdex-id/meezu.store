@@ -9,7 +9,8 @@ export async function GET() {
       Authorization: "Bearer " + process.env.TRIPAY_API_KEY,
     },
   });
-  const response = await res.json();
+  let response = [];
+  response = await res.json();
   return NextResponse.json({
     status: 200,
     data: response.data.filter((p) => p.active == true),
