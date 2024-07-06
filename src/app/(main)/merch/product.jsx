@@ -10,7 +10,6 @@ import ChevronDownIcon from "@/icons/chevron_down";
 
 export default function ProductScreen({ products, page }) {
   const [banners, setBanners] = useState([]);
-  console.log(products);
 
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState();

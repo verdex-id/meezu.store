@@ -38,7 +38,6 @@ export async function POST(request, { params }) {
       },
     });
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json(...failResponse(prismaErrorCode[e.code], 409));
     }

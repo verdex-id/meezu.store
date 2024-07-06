@@ -16,7 +16,6 @@ export default function AdminDashboardCourierPage() {
       const res = await fetch("/api/couriers?available=true").then((r) =>
         r.json()
       );
-      console.log(res);
       setCouriers(res.data.courier_companies);
     }
     getCouriers();

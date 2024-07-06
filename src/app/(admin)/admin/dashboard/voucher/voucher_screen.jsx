@@ -7,8 +7,6 @@ import { useState } from "react";
 export default function AdminVoucherScreen({ vouchers }) {
   const cookie = useCookies();
 
-  console.log(vouchers);
-
   const [loading, setLoading] = useState(false);
 
   async function handleDelete(voucherId) {

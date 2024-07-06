@@ -36,7 +36,6 @@ export default function ShipScreen({ order }) {
     if (res.status == "success") {
       window.location.replace("/admin/dashboard/order?filter=confirm_shipping");
     } else {
-      console.log(res);
       setError(
         "Gagal mengirim permintaan Pick-Up. Silahkan datang ke pihak ekspedisi untuk menyerahkan paket."
       );

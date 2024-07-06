@@ -6,12 +6,13 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import Joi from "joi";
 import { NextResponse } from "next/server";
 import fs from "fs";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 
 export async function GET(req, { params }) {
   let banner;
   try {
     const schema = Joi.object({
-      banner_id: Joi.number().integer().required(),
+      banner_id: Joi.string().required(),
     });
     let req = schema.validate({
       banner_id: params.bannerId,
@@ -30,11 +31,11 @@ export async function GET(req, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     return NextResponse.json(...errorResponse());
@@ -52,7 +53,7 @@ export async function PATCH(request, { params }) {
     }
 
     const schema = Joi.object({
-      banner_id: Joi.number().integer().required(),
+      banner_id: Joi.string().required(),
       banner_url: Joi.string().uri().required(),
     });
     let req = await request.json();
@@ -77,11 +78,11 @@ export async function PATCH(request, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -102,7 +103,7 @@ export async function DELETE(request, { params }) {
     }
 
     const schema = Joi.object({
-      banner_id: Joi.number().integer().required(),
+      banner_id: Joi.string().required(),
     });
     let req = schema.validate({
       banner_id: params.bannerId,
@@ -118,16 +119,17 @@ export async function DELETE(request, { params }) {
       },
     });
 
-    fs.unlinkSync("./public" + banner.banner_image_path);
+    // fs.unlinkSync("./public" + banner.banner_image_path);
+    await deleteFromCloudinary(req.banner_id);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -142,6 +144,6 @@ export async function DELETE(request, { params }) {
         banner_id: banner.banner_id,
         banner_url: banner.banner_url,
       },
-    }),
+    })
   );
 }

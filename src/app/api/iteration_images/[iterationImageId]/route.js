@@ -6,12 +6,13 @@ import prisma, { prismaErrorCode } from "@/lib/prisma";
 import Joi from "joi";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import fs from "fs";
+import { deleteFromCloudinary } from "@/lib/cloudinary";
 
 export async function GET(req, { params }) {
   let iterationImage;
   try {
     const schema = Joi.object({
-      iteration_image_id: Joi.number().integer().required(),
+      iteration_image_id: Joi.string().required(),
     });
 
     let req = schema.validate({ iteration_image_id: params.iterationImageId });
@@ -29,11 +30,11 @@ export async function GET(req, { params }) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -43,7 +44,7 @@ export async function GET(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ iteration_image: iterationImage }),
+    ...successResponse({ iteration_image: iterationImage })
   );
 }
 
@@ -56,7 +57,7 @@ export async function DELETE(req, { params }) {
     }
 
     const schema = Joi.object({
-      iteration_image_id: Joi.number().integer().required(),
+      iteration_image_id: Joi.string().required(),
     });
 
     let req = schema.validate({ iteration_image_id: params.iterationImageId });
@@ -71,16 +72,18 @@ export async function DELETE(req, { params }) {
       },
     });
 
-    fs.unlinkSync("./public" + iterationImage.iteration_image_path);
+    // fs.unlinkSync("./public" + iterationImage.iteration_image_path);
+
+    await deleteFromCloudinary(req.iteration_image_id);
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {
@@ -90,6 +93,6 @@ export async function DELETE(req, { params }) {
   }
 
   return NextResponse.json(
-    ...successResponse({ deleted_iteration_image: iterationImage }),
+    ...successResponse({ deleted_iteration_image: iterationImage })
   );
 }

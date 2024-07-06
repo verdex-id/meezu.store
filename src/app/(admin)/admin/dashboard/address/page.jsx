@@ -43,7 +43,6 @@ export default function AdminDashboardAddressPage() {
       r.json()
     );
 
-    console.log(res);
     if (res.status == "success") {
       setAreas(res.data.areas);
     }
@@ -78,7 +77,6 @@ export default function AdminDashboardAddressPage() {
         setSuccess(true);
       }
     } else {
-      console.log(selectedArea);
       const res = await fetch("/api/addresses/origin/1", {
         method: "PUT",
         headers: {

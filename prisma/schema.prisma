@@ -13,67 +13,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model ProductCategory {
-  product_category_id       Int     @unique   @default(autoincrement())  @id
-  product_category_slug     String  @unique   @db.VarChar(50)
-  product_category_name     String  @unique   @db.VarChar(50)
+  product_category_id   Int    @id @unique @default(autoincrement())
+  product_category_slug String @unique @db.VarChar(50)
+  product_category_name String @unique @db.VarChar(50)
 
   products Product[]
 }
 
 model Product {
-  product_id              Int      @default(autoincrement())  @unique  @id
-  product_slug            String   @db.VarChar(70)            @unique
-  product_name            String   @db.VarChar(70)            @unique
-  product_description     String   @db.VarChar(2000)               
-  product_category        ProductCategory     @relation(fields: [product_category_id], references: [product_category_id])
-  product_category_id     Int
-  product_discounts       ProductDiscount?    @relation(name: "ProductToProductDiscount")
-  product_iterations      ProductIteration[]  @relation(name: "ProductToProductIteration")
+  product_id          Int                @id @unique @default(autoincrement())
+  product_slug        String             @unique @db.VarChar(70)
+  product_name        String             @unique @db.VarChar(70)
+  product_description String             @db.VarChar(2000)
+  product_category    ProductCategory    @relation(fields: [product_category_id], references: [product_category_id])
+  product_category_id Int
+  product_discounts   ProductDiscount?   @relation(name: "ProductToProductDiscount")
+  product_iterations  ProductIteration[] @relation(name: "ProductToProductIteration")
 }
 
 model ProductIteration {
-  product_iteration_id      Int                       @default(autoincrement())  @unique  @id
-  product_variant_weight    Int                       // max 500.000 gram / 500 kg
-  product_variant_price     Int                       @db.UnsignedMediumInt
-  product_variant_stock     Int                       @db.UnsignedSmallInt
-  product                   Product                   @relation(name: "ProductToProductIteration", fields: [product_id], references: [product_id], onDelete: Cascade)
-  product_id                Int                
-  iteration_images          IterationImage[]         
-  product_variant_mapping   ProductVariantMapping[]
-  invoice_items             InvoiceItem[]
+  product_iteration_id    Int                     @id @unique @default(autoincrement())
+  product_variant_weight  Int // max 500.000 gram / 500 kg
+  product_variant_price   Int                     @db.UnsignedMediumInt
+  product_variant_stock   Int                     @db.UnsignedSmallInt
+  product                 Product                 @relation(name: "ProductToProductIteration", fields: [product_id], references: [product_id], onDelete: Cascade)
+  product_id              Int
+  iteration_images        IterationImage[]
+  product_variant_mapping ProductVariantMapping[]
+  invoice_items           InvoiceItem[]
 }
 
 model ProductVariantMapping {
-  product_variant_mapping_id    Int              @unique  @default(autoincrement())  @id
-  product_iteration             ProductIteration @relation(fields: [product_iteration_id], references: [product_iteration_id], onDelete: Cascade)
-  product_iteration_id          Int
-  variant                       Variant          @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
-  variant_id                    Int
+  product_variant_mapping_id Int              @id @unique @default(autoincrement())
+  product_iteration          ProductIteration @relation(fields: [product_iteration_id], references: [product_iteration_id], onDelete: Cascade)
+  product_iteration_id       Int
+  variant                    Variant          @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
+  variant_id                 Int
+
   @@unique([product_iteration_id, variant_id])
 }
 
 model VariantType {
-  varian_type_id      Int         @unique   @default(autoincrement())  @id
-  variant_type_name   String      @unique   @db.VarChar(30) 
-  variants            Variant[]
+  varian_type_id    Int       @id @unique @default(autoincrement())
+  variant_type_name String    @unique @db.VarChar(30)
+  variants          Variant[]
 }
 
 model Variant {
-  variant_id                  Int           @unique  @default(autoincrement())  @id
-  variant_slug                String        @unique  @db.VarChar(15) 
-  variant_name                String        @unique  @db.VarChar(15) 
-  varian_type                 VariantType   @relation(fields: [varian_type_id], references: [varian_type_id], onDelete: Cascade)
-  varian_type_id              Int
-  product_variant_mapping       ProductVariantMapping[]
+  variant_id              Int                     @id @unique @default(autoincrement())
+  variant_slug            String                  @unique @db.VarChar(15)
+  variant_name            String                  @unique @db.VarChar(15)
+  varian_type             VariantType             @relation(fields: [varian_type_id], references: [varian_type_id], onDelete: Cascade)
+  varian_type_id          Int
+  product_variant_mapping ProductVariantMapping[]
 }
 
 model IterationImage {
-  iteration_image_id      Int               @default(autoincrement())  @unique  @id
-  iteration_image_path    String  
-  product_iteration       ProductIteration  @relation(fields: [product_iteration_id], references: [product_iteration_id], onDelete: Cascade)
-  product_iteration_id    Int
+  iteration_image_id   String           @id @unique
+  iteration_image_path String
+  product_iteration    ProductIteration @relation(fields: [product_iteration_id], references: [product_iteration_id], onDelete: Cascade)
+  product_iteration_id Int
 }
 
 enum PaymentStatus {
@@ -85,36 +85,36 @@ enum PaymentStatus {
 }
 
 model Invoice {
-  invoice_id                String          @default(cuid())  @unique  @id 
-  invoice_date              DateTime        @default(now())
-  payment_status            PaymentStatus   @default(UNPAID)       
-  payment_date              DateTime?        
-  customer_full_name        String          @db.VarChar(35)
-  customer_phone_number     String          @db.TinyText
-  customer_full_address     String          @db.VarChar(200)
-  discount_amount           Int             @db.UnsignedMediumInt
-  total_weight              Int             // max 500.000 gram / 500 kg\
-  shipping_cost             Int             @db.UnsignedMediumInt
-  gross_price               Int             @db.UnsignedMediumInt
-  net_price                 Int             @db.UnsignedMediumInt
-  order                     Order           @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id], onDelete: Cascade)
-  order_id                  String          @unique
-  invoice_item              InvoiceItem[]
+  invoice_id            String        @id @unique @default(cuid())
+  invoice_date          DateTime      @default(now())
+  payment_status        PaymentStatus @default(UNPAID)
+  payment_date          DateTime?
+  customer_full_name    String        @db.VarChar(35)
+  customer_phone_number String        @db.TinyText
+  customer_full_address String        @db.VarChar(200)
+  discount_amount       Int           @db.UnsignedMediumInt
+  total_weight          Int // max 500.000 gram / 500 kg\
+  shipping_cost         Int           @db.UnsignedMediumInt
+  gross_price           Int           @db.UnsignedMediumInt
+  net_price             Int           @db.UnsignedMediumInt
+  order                 Order         @relation(name: "InvoiceToOrder", fields: [order_id], references: [order_id], onDelete: Cascade)
+  order_id              String        @unique
+  invoice_item          InvoiceItem[]
 }
 
 model InvoiceItem {
-  invoice_item_id             Int       @default(autoincrement())  @unique  @id
-  invoice_item_quantity       Int       @db.UnsignedSmallInt
-  invoice_item_name           String
-  invoice_item_weight         Int       // max 500.000 gram / 500 kg
-  invoice_item_total_weight   Int       // max 500.000 gram / 500 kg
-  invoice_item_price          Int       @db.UnsignedMediumInt
-  invoice_item_total_price    Int       @db.UnsignedMediumInt
+  invoice_item_id           Int    @id @unique @default(autoincrement())
+  invoice_item_quantity     Int    @db.UnsignedSmallInt
+  invoice_item_name         String
+  invoice_item_weight       Int // max 500.000 gram / 500 kg
+  invoice_item_total_weight Int // max 500.000 gram / 500 kg
+  invoice_item_price        Int    @db.UnsignedMediumInt
+  invoice_item_total_price  Int    @db.UnsignedMediumInt
 
-  invoice                     Invoice           @relation(fields: [invoice_id], references: [invoice_id], onDelete: Cascade)
-  invoice_id                  String
-  product_iteration           ProductIteration?  @relation(fields: [product_iteration_id], references: [product_iteration_id])
-  product_iteration_id        Int?
+  invoice              Invoice           @relation(fields: [invoice_id], references: [invoice_id], onDelete: Cascade)
+  invoice_id           String
+  product_iteration    ProductIteration? @relation(fields: [product_iteration_id], references: [product_iteration_id])
+  product_iteration_id Int?
 }
 
 enum OrderStatus {
@@ -133,161 +133,158 @@ enum OrderStatus {
 }
 
 model Order {
-  order_id            String        @default(cuid())  @unique  @id
-  order_code          String        @default(cuid())  @unique
-  discount_code       String?
-  order_date          DateTime      @default(now())
-  order_status        OrderStatus   @default(AWAITING_PAYMENT)
-  note_for_seller     String?       @db.VarChar(150)
+  order_id        String      @id @unique @default(cuid())
+  order_code      String      @unique @default(cuid())
+  discount_code   String?
+  order_date      DateTime    @default(now())
+  order_status    OrderStatus @default(AWAITING_PAYMENT)
+  note_for_seller String?     @db.VarChar(150)
 
-  
-
-  guest_order         GuestOrder?   @relation(name: "GuestOrderToOrder")
-  invoice             Invoice?      @relation(name: "InvoiceToOrder")
-  shipment            Shipment?
-  payment             Payment?
+  guest_order GuestOrder? @relation(name: "GuestOrderToOrder")
+  invoice     Invoice?    @relation(name: "InvoiceToOrder")
+  shipment    Shipment?
+  payment     Payment?
 }
 
 model Payment {
-  payment_id                String     @unique   @default(cuid())  @id
-  paygate_transaction_id    String               // tripay transaction reference code
-  payment_method            String
+  payment_id             String @id @unique @default(cuid())
+  paygate_transaction_id String // tripay transaction reference code
+  payment_method         String
 
-  order                     Order                @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  order_id                  String     @unique
+  order    Order  @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  order_id String @unique
 }
 
 model Shipment {
-  shipment_id             String      @unique  @default(cuid())  @id
-  expedition_order_id     String?     @unique           // biteship order id
-  courier_tracking_id     String?
-  courier_waybill_id      String?
-  shipment_status         String?
-  shipment_date           DateTime?
+  shipment_id         String    @id @unique @default(cuid())
+  expedition_order_id String?   @unique // biteship order id
+  courier_tracking_id String?
+  courier_waybill_id  String?
+  shipment_status     String?
+  shipment_date       DateTime?
 
-  cash_on_delivery_fee    Int         @db.UnsignedMediumInt   @default(0)
-  proof_of_delivery_fee   Int         @db.UnsignedMediumInt   @default(0)
-  shippment_fee           Int         @db.UnsignedMediumInt   @default(0)
-  price                   Int         @db.UnsignedMediumInt   @default(0)
+  cash_on_delivery_fee  Int @default(0) @db.UnsignedMediumInt
+  proof_of_delivery_fee Int @default(0) @db.UnsignedMediumInt
+  shippment_fee         Int @default(0) @db.UnsignedMediumInt
+  price                 Int @default(0) @db.UnsignedMediumInt
 
+  destination_area_id String
+  courier             Courier?       @relation(fields: [courier_id], references: [courier_id])
+  courier_id          Int?
+  origin_address      OriginAddress? @relation(fields: [origin_address_id], references: [origin_address_id])
+  origin_address_id   Int?
 
-  destination_area_id     String
-  courier                 Courier?          @relation(fields: [courier_id], references: [courier_id])
-  courier_id              Int?
-  origin_address          OriginAddress?    @relation(fields: [origin_address_id], references: [origin_address_id])
-  origin_address_id       Int?  
-              
-  order                   Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  order_id                String  @unique
+  order    Order  @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  order_id String @unique
 }
 
 model Courier {
-  courier_id              Int  @unique  @default(autoincrement())  @id
-  courier_name            String
-  courier_code            String
-  courier_service_name    String
-  courier_service_code    String
+  courier_id           Int    @id @unique @default(autoincrement())
+  courier_name         String
+  courier_code         String
+  courier_service_name String
+  courier_service_code String
 
-  shipments               Shipment[]
+  shipments Shipment[]
+
   @@unique([courier_code, courier_service_code])
 }
 
 model GuestOrder {
-  guest_order_id              Int      @unique   @default(autoincrement())  @id 
-  guest_email                 String             @db.VarChar(75)
-  guest_note_for_courier      String?            @db.VarChar(45)
-  
-  order                       Order              @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id], onDelete: Cascade)
-  order_id                    String   @unique
+  guest_order_id         Int     @id @unique @default(autoincrement())
+  guest_email            String  @db.VarChar(75)
+  guest_note_for_courier String? @db.VarChar(45)
+
+  order    Order  @relation(name: "GuestOrderToOrder", fields: [order_id], references: [order_id], onDelete: Cascade)
+  order_id String @unique
 }
 
 model Discount {
-  discount_id               Int        @default(autoincrement())  @unique @id
-  discount_code             String                                @unique
-  discount_value            Int        @db.UnsignedMediumInt
-  is_percent_discount       Boolean
-  maximum_discount_amount   Int        @db.UnsignedMediumInt
-  is_limited                Boolean
-  usage_limits              Int        @db.UnsignedSmallInt
-  number_of_uses            Int        @db.UnsignedSmallInt
+  discount_id             Int     @id @unique @default(autoincrement())
+  discount_code           String  @unique
+  discount_value          Int     @db.UnsignedMediumInt
+  is_percent_discount     Boolean
+  maximum_discount_amount Int     @db.UnsignedMediumInt
+  is_limited              Boolean
+  usage_limits            Int     @db.UnsignedSmallInt
+  number_of_uses          Int     @db.UnsignedSmallInt
 
-
-  product_discount          ProductDiscount?
-  threshold_discount        ThresholdDiscount?
-  limited_time_discount     LimitedTimeDiscount?
-  daily_discount            DailyDiscount?
+  product_discount      ProductDiscount?
+  threshold_discount    ThresholdDiscount?
+  limited_time_discount LimitedTimeDiscount?
+  daily_discount        DailyDiscount?
 }
 
 model ThresholdDiscount {
-  threshold_discount_id    Int         @unique   @default(autoincrement())  @id 
-  minimum_amount           Int                   @db.UnsignedMediumInt
+  threshold_discount_id Int @id @unique @default(autoincrement())
+  minimum_amount        Int @db.UnsignedMediumInt
 
-  discount                 Discount              @relation(fields: [discount_id], references: [discount_id])
-  discount_id              Int         @unique
+  discount    Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int      @unique
 }
 
 model LimitedTimeDiscount {
-  limited_time_discount_id    Int         @unique   @default(autoincrement())  @id 
-  from_date                   DateTime
-  to_date                     DateTime
+  limited_time_discount_id Int      @id @unique @default(autoincrement())
+  from_date                DateTime
+  to_date                  DateTime
 
-  discount                    Discount              @relation(fields: [discount_id], references: [discount_id])
-  discount_id                 Int         @unique
+  discount    Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int      @unique
 }
 
 model DailyDiscount {
-  daily_discount_id    Int       @unique  @default(autoincrement())  @id
-  from_hour            Int 
-  to_hour              Int
+  daily_discount_id Int @id @unique @default(autoincrement())
+  from_hour         Int
+  to_hour           Int
 
-  discount             Discount           @relation(fields: [discount_id], references: [discount_id])
-  discount_id          Int       @unique
+  discount    Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int      @unique
 }
 
 model ProductDiscount {
-  product_discount_id    Int       @unique   @default(autoincrement())  @id 
-  product                Product             @relation(name: "ProductToProductDiscount", fields: [product_id], references: [product_id])
-  product_id             Int       @unique
+  product_discount_id Int     @id @unique @default(autoincrement())
+  product             Product @relation(name: "ProductToProductDiscount", fields: [product_id], references: [product_id])
+  product_id          Int     @unique
 
-  discount               Discount            @relation(fields: [discount_id], references: [discount_id])
-  discount_id            Int       @unique
+  discount    Discount @relation(fields: [discount_id], references: [discount_id])
+  discount_id Int      @unique
 }
 
 model OriginAddress {
-  origin_address_id      Int        @unique          @default(autoincrement())  @id 
-  phone_number          String     @db.TinyText
-  address               String     @db.VarChar(200)
-  province              String     @db.VarChar(40)
-  city                  String     @db.VarChar(40)
-  district              String     @db.VarChar(40)
-  postal_code           String     @db.TinyText
-  area_id               String
-  is_active             Boolean    @default(false)
+  origin_address_id Int     @id @unique @default(autoincrement())
+  phone_number      String  @db.TinyText
+  address           String  @db.VarChar(200)
+  province          String  @db.VarChar(40)
+  city              String  @db.VarChar(40)
+  district          String  @db.VarChar(40)
+  postal_code       String  @db.TinyText
+  area_id           String
+  is_active         Boolean @default(false)
 
-  shipments             Shipment[]
+  shipments Shipment[]
 }
 
 model Admin {
-  admin_id                  String     @unique  @default(cuid())  @id 
-  admin_full_name           String              @db.VarChar(35)
-  admin_hashedPassword      String
-  admin_email               String     @unique  @db.VarChar(75)       
-  admin_created_at          DateTime            @default(now())
-  sessions                  Session[]
+  admin_id             String    @id @unique @default(cuid())
+  admin_full_name      String    @db.VarChar(35)
+  admin_hashedPassword String
+  admin_email          String    @unique @db.VarChar(75)
+  admin_created_at     DateTime  @default(now())
+  sessions             Session[]
 }
 
 model Session {
-  session_id        String      @default(cuid())  @unique  @id
-  refresh_token     String      @default(uuid())  @db.Text
-  is_blocked        Boolean     @default(false)
-  created_at        DateTime    @default(now())
-  expired_at        DateTime
-  admin             Admin?      @relation(fields: [admin_id], references: [admin_id])
-  admin_id          String?
+  session_id    String   @id @unique @default(cuid())
+  refresh_token String   @default(uuid()) @db.Text
+  is_blocked    Boolean  @default(false)
+  created_at    DateTime @default(now())
+  expired_at    DateTime
+  admin         Admin?   @relation(fields: [admin_id], references: [admin_id])
+  admin_id      String?
 }
 
 model Banner {
-  banner_id     Int   @unique   @default(autoincrement())  @id
-  banner_image_path    String
-  banner_url           String?
+  banner_id         String  @id @unique
+  banner_image_path String
+  banner_url        String?
 }

@@ -6,6 +6,8 @@ import { FailError } from "@/utils/custom-error";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
+import { generateRandomString } from "@/utils/random";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export async function GET() {
   let banners;
@@ -15,11 +17,11 @@ export async function GET() {
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     return NextResponse.json(...errorResponse());
@@ -52,52 +54,69 @@ export async function POST(request) {
       throw new FailError(
         "Invalid file name",
         400,
-        "Only one dot in file name is allowed",
+        "Only one dot in file name is allowed"
       );
     }
 
     if (!isMatch(imageType, file.type)) {
       throw new FailError(
         "Invalid file type. Please upload an image file",
-        415,
+        415
       );
     }
 
     if (file.size > sizeLimit) {
       throw new FailError(
         `File size exceeds the maximum limit of ${limit}MB`,
-        413,
+        413
       );
     }
 
-    const newFileName =
-      new Date().getTime() + "." + getFileExtension(file.name);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const savePath = path.join("public" + saveLocation + newFileName);
-    await writeFile(savePath, buffer);
+    // const newFileName =
+    //   new Date().getTime() + "." + getFileExtension(file.name);
+    // const buffer = Buffer.from(await file.arrayBuffer());
+    // const savePath = path.join("public" + saveLocation + newFileName);
+    // await writeFile(savePath, buffer);
 
-    banner = await prisma.banner.create({
-      data: {
-        banner_image_path: saveLocation + newFileName,
-      },
-    });
+    const fileBuffer = await file.arrayBuffer();
+
+    const mimeType = file.type;
+    const encoding = "base64";
+    const base64Data = Buffer.from(fileBuffer).toString("base64");
+    const fileUri = "data:" + mimeType + ";" + encoding + "," + base64Data;
+
+    const public_id = generateRandomString(12);
+    const folder = "banners";
+
+    const res = await uploadToCloudinary(fileUri, folder, file.name, public_id);
+
+    if (res.success && res.result) {
+      banner = await prisma.banner.create({
+        data: {
+          banner_id: public_id,
+          banner_image_path: res.result.secure_url,
+        },
+      });
+    } else {
+      throw new Error("failed upload image on cloudinary");
+    }
   } catch (e) {
     if (
       e instanceof TypeError &&
       e.message.includes("Could not parse content as FormData")
     ) {
       return NextResponse.json(
-        ...failResponse("Invalid image file", 400, e.message),
+        ...failResponse("Invalid image file", 400, e.message)
       );
     }
     if (e instanceof PrismaClientKnownRequestError) {
       if (e.code === "P2025") {
         return NextResponse.json(
-          ...failResponse(`${e.meta.modelName} not found`, 404),
+          ...failResponse(`${e.meta.modelName} not found`, 404)
         );
       }
       return NextResponse.json(
-        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName),
+        ...failResponse(prismaErrorCode[e.code], 409, e.meta.modelName)
       );
     }
     if (e instanceof FailError) {

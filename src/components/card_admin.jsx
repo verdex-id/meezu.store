@@ -7,10 +7,14 @@ export default function CardAdmin({ product, ...props }) {
       <div className="bg-white w-full max-w-sm mx-auto p-5" {...props}>
         <div className="grid grid-cols-4 gap-2 justify-between">
           <Image
-            src={"/banner/banner_1.png"}
+            src={
+              product.product_iterations[0]?.iteration_images[0]
+                ?.iteration_image_path || ""
+            }
             width={1080}
             height={1080}
             className="object-cover aspect-square"
+            alt="Image"
           />
           <div className="col-span-2">
             <h1 className="font-bold">{product.product_name}</h1>

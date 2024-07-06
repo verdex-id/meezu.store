@@ -7,6 +7,8 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import prisma, { prismaErrorCode } from "@/lib/prisma";
 import { fetchAdminIfAuthorized } from "@/utils/check-admin";
 import Joi from "joi";
+import { uploadToCloudinary } from "@/lib/cloudinary";
+import { generateRandomString } from "@/utils/random";
 
 export async function GET(request) {
   let iterationImages;
@@ -125,18 +127,35 @@ export async function POST(request) {
       );
     }
 
-    const newFileName =
-      new Date().getTime() + "." + getFileExtension(file.name);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const savePath = path.join("public" + saveLocation + newFileName);
-    await writeFile(savePath, buffer);
+    const fileBuffer = await file.arrayBuffer();
 
-    iterationImage = await prisma.iterationImage.create({
-      data: {
-        iteration_image_path: saveLocation + newFileName,
-        product_iteration_id: req.product_iteration_id,
-      },
-    });
+    const mimeType = file.type;
+    const encoding = "base64";
+    const base64Data = Buffer.from(fileBuffer).toString("base64");
+    const fileUri = "data:" + mimeType + ";" + encoding + "," + base64Data;
+
+    // const newFileName =
+    //   new Date().getTime() + "." + getFileExtension(file.name);
+    // const buffer = Buffer.from(await file.arrayBuffer());
+    // const savePath = path.join("public" + saveLocation + newFileName);
+    // await writeFile(savePath, buffer);
+
+    const public_id = generateRandomString(12);
+    const folder = "iteration_images";
+
+    const res = await uploadToCloudinary(fileUri, folder, file.name, public_id);
+
+    if (res.success && res.result) {
+      iterationImage = await prisma.iterationImage.create({
+        data: {
+          iteration_image_id: folder + "-" + public_id,
+          iteration_image_path: res.result.secure_url,
+          product_iteration_id: req.product_iteration_id,
+        },
+      });
+    } else {
+      throw new Error("failed upload image on cloudinary");
+    }
   } catch (e) {
     if (
       e instanceof TypeError &&

@@ -39,8 +39,6 @@ export default function AddIterationImageModal({
 
     setLoading(false);
 
-    console.log(res);
-
     if (res.status == "success") {
       window.location.reload();
       setShowAddImageModal(false);
